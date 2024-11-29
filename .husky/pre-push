@@ -24,7 +24,7 @@ run_tests () {
   fi
 }
 
-# run_branch_name_validation
+run_branch_name_validation
 # run_tests
 
 printf "${BASIC_GREEN} ✔ All checks have passed. Happy coding!${ENDCOLOR}\n"
