@@ -38,10 +38,16 @@ styles:
       - any-glob-to-any-file: '**/*.scss'
 
 sprint1:
-  - head-branch: 'tu-01'
+  - head-branch: 'RS-01'
 
 sprint2:
-  - head-branch: 'tu-02'
+  - head-branch: 'RS-02'
 
 sprint3:
-  - head-branch: 'tu-03'
+  - head-branch: 'RS-03'
+
+sprint4:
+  - head-branch: 'RS-04'
+
+sprint5:
+  - head-branch: 'RS-05'

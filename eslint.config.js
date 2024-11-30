@@ -37,6 +37,7 @@ const customRules = {
   'class-methods-use-this': 'off',
   curly: ['error', 'all'],
   'dot-notation': 'off',
+  'implicit-arrow-linebreak': 'off',
   'import/extensions': [
     'error',
     'ignorePackages',
@@ -57,14 +58,26 @@ const customRules = {
       ],
     },
   ],
+  'max-len': ['error', { code: 120, ignoreComments: true }],
   'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
   'no-empty-function': 'error',
   'no-unused-vars': 'off',
+  'object-curly-newline': 'off',
   'unused-imports/no-unused-imports': 'error',
 };
 
 export default [
-  { ignores: ['eslint.config.js', '**/.angular/**', '**/dist/**', '.validate-branch-name.cjs'] },
+  {
+    ignores: [
+      'eslint.config.js',
+      '**/.angular/**',
+      '**/coverage/**',
+      '**/dist/**',
+      '.validate-branch-namerc.cjs',
+      'jest.config.ts',
+      'setup-jest.ts',
+    ],
+  },
   ...compat.extends('airbnb-base'),
   ...tsEslint.configs.strictTypeChecked,
   ...tsEslint.configs.stylisticTypeChecked,

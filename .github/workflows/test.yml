@@ -1,19 +1,12 @@
-name: Format
+name: Test
 
 on:
   pull_request:
-    branches:
-      - develop
-      - sprint-1
-      - sprint-2
-      - sprint-3
-      - sprint-4
-      - sprint-5
+    types: [opened]
 
 jobs:
-  format:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,5 +19,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Format code with Prettier
-        run: npm run ci:format
+      - name: Run Jest tests
+        run: npm test
+
+      - name: Generate coverage report
+        run: npm run test:coverage

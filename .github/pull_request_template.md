@@ -3,10 +3,10 @@
 📍 conforms with the following format:
 
 - [ ] prefix (following the [convention](https://www.conventionalcommits.org/en/v1.0.0-beta.2/): `feat`, `fix`, `hotfix`, `chore`, `refactor`, `revert`, `docs`, `style`, `test`)
-- [ ] sprint and issue number (e.g. `tu-01-02`, where `01` - is the sprint number and `02` - is the issue number)
+- [ ] sprint and issue number (e.g. `RS-01-02`, where `01` - is the sprint number and `02` - is the issue number)
 - [ ] short description
 
-👀 Example: `feat(tu-01-02): description`
+👀 Example: `feat(RS-01-02): description`
 
 ## PR Description 🧙‍♂️
 
@@ -37,15 +37,15 @@ Specify if any documentation updates are required and provide details on what ne
 ## Auto-Review 🤖
 
 - [x] The reviewers have been requested 📝
-      [![Request Review on PR Open](https://github.com/kleostro/tu-tu/actions/workflows/request_review.yml/badge.svg)](https://github.com/kleostro/tu-tu/actions/workflows/request_review.yml)
+      [![Request Review on PR Open](https://github.com/kleostro/RSSence-frontend/actions/workflows/request_review.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/request_review.yml)
 - [x] The labels have been added 🎨
-      [![Pull Request Labeler](https://github.com/kleostro/tu-tu/actions/workflows/labeler.yml/badge.svg)](https://github.com/kleostro/tu-tu/actions/workflows/labeler.yml)
+      [![Pull Request Labeler](https://github.com/kleostro/RSSence-frontend/actions/workflows/labeler.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/labeler.yml)
 - [x] My code doesn't generate any errors or warnings ⚠️
-      [![Code Formatter](https://github.com/kleostro/tu-tu/actions/workflows/format.yml/badge.svg)](https://github.com/kleostro/tu-tu/actions/workflows/format.yml)
+      [![Code Formatter](https://github.com/kleostro/RSSence-frontend/actions/workflows/format.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/format.yml)
 - [x] My code passes all tests 🧪
-      [![Test](https://github.com/kleostro/tu-tu/actions/workflows/test.yml/badge.svg)](https://github.com/kleostro/tu-tu/actions/workflows/test.yml)
+      [![Test](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml)
 - [x] My code builds successfully ⚙️
-      [![Netlify Status](https://api.netlify.com/api/v1/badges/9704b9db-b410-40b1-8d2b-2eeed828626e/deploy-status)](https://app.netlify.com/sites/mad-wizards-tu-tu/deploys)
+      [![Netlify Status](https://api.netlify.com/api/v1/badges/8a371eed-836c-40ad-9a77-8f317c8300da/deploy-status)](https://app.netlify.com/sites/stunning-cactus-e40713/deploys)
 
 ## Self-Check 🌟
 
