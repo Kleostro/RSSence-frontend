@@ -5,6 +5,7 @@ ci:
           - any-glob-to-any-file: '.husky/*'
           - any-glob-to-any-file: '.husky_scripts/*'
           - any-glob-to-any-file: '.lintstagedrc'
+          - any-glob-to-any-file: '.commitlintrc.json'
           - any-glob-to-any-file: '.validate-branch-name.cjs'
       - head-branch:
           - '^ci'
