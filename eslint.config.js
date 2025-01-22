@@ -149,11 +149,11 @@ export default [
   // TypeScript test files configuration
   {
     name: 'test files',
-    files: ['*.spec.ts'],
+    files: ['**/*.spec.ts'],
     rules: {
-      '@typescript-eslint/consistent-type-assertions': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'max-lines-per-function': 'off',
+      '@typescript-eslint/consistent-type-assertions': 'off',
     },
   },
 ];
