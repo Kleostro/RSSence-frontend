@@ -90,5 +90,8 @@
         "analytics": "0778deeb-a65a-4705-b12e-46ec318e379b"
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
