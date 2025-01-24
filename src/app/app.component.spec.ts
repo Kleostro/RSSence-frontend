@@ -30,4 +30,10 @@ describe('AppComponent', () => {
   it('should create the app', () => {
     expect(app).toBeTruthy();
   });
+
+  it('should initialize themeSwitchService on component creation', () => {
+    expect(app.themeSwitchService).toBeDefined();
+    expect(mockThemeSwitchService.toggle).not.toHaveBeenCalled();
+    expect(mockThemeSwitchService.darkMode).toHaveBeenCalled();
+  });
 });
