@@ -1,3 +1,4 @@
-<tui-root>
+<tui-root [attr.tuiTheme]="themeSwitchService.darkMode() ? 'dark' : null">
+  <app-header />
   <router-outlet />
 </tui-root>
