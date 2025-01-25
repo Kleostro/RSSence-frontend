@@ -13,7 +13,5 @@ import { ThemeSwitchService } from './core/services/theme-switch/theme-switch.se
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  public readonly title = 'RSSence-frontend';
-
   public themeSwitchService = inject(ThemeSwitchService);
 }

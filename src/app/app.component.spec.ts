@@ -31,10 +31,6 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it("should have the 'RSSence-frontend' title", () => {
-    expect(app.title).toEqual('RSSence-frontend');
-  });
-
   it('should initialize themeSwitchService on component creation', () => {
     expect(app.themeSwitchService).toBeDefined();
     expect(mockThemeSwitchService.toggle).not.toHaveBeenCalled();
