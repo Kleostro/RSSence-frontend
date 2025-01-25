@@ -4,6 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
+import { AuthResponse } from '@/app/api/types/auth-response';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -12,7 +13,7 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class SignUpService {
   private readonly http = inject(HttpClient);
 
-  public register(email: string, password: string): Observable<unknown> {
-    return this.http.post<unknown>(`${ENVIRONMENT.API_URL}${ENDPOINTS.SIGN_UP}`, { email, password });
+  public register(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.SIGN_UP}`, { email, password });
   }
 }
