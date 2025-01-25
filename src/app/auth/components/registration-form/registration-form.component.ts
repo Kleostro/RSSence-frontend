@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
-import { TuiButton, TuiError, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
+import { TuiAppearance, TuiButton, TuiError, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
 import { TuiFieldErrorPipe } from '@taiga-ui/kit';
 import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
 
@@ -15,6 +15,7 @@ import { passwordsMatchValidator } from '../../validators/validators';
 @Component({
   selector: 'app-registration-form',
   imports: [
+    TuiAppearance,
     AsyncPipe,
     ReactiveFormsModule,
     TuiButton,
@@ -56,7 +57,7 @@ export class RegistrationFormComponent {
             String(this.form.controls.password.value),
           ),
         );
-        // TBD: replace with notifications later
+        // TBD: replace with notifications
         // eslint-disable-next-line no-console
         console.log('Registration successful');
       } catch (err) {
