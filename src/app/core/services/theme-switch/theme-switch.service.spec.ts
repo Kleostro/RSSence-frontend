@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { WA_LOCAL_STORAGE, WA_WINDOW } from '@ng-web-apis/common';
 
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TUI_DARK_MODE, TUI_DARK_MODE_KEY } from '@taiga-ui/core';
-
-import { ThemeSwitchService } from './theme-switch.service';
 
 describe('ThemeSwitchService', () => {
   let service: ThemeSwitchService;

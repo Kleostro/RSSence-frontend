@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
 import { TuiButton } from '@taiga-ui/core';
-
-import { ThemeSwitchService } from '../../services/theme-switch/theme-switch.service';
 
 @Component({
   selector: 'app-header',

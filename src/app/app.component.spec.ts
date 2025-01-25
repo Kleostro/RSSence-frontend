@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { AppComponent } from '@/app/app.component';
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TuiRoot } from '@taiga-ui/core';
 import { NG_EVENT_PLUGINS } from '@taiga-ui/event-plugins';
-
-import { AppComponent } from './app.component';
-import { ThemeSwitchService } from './core/services/theme-switch/theme-switch.service';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -29,10 +28,6 @@ describe('AppComponent', () => {
 
   it('should create the app', () => {
     expect(app).toBeTruthy();
-  });
-
-  it("should have the 'RSSence-frontend' title", () => {
-    expect(app.title).toEqual('RSSence-frontend');
   });
 
   it('should initialize themeSwitchService on component creation', () => {

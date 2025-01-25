@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
+import { HeaderComponent } from '@/app/core/components/header/header.component';
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
 import { TuiButton } from '@taiga-ui/core';
-
-import { ThemeSwitchService } from '../../services/theme-switch/theme-switch.service';
-import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;

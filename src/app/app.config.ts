@@ -1,10 +1,10 @@
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 
+import { routes } from '@/app/app.routes';
 import { NG_EVENT_PLUGINS } from '@taiga-ui/event-plugins';
-
-import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,5 +17,6 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
+    provideHttpClient(withInterceptors([])),
   ],
 };

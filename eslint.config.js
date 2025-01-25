@@ -1,4 +1,5 @@
 import angular from 'angular-eslint';
+import eslintPluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import unusedImports from 'eslint-plugin-unused-imports';
 import path from 'path';
 import tsEslint from 'typescript-eslint';
@@ -31,6 +32,19 @@ const customRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-floating-promises': 'off',
   '@typescript-eslint/no-inferrable-types': 'error',
+  '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      args: 'all',
+      argsIgnorePattern: '^_',
+      caughtErrors: 'all',
+      caughtErrorsIgnorePattern: '^_',
+      destructuredArrayIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      ignoreRestSiblings: true,
+    },
+  ],
   '@typescript-eslint/no-use-before-define': 'error',
   '@typescript-eslint/prefer-for-of': 'off',
   '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
@@ -61,6 +75,10 @@ const customRules = {
   'max-len': ['error', { code: 120, ignoreComments: true }],
   'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
   'no-empty-function': 'error',
+  'no-relative-import-paths/no-relative-import-paths': [
+    'error',
+    { allowSameFolder: false, rootDir: 'src', prefix: '@' },
+  ],
   'no-unused-vars': 'off',
   'object-curly-newline': 'off',
   'unused-imports/no-unused-imports': 'error',
@@ -98,6 +116,7 @@ export default [
     },
     plugins: {
       'unused-imports': unusedImports,
+      'no-relative-import-paths': eslintPluginNoRelativeImportPaths,
     },
     rules: {
       ...customRules,

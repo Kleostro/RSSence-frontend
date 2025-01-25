@@ -10,6 +10,10 @@ const config: Config = {
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: ['<rootDir>/dist/', 'node_modules/(?!(.*\\.mjs$))'],
   resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  moduleFileExtensions: ['ts', 'js', 'html', 'json', 'scss'],
 };
 
 export default config;
