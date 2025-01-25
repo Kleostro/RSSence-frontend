@@ -28,6 +28,10 @@ export class NavigationService {
     this.location.back();
   }
 
+  public navigateToLogin(): void {
+    this.router.navigate([APP_ROUTE.LOGIN]);
+  }
+
   public updateQueryParams(params: Params): void {
     this.router.navigate([], {
       queryParams: params,

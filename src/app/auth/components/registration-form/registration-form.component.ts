@@ -1,11 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { firstValueFrom } from 'rxjs';
 
-import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
+import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { passwordsMatchValidator } from '@/app/auth/validators/validators';
+import { trimData } from '@/app/utils/trim-data';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
 import { TuiAppearance, TuiButton, TuiError, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
 import { TuiFieldErrorPipe } from '@taiga-ui/kit';
@@ -33,14 +34,16 @@ import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent {
-  private readonly signUpService = inject(SignUpService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
+
+  public isRegistrationInProgress = signal(false);
 
   public form = this.fb.nonNullable.group(
     {
       email: ['', [Validators.email, Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirm: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
+      confirm: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
     },
     {
       validators: passwordsMatchValidator,
@@ -48,21 +51,40 @@ export class RegistrationFormComponent {
   );
 
   public async onSubmit(): Promise<void> {
-    if (this.form.valid) {
-      try {
-        await firstValueFrom(
-          this.signUpService.register(
-            String(this.form.controls.email.value),
-            String(this.form.controls.password.value),
-          ),
-        );
-        // TBD: replace with notifications
-        // eslint-disable-next-line no-console
-        console.log('Registration successful');
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Registration failed', err);
-      }
+    this.form.markAllAsTouched();
+
+    if (!this.form.valid) {
+      return;
     }
+
+    this.isRegistrationInProgress.set(true);
+
+    try {
+      const { email, password } = this.getTrimmedFormData();
+      await this.registerUser(email, password);
+      this.showSuccessNotification();
+    } catch (error) {
+      this.handleRegistrationError(error);
+    } finally {
+      this.isRegistrationInProgress.set(false);
+    }
+  }
+
+  private getTrimmedFormData(): { email: string; password: string } {
+    return trimData(this.form.getRawValue());
+  }
+
+  private async registerUser(email: string, password: string): Promise<void> {
+    await firstValueFrom(this.authService.register({ email, password }));
+  }
+
+  private showSuccessNotification(): void {
+    // eslint-disable-next-line no-console
+    console.log('Registration successful');
+  }
+
+  private handleRegistrationError(error: unknown): void {
+    // eslint-disable-next-line no-console
+    console.error('Registration failed', error);
   }
 }
