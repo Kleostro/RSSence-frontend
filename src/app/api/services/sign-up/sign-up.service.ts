@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { catchError, Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -12,8 +13,6 @@ export class SignUpService {
   private readonly http = inject(HttpClient);
 
   public register(email: string, password: string): Observable<unknown> {
-    return this.http
-      .post<unknown>(`${ENVIRONMENT.API_URL}auth/register`, { email, password })
-      .pipe(catchError(() => throwError(() => new Error('Failed to register. Please try again later.'))));
+    return this.http.post<unknown>(`${ENVIRONMENT.API_URL}${ENDPOINTS.SIGN_UP}`, { email, password });
   }
 }

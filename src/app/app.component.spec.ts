@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { AppComponent } from '@/app/app.component';
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TuiRoot } from '@taiga-ui/core';
 import { NG_EVENT_PLUGINS } from '@taiga-ui/event-plugins';
-
-import { AppComponent } from './app.component';
-import { ThemeSwitchService } from './core/services/theme-switch/theme-switch.service';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;

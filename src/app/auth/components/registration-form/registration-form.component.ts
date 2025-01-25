@@ -5,12 +5,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
+import { passwordsMatchValidator } from '@/app/auth/validators/validators';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
 import { TuiAppearance, TuiButton, TuiError, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
 import { TuiFieldErrorPipe } from '@taiga-ui/kit';
 import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
-
-import { passwordsMatchValidator } from '../../validators/validators';
 
 @Component({
   selector: 'app-registration-form',

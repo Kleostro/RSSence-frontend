@@ -4,7 +4,7 @@ import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 
 import { filter } from 'rxjs';
 
-import { APP_ROUTE } from './routes';
+import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 
 @Injectable({
   providedIn: 'root',

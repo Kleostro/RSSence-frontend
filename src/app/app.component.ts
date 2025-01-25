@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { HeaderComponent } from '@/app/core/components/header/header.component';
+import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 import { TuiRoot } from '@taiga-ui/core';
-
-import { HeaderComponent } from './core/components/header/header.component';
-import { ThemeSwitchService } from './core/services/theme-switch/theme-switch.service';
 
 @Component({
   selector: 'app-root',

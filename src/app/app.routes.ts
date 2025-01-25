@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { APP_PATH } from './core/services/navigation/routes';
+import { APP_PATH } from '@/app/core/services/navigation/routes';
 
 export const routes: Routes = [
   {

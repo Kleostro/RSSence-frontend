@@ -1,4 +1,5 @@
 import angular from 'angular-eslint';
+import eslintPluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import unusedImports from 'eslint-plugin-unused-imports';
 import path from 'path';
 import tsEslint from 'typescript-eslint';
@@ -61,6 +62,10 @@ const customRules = {
   'max-len': ['error', { code: 120, ignoreComments: true }],
   'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
   'no-empty-function': 'error',
+  'no-relative-import-paths/no-relative-import-paths': [
+    'error',
+    { allowSameFolder: false, rootDir: 'src', prefix: '@' },
+  ],
   'no-unused-vars': 'off',
   'object-curly-newline': 'off',
   'unused-imports/no-unused-imports': 'error',
@@ -98,6 +103,7 @@ export default [
     },
     plugins: {
       'unused-imports': unusedImports,
+      'no-relative-import-paths': eslintPluginNoRelativeImportPaths,
     },
     rules: {
       ...customRules,
