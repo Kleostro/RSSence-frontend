@@ -32,6 +32,18 @@ const customRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-floating-promises': 'off',
   '@typescript-eslint/no-inferrable-types': 'error',
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      args: 'all',
+      argsIgnorePattern: '^_',
+      caughtErrors: 'all',
+      caughtErrorsIgnorePattern: '^_',
+      destructuredArrayIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      ignoreRestSiblings: true,
+    },
+  ],
   '@typescript-eslint/no-use-before-define': 'error',
   '@typescript-eslint/prefer-for-of': 'off',
   '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
