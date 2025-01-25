@@ -32,6 +32,7 @@ const customRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-floating-promises': 'off',
   '@typescript-eslint/no-inferrable-types': 'error',
+  '@typescript-eslint/no-unnecessary-type-parameters': 'off',
   '@typescript-eslint/no-unused-vars': [
     'error',
     {

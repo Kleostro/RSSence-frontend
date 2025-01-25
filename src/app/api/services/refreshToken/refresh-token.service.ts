@@ -14,6 +14,6 @@ export class RefreshTokenService {
   private readonly http = inject(HttpClient);
 
   public refreshToken(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`);
+    return this.http.post<AuthResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`, null);
   }
 }

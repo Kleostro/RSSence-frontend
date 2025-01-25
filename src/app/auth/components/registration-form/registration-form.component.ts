@@ -60,7 +60,7 @@ export class RegistrationFormComponent {
     this.isRegistrationInProgress.set(true);
 
     try {
-      const { email, password } = this.getTrimmedFormData();
+      const { email, password } = trimData(this.form.getRawValue());
       await this.registerUser(email, password);
       this.showSuccessNotification();
     } catch (error) {
@@ -68,10 +68,6 @@ export class RegistrationFormComponent {
     } finally {
       this.isRegistrationInProgress.set(false);
     }
-  }
-
-  private getTrimmedFormData(): { email: string; password: string } {
-    return trimData(this.form.getRawValue());
   }
 
   private async registerUser(email: string, password: string): Promise<void> {

@@ -10,10 +10,10 @@ import { ENVIRONMENT } from '@/environment/environment';
 
 describe('RefreshTokenService', () => {
   let service: RefreshTokenService;
-  let httpClientMock: { get: jest.Mock };
+  let httpClientMock: { post: jest.Mock };
 
   beforeEach(() => {
-    httpClientMock = { get: jest.fn() };
+    httpClientMock = { post: jest.fn() };
 
     TestBed.configureTestingModule({
       providers: [RefreshTokenService, { provide: HttpClient, useValue: httpClientMock }],
@@ -28,22 +28,22 @@ describe('RefreshTokenService', () => {
   describe('refreshToken', () => {
     it('should return the auth response on success', () => {
       const mockResponse: AuthResponse = { accessToken: 'new-token' };
-      httpClientMock.get.mockReturnValue(of(mockResponse));
+      httpClientMock.post.mockReturnValue(of(mockResponse));
 
       service.refreshToken().subscribe((response) => {
         expect(response).toEqual(mockResponse);
-        expect(httpClientMock.get).toHaveBeenCalledWith(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`);
+        expect(httpClientMock.post).toHaveBeenCalledWith(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`, null);
       });
     });
 
     it('should handle error correctly and return an empty observable', () => {
       const errorResponse = new Error('Something went wrong');
-      httpClientMock.get.mockReturnValue(throwError(() => errorResponse));
+      httpClientMock.post.mockReturnValue(throwError(() => errorResponse));
 
       service.refreshToken().subscribe({
         error: (error) => {
           expect(error).toEqual(errorResponse);
-          expect(httpClientMock.get).toHaveBeenCalledWith(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`);
+          expect(httpClientMock.post).toHaveBeenCalledWith(`${ENVIRONMENT.API_URL}${ENDPOINTS.REFRESH}`, null);
         },
       });
     });

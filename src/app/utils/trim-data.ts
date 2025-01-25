@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-export function trimData<T extends Record<string, string>>(data: T): T {
-  const result: T = {} as T;
-
+export function trimData<T extends Record<string, string>>(data: T): Record<string, string> {
+  const result: Record<string, string> = {};
   Object.entries(data).forEach(([key, value]) => {
-    (result as Record<string, string>)[key] = value.trim();
+    result[key] = value.trim();
   });
 
   return result;
