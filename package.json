@@ -37,10 +37,12 @@
     "@taiga-ui/icons": "^4.17.0",
     "@taiga-ui/kit": "^4.17.0",
     "@taiga-ui/layout": "^4.17.0",
+    "@taiga-ui/polymorpheus": "^4.8.0",
     "modern-normalize": "^3.0.1",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.8.1",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.2",
