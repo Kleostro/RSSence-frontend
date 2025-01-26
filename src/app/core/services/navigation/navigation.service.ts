@@ -32,6 +32,10 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.LOGIN]);
   }
 
+  public navigateToHome(): void {
+    this.router.navigate([APP_ROUTE.HOME]);
+  }
+
   public updateQueryParams(params: Params): void {
     this.router.navigate([], {
       queryParams: params,

@@ -3,10 +3,10 @@ import { TestBed } from '@angular/core/testing';
 
 import { of } from 'rxjs';
 
-import { RefreshTokenService } from '@/app/api/services/refreshToken/refresh-token.service';
+import { AuthResponse } from '@/app/api/schemas/auth-response';
+import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
-import { AuthResponse } from '@/app/api/types/auth-response';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
