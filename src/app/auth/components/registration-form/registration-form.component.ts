@@ -6,7 +6,7 @@ import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { passwordsMatchValidator } from '@/app/auth/validators/validators';
 import { trimData } from '@/app/utils/trim-data';
 import { TuiRipple } from '@taiga-ui/addon-mobile';
-import { TuiAppearance, TuiButton, TuiError, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
+import { TuiAppearance, TuiButton, TuiError, TuiLoader, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
 import { TuiFieldErrorPipe } from '@taiga-ui/kit';
 import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
 
@@ -26,6 +26,7 @@ import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
     TuiTextfield,
     TuiTitle,
     TuiRipple,
+    TuiLoader,
   ],
   templateUrl: './registration-form.component.html',
   styleUrl: './registration-form.component.scss',

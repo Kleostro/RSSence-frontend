@@ -1,48 +1,50 @@
-<form
-  tuiAppearance="floating"
-  tuiCardLarge
-  tuiForm="l"
-  [formGroup]="form"
-  [style.max-width.rem]="32"
-  (ngSubmit)="onSubmit()"
->
-  <header tuiHeader>
-    <h2 tuiTitle>
-      Registration form
-      <span tuiSubtitle>Tell us about yourself</span>
-    </h2>
-  </header>
+<tui-loader [showLoader]="isRegistrationInProgress()" [overlay]="true">
+  <form
+    tuiAppearance="floating"
+    tuiCardLarge
+    tuiForm="l"
+    [formGroup]="form"
+    [style.max-width.rem]="32"
+    (ngSubmit)="onSubmit()"
+  >
+    <header tuiHeader>
+      <h2 tuiTitle>
+        Registration form
+        <span tuiSubtitle>Tell us about yourself</span>
+      </h2>
+    </header>
 
-  <tui-notification appearance="warning">
-    <h3 tuiTitle>
-      Authenticity required
-      <span tuiSubtitle>Please be honest and use your real data</span>
-    </h3>
-  </tui-notification>
+    <tui-notification appearance="warning">
+      <h3 tuiTitle>
+        Authenticity required
+        <span tuiSubtitle>Please be honest and use your real data</span>
+      </h3>
+    </tui-notification>
 
-  <tui-textfield>
-    <label tuiLabel>Email</label>
-    <input formControlName="email" placeholder="john@wick.com" tuiTextfield type="email" />
-  </tui-textfield>
-  <tui-error formControlName="email" [error]="[] | tuiFieldError | async"></tui-error>
+    <tui-textfield>
+      <label tuiLabel>Email</label>
+      <input formControlName="email" placeholder="john@wick.com" tuiTextfield type="email" />
+    </tui-textfield>
+    <tui-error formControlName="email" [error]="[] | tuiFieldError | async"></tui-error>
 
-  <tui-textfield>
-    <label tuiLabel>Password</label>
-    <input formControlName="password" placeholder="Password" tuiTextfield type="password" />
-  </tui-textfield>
-  <tui-error formControlName="password" [error]="[] | tuiFieldError | async"></tui-error>
+    <tui-textfield>
+      <label tuiLabel>Password</label>
+      <input formControlName="password" placeholder="Password" tuiTextfield type="password" />
+    </tui-textfield>
+    <tui-error formControlName="password" [error]="[] | tuiFieldError | async"></tui-error>
 
-  <tui-textfield>
-    <label tuiLabel>Repeat Password</label>
-    <input formControlName="confirm" placeholder="Repeat your password" tuiTextfield type="password" />
-  </tui-textfield>
-  <tui-error formControlName="confirm" [error]="[] | tuiFieldError | async"></tui-error>
+    <tui-textfield>
+      <label tuiLabel>Repeat Password</label>
+      <input formControlName="confirm" placeholder="Repeat your password" tuiTextfield type="password" />
+    </tui-textfield>
+    <tui-error formControlName="confirm" [error]="[] | tuiFieldError | async"></tui-error>
 
-  @if (form.hasError('passwordMismatch') && form.get('confirm')?.touched) {
-    <tui-error [error]="[] | tuiFieldError | async">Passwords</tui-error>
-  }
+    @if (form.hasError('passwordMismatch') && form.get('confirm')?.touched) {
+      <tui-error [error]="[] | tuiFieldError | async">Passwords</tui-error>
+    }
 
-  <footer>
-    <button tuiRipple class="tui-button" tuiButton type="submit" [disabled]="!form.valid">Submit</button>
-  </footer>
-</form>
+    <footer>
+      <button tuiRipple class="tui-button" tuiButton type="submit" [disabled]="!form.valid">Submit</button>
+    </footer>
+  </form>
+</tui-loader>
