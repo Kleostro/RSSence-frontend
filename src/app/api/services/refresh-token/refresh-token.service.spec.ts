@@ -4,8 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { RefreshTokenService } from '@/app/api/services/refreshToken/refresh-token.service';
-import { AuthResponse } from '@/app/api/types/auth-response';
+import { AuthResponse } from '@/app/api/schemas/auth-response';
+import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { ENVIRONMENT } from '@/environment/environment';
 
 describe('RefreshTokenService', () => {

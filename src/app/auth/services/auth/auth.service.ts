@@ -2,11 +2,14 @@ import { inject, Injectable, signal } from '@angular/core';
 
 import { catchError, EMPTY, Observable, take, tap } from 'rxjs';
 
-import { RefreshTokenService } from '@/app/api/services/refreshToken/refresh-token.service';
+import { ApiError } from '@/app/api/models/api-error';
+import { AuthResponse } from '@/app/api/schemas/auth-response';
+import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
-import { AuthResponse } from '@/app/api/types/auth-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { MESSAGE } from '@/app/shared/services/constants/message';
+import { MessageService } from '@/app/shared/services/message.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,18 +19,17 @@ export class AuthService {
   private readonly navigationService = inject(NavigationService);
   private readonly refreshTokenService = inject(RefreshTokenService);
   private readonly tokenService = inject(TokenService);
+  private readonly message = inject(MessageService);
 
   public isUserLoggedIn = signal(false);
 
   public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
     return this.signUpService.register(email, password).pipe(
       take(1),
-      tap((data) => {
-        // eslint-disable-next-line no-console
-        console.log('Registration successful');
-        this.handleAuthSuccess(data);
+      tap(() => {
+        this.message.showSuccessAlert(MESSAGE.REGISTRATION_SUCCESS);
       }),
-      catchError(this.handleAuthError.bind(this)),
+      catchError((error: ApiError) => this.handleAuthError(error)),
     );
   }
 
@@ -59,9 +61,11 @@ export class AuthService {
   private handleAuthSuccess({ accessToken }: AuthResponse): void {
     this.tokenService.setToken(accessToken);
     this.isUserLoggedIn.set(true);
+    this.message.showSuccessAlert(MESSAGE.LOGIN_SUCCESS);
   }
 
-  private handleAuthError(_error: Error): Observable<never> {
+  private handleAuthError(error: ApiError): Observable<never> {
+    this.message.showErrorAlert(error.message);
     return EMPTY;
   }
 }

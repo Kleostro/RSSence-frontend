@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { AuthResponse } from '@/app/api/types/auth-response';
+import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({

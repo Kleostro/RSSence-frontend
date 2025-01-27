@@ -4,8 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
+import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
-import { AuthResponse } from '@/app/api/types/auth-response';
 import { ENVIRONMENT } from '@/environment/environment';
 
 describe('SignUpService', () => {

@@ -45,7 +45,7 @@ Specify if any documentation updates are required and provide details on what ne
 - [x] My code passes all tests 🧪
       [![Test](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml)
 - [x] My code builds successfully ⚙️
-      [![Netlify Status](https://api.netlify.com/api/v1/badges/8a371eed-836c-40ad-9a77-8f317c8300da/deploy-status)](https://app.netlify.com/sites/stunning-cactus-e40713/deploys)
+      [![Netlify Status](https://api.netlify.com/api/v1/badges/c2d017fb-a7d0-4279-981d-918587dde979/deploy-status)](https://app.netlify.com/sites/rssence/deploys)
 
 ## Self-Check 🌟
 

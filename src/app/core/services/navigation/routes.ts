@@ -10,4 +10,5 @@ export const APP_ROUTE = {
   LOGIN: `/${APP_PATH.LOGIN.toLowerCase()}`,
   SIGN_UP: `/${APP_PATH.SIGN_UP.toLowerCase()}`,
   NOT_FOUND: `/${APP_PATH.NOT_FOUND.toLowerCase()}`,
+  HOME: '/',
 } as const;
