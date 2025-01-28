@@ -1,24 +1,23 @@
-import { inject, Injectable, OnInit } from '@angular/core';
-import { WA_LOCAL_STORAGE, WA_WINDOW } from '@ng-web-apis/common';
-
-import { TUI_DARK_MODE, TUI_DARK_MODE_KEY } from '@taiga-ui/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ThemeSwitchService implements OnInit {
-  private readonly key = inject(TUI_DARK_MODE_KEY);
-  private readonly storage = inject(WA_LOCAL_STORAGE);
-  private readonly media = inject(WA_WINDOW).matchMedia('(prefers-color-scheme: dark)');
+export class ThemeSwitchService {
+  private readonly document = inject(DOCUMENT);
 
-  public readonly darkMode = inject(TUI_DARK_MODE);
+  constructor() {
+    if (this.isDarkPreferred()) {
+      this.toggle();
+    }
+  }
 
-  public ngOnInit(): void {
-    this.darkMode.set(this.media.matches);
+  private isDarkPreferred(): boolean {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
   public toggle(): void {
-    this.storage.removeItem(this.key);
-    this.darkMode.set(!this.darkMode());
+    this.document.querySelector('html')?.classList.toggle('app-dark');
   }
 }

@@ -3,15 +3,18 @@ import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 
+import { MessageService } from 'primeng/api';
+import { providePrimeNG } from 'primeng/config';
+
 import { errorInterceptor } from '@/app/api/interceptors/error-interceptor/error-interceptor';
 import { routes } from '@/app/app.routes';
-import { NG_EVENT_PLUGINS } from '@taiga-ui/event-plugins';
+import { MyPreset } from '@/app/utils/my-preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideAnimations(),
-    NG_EVENT_PLUGINS,
     provideExperimentalZonelessChangeDetection(),
+    provideAnimations(),
+    MessageService,
     provideRouter(
       routes,
       withComponentInputBinding(),
@@ -19,5 +22,15 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
     provideHttpClient(withInterceptors([errorInterceptor])),
+    providePrimeNG({
+      theme: {
+        preset: MyPreset,
+        options: {
+          cssLayer: false,
+          darkModeSelector: '.app-dark',
+        },
+      },
+      ripple: true,
+    }),
   ],
 };
