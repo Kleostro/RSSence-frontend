@@ -1,42 +1,47 @@
 import { inject, Injectable } from '@angular/core';
 
-import { TuiAlertService } from '@taiga-ui/core';
+import { MessageService as service } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  private readonly alert = inject(TuiAlertService);
-  private readonly duration = 3000;
+  private readonly MESSAGE_DURATION = 3000;
+  private readonly messageService = inject(service);
 
-  public showSuccessAlert(message?: string, title = 'Success'): void {
-    this.alert
-      .open(message, {
-        label: title,
-        appearance: 'positive',
-        autoClose: this.duration,
-      })
-      .subscribe();
+  public success(message: string): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      life: this.MESSAGE_DURATION,
+      detail: message,
+    });
   }
 
-  public showWarningAlert(message?: string, title = 'Warning'): void {
-    this.alert
-      .open(message, {
-        label: title,
-        appearance: 'warning',
-        autoClose: this.duration,
-      })
-      .subscribe();
+  public error(message: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      life: this.MESSAGE_DURATION,
+      detail: message,
+    });
   }
 
-  public showErrorAlert(message?: unknown, title = 'Error'): void {
-    const errorMessage = message instanceof Error ? message.message : (message ?? 'An unknown error occurred');
-    this.alert
-      .open(errorMessage, {
-        label: title,
-        appearance: 'negative',
-        autoClose: this.duration,
-      })
-      .subscribe();
+  public info(message: string): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Info',
+      life: this.MESSAGE_DURATION,
+      detail: message,
+    });
+  }
+
+  public warning(message: string): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      life: this.MESSAGE_DURATION,
+      detail: message,
+    });
   }
 }
