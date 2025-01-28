@@ -27,7 +27,7 @@ export class AuthService {
     return this.signUpService.register(email, password).pipe(
       take(1),
       tap(() => {
-        this.message.showSuccessAlert(MESSAGE.REGISTRATION_SUCCESS);
+        this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),
       catchError((error: ApiError) => this.handleAuthError(error)),
     );
@@ -61,11 +61,11 @@ export class AuthService {
   private handleAuthSuccess({ accessToken }: AuthResponse): void {
     this.tokenService.setToken(accessToken);
     this.isUserLoggedIn.set(true);
-    this.message.showSuccessAlert(MESSAGE.LOGIN_SUCCESS);
+    this.message.success(MESSAGE.LOGIN_SUCCESS);
   }
 
   private handleAuthError(error: ApiError): Observable<never> {
-    this.message.showErrorAlert(error.message);
+    this.message.error(error.message);
     return EMPTY;
   }
 }
