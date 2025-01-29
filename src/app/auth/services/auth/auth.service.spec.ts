@@ -1,6 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { MessageService } from 'primeng/api';
 import { of } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
@@ -9,6 +10,7 @@ import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { MessageService as UserMessageService } from '@/app/shared/services/message.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -34,6 +36,21 @@ describe('AuthService', () => {
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: NavigationService, useValue: navigationServiceMock },
         { provide: RefreshTokenService, useValue: refreshTokenServiceMock },
+        {
+          provide: UserMessageService,
+          useValue: {
+            success: jest.fn(),
+            error: jest.fn(),
+            info: jest.fn(),
+            warning: jest.fn(),
+          },
+        },
+        {
+          provide: MessageService,
+          useValue: {
+            add: jest.fn(),
+          },
+        },
         provideHttpClientTesting(),
       ],
     });

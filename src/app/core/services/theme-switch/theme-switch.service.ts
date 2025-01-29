@@ -1,24 +1,46 @@
-import { inject, Injectable, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable } from '@angular/core';
 import { WA_LOCAL_STORAGE, WA_WINDOW } from '@ng-web-apis/common';
-
-import { TUI_DARK_MODE, TUI_DARK_MODE_KEY } from '@taiga-ui/core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ThemeSwitchService implements OnInit {
-  private readonly key = inject(TUI_DARK_MODE_KEY);
-  private readonly storage = inject(WA_LOCAL_STORAGE);
+export class ThemeSwitchService {
+  private readonly document = inject(DOCUMENT);
+  private readonly localStorage = inject(WA_LOCAL_STORAGE);
+  private readonly key = 'app-theme';
   private readonly media = inject(WA_WINDOW).matchMedia('(prefers-color-scheme: dark)');
 
-  public readonly darkMode = inject(TUI_DARK_MODE);
+  private isDarkTheme = false;
 
-  public ngOnInit(): void {
-    this.darkMode.set(this.media.matches);
+  constructor() {
+    const savedTheme = this.localStorage.getItem(this.key);
+    if (savedTheme === 'dark') {
+      this.isDarkTheme = true;
+    } else if (savedTheme === 'light') {
+      this.isDarkTheme = false;
+    } else {
+      this.isDarkTheme = this.isDarkPreferred();
+    }
+    this.applyTheme();
+  }
+
+  private isDarkPreferred(): boolean {
+    return this.media.matches;
+  }
+
+  private applyTheme(): void {
+    const htmlElement = this.document.querySelector('html');
+    if (this.isDarkTheme) {
+      htmlElement?.classList.add('app-dark');
+    } else {
+      htmlElement?.classList.remove('app-dark');
+    }
   }
 
   public toggle(): void {
-    this.storage.removeItem(this.key);
-    this.darkMode.set(!this.darkMode());
+    this.isDarkTheme = !this.isDarkTheme;
+    this.applyTheme();
+    this.localStorage.setItem(this.key, this.isDarkTheme ? 'dark' : 'light');
   }
 }

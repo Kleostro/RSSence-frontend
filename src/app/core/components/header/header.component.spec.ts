@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
+import { ButtonModule } from 'primeng/button';
+
 import { HeaderComponent } from '@/app/core/components/header/header.component';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
-import { TuiRipple } from '@taiga-ui/addon-mobile';
-import { TuiButton } from '@taiga-ui/core';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -17,7 +17,7 @@ describe('HeaderComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [HeaderComponent, TuiButton, TuiRipple],
+      imports: [HeaderComponent, ButtonModule],
       providers: [{ provide: ThemeSwitchService, useValue: mockThemeSwitchService }],
     }).compileComponents();
 

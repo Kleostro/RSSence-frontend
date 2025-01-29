@@ -1,16 +1,21 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { PrimeNG } from 'primeng/config';
+import { ToastModule } from 'primeng/toast';
+
 import { HeaderComponent } from '@/app/core/components/header/header.component';
-import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
-import { TuiRoot } from '@taiga-ui/core';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TuiRoot, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent, ToastModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-  public themeSwitchService = inject(ThemeSwitchService);
+export class AppComponent implements OnInit {
+  private readonly primeng = inject(PrimeNG);
+
+  public ngOnInit(): void {
+    this.primeng.ripple.set(true);
+  }
 }

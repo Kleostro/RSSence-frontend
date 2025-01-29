@@ -1,32 +1,32 @@
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+import { ButtonModule } from 'primeng/button';
+import { DividerModule } from 'primeng/divider';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
 
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { passwordsMatchValidator } from '@/app/auth/validators/validators';
+import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { trimData } from '@/app/utils/trim-data';
-import { TuiRipple } from '@taiga-ui/addon-mobile';
-import { TuiAppearance, TuiButton, TuiError, TuiLoader, TuiNotification, TuiTextfield, TuiTitle } from '@taiga-ui/core';
-import { TuiFieldErrorPipe } from '@taiga-ui/kit';
-import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
 
 @Component({
   selector: 'app-registration-form',
   imports: [
-    TuiAppearance,
-    AsyncPipe,
     ReactiveFormsModule,
-    TuiButton,
-    TuiCardLarge,
-    TuiError,
-    TuiFieldErrorPipe,
-    TuiForm,
-    TuiHeader,
-    TuiNotification,
-    TuiTextfield,
-    TuiTitle,
-    TuiRipple,
-    TuiLoader,
+    FloatLabelModule,
+    InputTextModule,
+    ButtonModule,
+    PasswordModule,
+    RouterLink,
+    IconField,
+    InputIcon,
+    DividerModule,
   ],
   templateUrl: './registration-form.component.html',
   styleUrl: './registration-form.component.scss',
@@ -38,7 +38,9 @@ export class RegistrationFormComponent {
 
   public isRegistrationInProgress = signal(false);
 
-  public form = this.fb.nonNullable.group(
+  public APP_ROUTE = APP_ROUTE;
+
+  public registrationForm = this.fb.nonNullable.group(
     {
       email: ['', [Validators.email, Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
@@ -50,15 +52,15 @@ export class RegistrationFormComponent {
   );
 
   public onSubmit(): void {
-    this.form.markAllAsTouched();
+    this.registrationForm.markAllAsTouched();
 
-    if (!this.form.valid) {
+    if (!this.registrationForm.valid) {
       return;
     }
 
     this.isRegistrationInProgress.set(true);
 
-    const { email, password } = trimData(this.form.getRawValue());
+    const { email, password } = trimData(this.registrationForm.getRawValue());
 
     this.authService.register({ email, password }).subscribe({
       complete: () => {

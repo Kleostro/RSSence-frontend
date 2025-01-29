@@ -1,50 +1,49 @@
-<tui-loader [showLoader]="isRegistrationInProgress()" [overlay]="true">
-  <form
-    tuiAppearance="floating"
-    tuiCardLarge
-    tuiForm="l"
-    [formGroup]="form"
-    [style.max-width.rem]="32"
-    (ngSubmit)="onSubmit()"
-  >
-    <header tuiHeader>
-      <h2 tuiTitle>
-        Registration form
-        <span tuiSubtitle>Tell us about yourself</span>
-      </h2>
-    </header>
+<form [formGroup]="registrationForm" class="registration-form" (ngSubmit)="onSubmit()">
+  <header>
+    <h2 class="registration-title">Sign Up</h2>
+    <span class="registration-subtitle">Tell us about yourself</span>
+  </header>
 
-    <tui-notification appearance="warning">
-      <h3 tuiTitle>
-        Authenticity required
-        <span tuiSubtitle>Please be honest and use your real data</span>
-      </h3>
-    </tui-notification>
+  <div class="registration-inputs-container">
+    <p-iconfield>
+      <p-floatlabel variant="on">
+        <input id="email" type="email" pInputText formControlName="email" />
+        <label for="email">Email</label>
+        <p-inputicon styleClass="pi pi-envelope" />
+      </p-floatlabel>
+    </p-iconfield>
 
-    <tui-textfield>
-      <label tuiLabel>Email</label>
-      <input formControlName="email" placeholder="john@wick.com" tuiTextfield type="email" />
-    </tui-textfield>
-    <tui-error formControlName="email" [error]="[] | tuiFieldError | async"></tui-error>
+    <p-floatLabel variant="on">
+      <p-password formControlName="password" [toggleMask]="true">
+        <ng-template #footer>
+          <p-divider />
+          <ul class="pl-2 ml-2 my-0 leading-normal">
+            <li>At least one lowercase</li>
+            <li>At least one uppercase</li>
+            <li>At least one numeric</li>
+            <li>Minimum 8 characters</li>
+          </ul>
+        </ng-template>
+      </p-password>
+      <label class="label" for="password">Password</label>
+    </p-floatLabel>
 
-    <tui-textfield>
-      <label tuiLabel>Password</label>
-      <input formControlName="password" placeholder="Password" tuiTextfield type="password" />
-    </tui-textfield>
-    <tui-error formControlName="password" [error]="[] | tuiFieldError | async"></tui-error>
+    <p-floatLabel variant="on">
+      <p-password formControlName="confirm" [toggleMask]="true" />
+      <label class="label" for="confirm">Confirm Password</label>
+    </p-floatLabel>
+  </div>
 
-    <tui-textfield>
-      <label tuiLabel>Repeat Password</label>
-      <input formControlName="confirm" placeholder="Repeat your password" tuiTextfield type="password" />
-    </tui-textfield>
-    <tui-error formControlName="confirm" [error]="[] | tuiFieldError | async"></tui-error>
-
-    @if (form.hasError('passwordMismatch') && form.get('confirm')?.touched) {
-      <tui-error [error]="[] | tuiFieldError | async">Passwords</tui-error>
-    }
-
-    <footer>
-      <button tuiRipple class="tui-button" tuiButton type="submit" [disabled]="!form.valid">Submit</button>
-    </footer>
-  </form>
-</tui-loader>
+  <footer>
+    <div class="registration-button-container">
+      <p-button
+        type="submit"
+        label="Register"
+        [disabled]="!registrationForm.valid || isRegistrationInProgress()"
+        class="p-mt-2"
+        [icon]="isRegistrationInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
+      ></p-button>
+      <p-link pButton [routerLink]="APP_ROUTE.LOGIN" label="Sign In" class="p-button-text p-mt-2"></p-link>
+    </div>
+  </footer>
+</form>
