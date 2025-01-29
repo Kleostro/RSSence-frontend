@@ -1,1 +1,34 @@
-<p>login-form works!</p>
+<form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit()">
+  <header>
+    <h2 class="login-title">Sign Up</h2>
+    <span class="login-subtitle">Tell us about yourself</span>
+  </header>
+
+  <div class="login-inputs-container">
+    <p-iconfield>
+      <p-floatlabel variant="on">
+        <input id="email" type="email" pInputText formControlName="email" />
+        <label for="email">Email</label>
+        <p-inputicon styleClass="pi pi-envelope" />
+      </p-floatlabel>
+    </p-iconfield>
+
+    <p-floatLabel variant="on">
+      <p-password formControlName="password" [toggleMask]="true" />
+      <label class="label" for="password">Password</label>
+    </p-floatLabel>
+  </div>
+
+  <footer>
+    <div class="login-button-container">
+      <p-button
+        type="submit"
+        label="Login"
+        [disabled]="!loginForm.valid || isLoginInProgress()"
+        class="p-mt-2"
+        [icon]="isLoginInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
+      ></p-button>
+      <p-link pButton [routerLink]="APP_ROUTE.SIGN_UP" label="Sign Up" class="p-button-text p-mt-2"></p-link>
+    </div>
+  </footer>
+</form>
