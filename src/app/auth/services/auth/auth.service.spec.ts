@@ -1,117 +1,152 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { MessageService } from 'primeng/api';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
-import { AuthResponse } from '@/app/api/schemas/auth-response';
+import { LoginService } from '@/app/api/services/login/login.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { MessageService as UserMessageService } from '@/app/shared/services/message.service';
+import { MessageService } from '@/app/shared/services/message.service';
 
 describe('AuthService', () => {
-  let service: AuthService;
-  let signUpServiceMock: { register: jest.Mock };
-  let tokenServiceMock: { setToken: jest.Mock; getToken: jest.Mock; removeToken: jest.Mock };
-  let navigationServiceMock: { navigateToLogin: jest.Mock };
-  let refreshTokenServiceMock: { refreshToken: jest.Mock };
+  let authService: AuthService;
+  let loginService: jest.Mocked<LoginService>;
+  let signUpService: jest.Mocked<SignUpService>;
+  let refreshTokenService: jest.Mocked<RefreshTokenService>;
+  let tokenService: jest.Mocked<TokenService>;
+  let navigationService: jest.Mocked<NavigationService>;
+  let messageService: jest.Mocked<MessageService>;
 
   beforeEach(() => {
-    signUpServiceMock = { register: jest.fn() };
-    tokenServiceMock = {
-      setToken: jest.fn(),
+    const loginServiceMock = {
+      login: jest.fn(),
+    };
+    const signUpServiceMock = {
+      register: jest.fn(),
+    };
+    const refreshTokenServiceMock = {
+      refreshToken: jest.fn(),
+    };
+    const tokenServiceMock = {
       getToken: jest.fn(),
+      setToken: jest.fn(),
       removeToken: jest.fn(),
     };
-    navigationServiceMock = { navigateToLogin: jest.fn() };
-    refreshTokenServiceMock = { refreshToken: jest.fn() };
+    const navigationServiceMock = {
+      navigateToHome: jest.fn(),
+      navigateToLogin: jest.fn(),
+    };
+    const messageServiceMock = {
+      success: jest.fn(),
+      error: jest.fn(),
+    };
 
     TestBed.configureTestingModule({
+      imports: [],
       providers: [
+        provideHttpClientTesting(),
         AuthService,
+        { provide: LoginService, useValue: loginServiceMock },
         { provide: SignUpService, useValue: signUpServiceMock },
+        { provide: RefreshTokenService, useValue: refreshTokenServiceMock },
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: NavigationService, useValue: navigationServiceMock },
-        { provide: RefreshTokenService, useValue: refreshTokenServiceMock },
-        {
-          provide: UserMessageService,
-          useValue: {
-            success: jest.fn(),
-            error: jest.fn(),
-            info: jest.fn(),
-            warning: jest.fn(),
-          },
-        },
-        {
-          provide: MessageService,
-          useValue: {
-            add: jest.fn(),
-          },
-        },
-        provideHttpClientTesting(),
+        { provide: MessageService, useValue: messageServiceMock },
       ],
     });
-    service = TestBed.inject(AuthService);
+
+    authService = TestBed.inject(AuthService);
+    loginService = TestBed.inject(LoginService) as jest.Mocked<LoginService>;
+    signUpService = TestBed.inject(SignUpService) as jest.Mocked<SignUpService>;
+    refreshTokenService = TestBed.inject(RefreshTokenService) as jest.Mocked<RefreshTokenService>;
+    tokenService = TestBed.inject(TokenService) as jest.Mocked<TokenService>;
+    navigationService = TestBed.inject(NavigationService) as jest.Mocked<NavigationService>;
+    messageService = TestBed.inject(MessageService) as jest.Mocked<MessageService>;
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(authService).toBeTruthy();
   });
 
-  describe('register', () => {
-    it('should handle successful registration', () => {
-      const mockResponse: AuthResponse = { accessToken: 'test-token' };
-      signUpServiceMock.register.mockReturnValue(of(mockResponse));
+  it('should handle successful registration', () => {
+    const mockResponse = { accessToken: 'mockToken' };
+    signUpService.register.mockReturnValue(of(mockResponse));
 
-      service.register({ email: 'test@test.com', password: 'password' }).subscribe(() => {
-        expect(signUpServiceMock.register).toHaveBeenCalledWith({ email: 'test@test.com', password: 'password' });
-        expect(tokenServiceMock.setToken).toHaveBeenCalledWith(mockResponse.accessToken);
-      });
-    });
-
-    it('should handle registration error', () => {
-      signUpServiceMock.register.mockReturnValue(of({}));
-      service.register({ email: 'test@test.com', password: 'password' }).subscribe();
+    authService.register({ email: 'test@example.com', password: 'password' }).subscribe(() => {
+      expect(messageService.success).toHaveBeenCalledWith('Registration successful');
     });
   });
 
-  describe('refreshToken', () => {
-    it('should refresh token successfully', () => {
-      const mockResponse: AuthResponse = { accessToken: 'new-token' };
-      refreshTokenServiceMock.refreshToken.mockReturnValue(of(mockResponse));
+  it('should handle registration error', () => {
+    const mockError = { message: 'Registration failed' };
+    signUpService.register.mockReturnValue(throwError(() => mockError));
 
-      service.refreshToken().subscribe(() => {
-        expect(refreshTokenServiceMock.refreshToken).toHaveBeenCalled();
-        expect(tokenServiceMock.setToken).toHaveBeenCalledWith(mockResponse.accessToken);
-      });
-    });
-
-    it('should handle token refresh error and navigate to login', () => {
-      refreshTokenServiceMock.refreshToken.mockReturnValue(of(null));
-
-      service.refreshToken().subscribe(() => {
-        expect(tokenServiceMock.removeToken).toHaveBeenCalled();
-        expect(navigationServiceMock.navigateToLogin).toHaveBeenCalled();
-      });
+    authService.register({ email: 'test@example.com', password: 'password' }).subscribe({
+      error: () => {
+        expect(messageService.error).toHaveBeenCalledWith('Registration failed');
+      },
     });
   });
 
-  describe('checkAuth', () => {
-    it('should return true and refresh token if token exists', () => {
-      tokenServiceMock.getToken.mockReturnValue('mock-token');
-      refreshTokenServiceMock.refreshToken.mockReturnValue(of({ accessToken: 'new-token' }));
+  it('should handle successful login', () => {
+    const mockResponse = { accessToken: 'mockToken' };
+    loginService.login.mockReturnValue(of(mockResponse));
 
-      expect(service.checkAuth()).toBe(true);
-      expect(refreshTokenServiceMock.refreshToken).toHaveBeenCalled();
+    authService.login({ email: 'test@example.com', password: 'password' }).subscribe(() => {
+      expect(tokenService.setToken).toHaveBeenCalledWith('mockToken');
+      expect(navigationService.navigateToHome).toHaveBeenCalled();
+      expect(messageService.success).toHaveBeenCalledWith('Login successful');
     });
+  });
 
-    it('should return false if no token exists', () => {
-      tokenServiceMock.getToken.mockReturnValue(null);
+  it('should handle login error', () => {
+    const mockError = { message: 'Login failed' };
+    loginService.login.mockReturnValue(throwError(() => mockError));
 
-      expect(service.checkAuth()).toBe(false);
+    authService.login({ email: 'test@example.com', password: 'password' }).subscribe({
+      error: () => {
+        expect(messageService.error).toHaveBeenCalledWith('Login failed');
+      },
     });
+  });
+
+  it('should refresh token successfully', () => {
+    const mockResponse = { accessToken: 'newMockToken' };
+    refreshTokenService.refreshToken.mockReturnValue(of(mockResponse));
+
+    authService.refreshToken().subscribe(() => {
+      expect(tokenService.setToken).toHaveBeenCalledWith('newMockToken');
+      expect(messageService.success).toHaveBeenCalledWith('Login successful');
+    });
+  });
+
+  it('should handle token refresh error and navigate to login', () => {
+    refreshTokenService.refreshToken.mockReturnValue(throwError(() => new Error('Token refresh failed')));
+
+    authService.refreshToken().subscribe({
+      error: () => {
+        expect(tokenService.removeToken).toHaveBeenCalled();
+        expect(navigationService.navigateToLogin).toHaveBeenCalled();
+      },
+    });
+  });
+
+  it('should return true and refresh token if token exists', () => {
+    tokenService.getToken.mockReturnValue('existingToken');
+    refreshTokenService.refreshToken.mockReturnValue(of({ accessToken: 'newMockToken' }));
+
+    const result = authService.checkAuth();
+    expect(result).toBe(true);
+    expect(refreshTokenService.refreshToken).toHaveBeenCalled();
+  });
+
+  it('should return false if no token exists', () => {
+    tokenService.getToken.mockReturnValue(null);
+
+    const result = authService.checkAuth();
+    expect(result).toBe(false);
   });
 });

@@ -1,0 +1,50 @@
+@use 'variables' as var;
+
+:host {
+  display: contents;
+  color: var(--p-primary-950);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var.$offset-s;
+  align-items: center;
+  justify-content: center;
+
+  width: var.$offset-xxxl * 5;
+  height: auto;
+  margin: auto;
+  padding: var.$offset-xs;
+  padding: var.$offset-ms;
+
+  color: var(--p-primary-950);
+
+  background-color: var(--p-primary-100);
+  box-shadow: var.$shadow-100;
+}
+
+.login-title {
+  margin-bottom: var.$offset-xs;
+  font-weight: 700;
+  color: var(--p-primary-950);
+  text-align: center;
+}
+
+.login-subtitle {
+  font-weight: 500;
+  color: var(--p-primary-950);
+  text-align: center;
+}
+
+.login-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: var.$offset-s;
+}
+
+.login-button-container {
+  display: flex;
+  gap: var.$offset-xs;
+  margin-top: var.$offset-s;
+}
