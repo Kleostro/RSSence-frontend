@@ -31,7 +31,6 @@ import { trimData } from '@/app/utils/trim-data';
   styleUrl: './login-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class LoginFormComponent {
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
