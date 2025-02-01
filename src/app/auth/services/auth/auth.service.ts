@@ -2,9 +2,9 @@ import { inject, Injectable, signal } from '@angular/core';
 
 import { catchError, EMPTY, Observable, switchMap, take, tap } from 'rxjs';
 
-import { ApiError } from '@/app/api/models/api-error';
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-response';
 import { LoginService } from '@/app/api/services/login/login.service';
 import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
@@ -35,7 +35,7 @@ export class AuthService {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),
       switchMap(() => this.login({ email, password })),
-      catchError((error: ApiError) => this.handleAuthError(error)),
+      catchError((error: OverriddenHttpErrorResponse) => this.handleAuthError(error)),
     );
   }
 
@@ -97,8 +97,8 @@ export class AuthService {
     this.message.success(MESSAGE.LOGIN_SUCCESS);
   }
 
-  private handleAuthError(error: ApiError): Observable<never> {
-    this.message.error(error.message);
+  private handleAuthError(error: OverriddenHttpErrorResponse): Observable<never> {
+    this.message.error(error.error.message);
     return EMPTY;
   }
 }

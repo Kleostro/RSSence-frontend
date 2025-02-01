@@ -6,7 +6,6 @@ import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withVi
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
-import { errorInterceptor } from '@/app/api/interceptors/error-interceptor';
 import { httpInterceptor } from '@/app/api/interceptors/http-interceptor';
 import { routes } from '@/app/app.routes';
 import { MyPreset } from '@/app/utils/my-preset';
@@ -22,7 +21,7 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
-    provideHttpClient(withInterceptors([errorInterceptor, httpInterceptor])),
+    provideHttpClient(withInterceptors([httpInterceptor])),
     providePrimeNG({
       theme: {
         preset: MyPreset,
