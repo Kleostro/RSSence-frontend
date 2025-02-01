@@ -4,7 +4,7 @@ import { catchError, EMPTY, Observable, switchMap, take, tap } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-response';
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { LoginService } from '@/app/api/services/login/login.service';
 import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
