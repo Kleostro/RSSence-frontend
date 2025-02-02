@@ -9,6 +9,7 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { finalize } from 'rxjs';
 
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { passwordsMatchValidator } from '@/app/auth/validators/validators';
@@ -62,10 +63,13 @@ export class RegistrationFormComponent {
 
     const { email, password } = trimData(this.registrationForm.getRawValue());
 
-    this.authService.register({ email, password }).subscribe({
-      complete: () => {
-        this.isRegistrationInProgress.set(false);
-      },
-    });
+    this.authService
+      .register({ email, password })
+      .pipe(
+        finalize(() => {
+          this.isRegistrationInProgress.set(false);
+        }),
+      )
+      .subscribe();
   }
 }

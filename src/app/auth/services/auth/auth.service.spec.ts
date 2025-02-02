@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { LoginService } from '@/app/api/services/login/login.service';
+import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
@@ -14,6 +15,7 @@ import { MessageService } from '@/app/shared/services/message.service';
 describe('AuthService', () => {
   let authService: AuthService;
   let loginService: jest.Mocked<LoginService>;
+  let logoutService: jest.Mocked<LogoutService>;
   let signUpService: jest.Mocked<SignUpService>;
   let refreshTokenService: jest.Mocked<RefreshTokenService>;
   let tokenService: jest.Mocked<TokenService>;
@@ -26,6 +28,9 @@ describe('AuthService', () => {
     };
     const signUpServiceMock = {
       register: jest.fn(),
+    };
+    const logoutServiceMock = {
+      logout: jest.fn().mockReturnValue(of({})),
     };
     const refreshTokenServiceMock = {
       refreshToken: jest.fn(),
@@ -51,6 +56,7 @@ describe('AuthService', () => {
         AuthService,
         { provide: LoginService, useValue: loginServiceMock },
         { provide: SignUpService, useValue: signUpServiceMock },
+        { provide: LogoutService, useValue: logoutServiceMock },
         { provide: RefreshTokenService, useValue: refreshTokenServiceMock },
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: NavigationService, useValue: navigationServiceMock },
@@ -60,6 +66,7 @@ describe('AuthService', () => {
 
     authService = TestBed.inject(AuthService);
     loginService = TestBed.inject(LoginService) as jest.Mocked<LoginService>;
+    logoutService = TestBed.inject(LogoutService) as jest.Mocked<LogoutService>;
     signUpService = TestBed.inject(SignUpService) as jest.Mocked<SignUpService>;
     refreshTokenService = TestBed.inject(RefreshTokenService) as jest.Mocked<RefreshTokenService>;
     tokenService = TestBed.inject(TokenService) as jest.Mocked<TokenService>;
@@ -72,7 +79,7 @@ describe('AuthService', () => {
   });
 
   it('should handle successful registration', () => {
-    const mockResponse = { accessToken: 'mockToken' };
+    const mockResponse = { accessToken: 'mockToken', refreshToken: 'mockRefreshToken' };
     signUpService.register.mockReturnValue(of(mockResponse));
 
     authService.register({ email: 'test@example.com', password: 'password' }).subscribe(() => {
@@ -92,7 +99,7 @@ describe('AuthService', () => {
   });
 
   it('should handle successful login', () => {
-    const mockResponse = { accessToken: 'mockToken' };
+    const mockResponse = { accessToken: 'mockToken', refreshToken: 'mockRefreshToken' };
     loginService.login.mockReturnValue(of(mockResponse));
 
     authService.login({ email: 'test@example.com', password: 'password' }).subscribe(() => {
@@ -114,7 +121,7 @@ describe('AuthService', () => {
   });
 
   it('should refresh token successfully', () => {
-    const mockResponse = { accessToken: 'newMockToken' };
+    const mockResponse = { accessToken: 'newMockToken', refreshToken: 'newRefreshToken' };
     refreshTokenService.refreshToken.mockReturnValue(of(mockResponse));
 
     authService.refreshToken().subscribe(() => {
@@ -135,8 +142,10 @@ describe('AuthService', () => {
   });
 
   it('should return true and refresh token if token exists', () => {
-    tokenService.getToken.mockReturnValue('existingToken');
-    refreshTokenService.refreshToken.mockReturnValue(of({ accessToken: 'newMockToken' }));
+    tokenService.getToken.mockReturnValue({ accessToken: 'mockToken', refreshToken: 'mockRefreshToken' });
+    refreshTokenService.refreshToken.mockReturnValue(
+      of({ accessToken: 'newMockToken', refreshToken: 'newRefreshToken' }),
+    );
 
     const result = authService.checkAuth();
     expect(result).toBe(true);
@@ -148,5 +157,14 @@ describe('AuthService', () => {
 
     const result = authService.checkAuth();
     expect(result).toBe(false);
+  });
+
+  it('should handle logout successfully', () => {
+    authService.logout().subscribe(() => {
+      expect(logoutService.logout).toHaveBeenCalled();
+      expect(tokenService.removeToken).toHaveBeenCalled();
+      expect(navigationService.navigateToLogin).toHaveBeenCalled();
+      expect(messageService.success).toHaveBeenCalledWith('Logout successful');
+    });
   });
 });

@@ -9,6 +9,7 @@ import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { finalize } from 'rxjs';
 
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
@@ -55,10 +56,13 @@ export class LoginFormComponent {
 
     const { email, password } = trimData(this.loginForm.getRawValue());
 
-    this.authService.login({ email, password }).subscribe({
-      complete: () => {
-        this.isLoginInProgress.set(false);
-      },
-    });
+    this.authService
+      .login({ email, password })
+      .pipe(
+        finalize(() => {
+          this.isLoginInProgress.set(false);
+        }),
+      )
+      .subscribe();
   }
 }

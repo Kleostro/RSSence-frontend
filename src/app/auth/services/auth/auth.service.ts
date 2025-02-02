@@ -1,10 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, Observable, take, tap } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, take, tap } from 'rxjs';
 
-import { ApiError } from '@/app/api/models/api-error';
 import { AuthResponse } from '@/app/api/schemas/auth-response';
+import { LogoutResponse } from '@/app/api/schemas/logout-response';
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { LoginService } from '@/app/api/services/login/login.service';
+import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
@@ -18,8 +20,9 @@ import { MessageService } from '@/app/shared/services/message.service';
 export class AuthService {
   private readonly signUpService = inject(SignUpService);
   private readonly loginService = inject(LoginService);
-  private readonly navigationService = inject(NavigationService);
+  private readonly logoutService = inject(LogoutService);
   private readonly refreshTokenService = inject(RefreshTokenService);
+  private readonly navigationService = inject(NavigationService);
   private readonly tokenService = inject(TokenService);
   private readonly message = inject(MessageService);
 
@@ -31,7 +34,8 @@ export class AuthService {
       tap(() => {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),
-      catchError((error: ApiError) => this.handleAuthError(error)),
+      switchMap(() => this.login({ email, password })),
+      catchError((error: OverriddenHttpErrorResponse) => this.handleAuthError(error)),
     );
   }
 
@@ -43,6 +47,22 @@ export class AuthService {
         this.navigationService.navigateToHome();
       }),
       catchError(this.handleAuthError.bind(this)),
+    );
+  }
+
+  public logout(): Observable<LogoutResponse> {
+    return this.logoutService.logout().pipe(
+      take(1),
+      tap(() => {
+        this.isUserLoggedIn.set(false);
+        this.tokenService.removeToken();
+        this.navigationService.navigateToLogin();
+        this.message.success(MESSAGE.LOGOUT_SUCCESS);
+      }),
+      catchError(() => {
+        this.message.error(MESSAGE.LOGOUT_ERROR);
+        return EMPTY;
+      }),
     );
   }
 
@@ -71,14 +91,14 @@ export class AuthService {
     return false;
   }
 
-  private handleAuthSuccess({ accessToken }: AuthResponse): void {
-    this.tokenService.setToken(accessToken);
+  private handleAuthSuccess({ accessToken, refreshToken }: AuthResponse): void {
+    this.tokenService.setToken(accessToken, refreshToken);
     this.isUserLoggedIn.set(true);
     this.message.success(MESSAGE.LOGIN_SUCCESS);
   }
 
-  private handleAuthError(error: ApiError): Observable<never> {
-    this.message.error(error.message);
+  private handleAuthError(error: OverriddenHttpErrorResponse): Observable<never> {
+    this.message.error(error.error.message);
     return EMPTY;
   }
 }

@@ -27,7 +27,7 @@ describe('SignUpService', () => {
 
   describe('register', () => {
     it('should return the auth response on success', () => {
-      const mockResponse: AuthResponse = { accessToken: 'new-token' };
+      const mockResponse: AuthResponse = { accessToken: 'new-token', refreshToken: 'new-refresh-token' };
       httpClientMock.post.mockReturnValue(of(mockResponse));
 
       const email = 'test@example.com';

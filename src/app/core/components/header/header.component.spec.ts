@@ -1,10 +1,15 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
+import { of } from 'rxjs';
 
 import { HeaderComponent } from '@/app/core/components/header/header.component';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
+import { MessageService } from '@/app/shared/services/message.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -18,7 +23,13 @@ describe('HeaderComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [HeaderComponent, ButtonModule],
-      providers: [{ provide: ThemeSwitchService, useValue: mockThemeSwitchService }],
+      providers: [
+        provideHttpClientTesting(),
+        provideHttpClient(),
+        { provide: ThemeSwitchService, useValue: mockThemeSwitchService },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: of({}) } } },
+        { provide: MessageService, useValue: {} },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);
