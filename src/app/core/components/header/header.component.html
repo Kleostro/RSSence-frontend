@@ -3,6 +3,8 @@
     <p-button appearance="primary" type="button" (click)="themeSwitchService.toggle()">Toggle</p-button>
     <p-button appearance="primary" type="button" [routerLink]="APP_ROUTE.LOGIN">Sign In</p-button>
     <p-button appearance="primary" type="button" [routerLink]="APP_ROUTE.SIGN_UP">Sign Up</p-button>
-    <p-button appearance="primary" type="button" (click)="logout()">Logout</p-button>
+    @if (this.authService.isUserLoggedIn()) {
+      <app-sidebar />
+    }
   </header>
 </div>

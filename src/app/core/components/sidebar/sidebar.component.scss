@@ -1,0 +1,10 @@
+::ng-deep .p-drawer-left .p-drawer-content,
+.p-drawer-right .p-drawer-content,
+.p-drawer-top .p-drawer-content,
+.p-drawer-bottom .p-drawer-content {
+  overflow-y: clip;
+}
+
+::ng-deep .p-tieredmenu {
+  width: 100%;
+}

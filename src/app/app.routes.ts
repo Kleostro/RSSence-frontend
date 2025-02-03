@@ -20,6 +20,11 @@ export const routes: Routes = [
     title: `RSS | ${APP_PATH.SIGN_UP}`,
   },
   {
+    path: APP_PATH.PROFILE.toLowerCase(),
+    loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
+    title: `RSS | ${APP_PATH.PROFILE}`,
+  },
+  {
     path: APP_PATH.NOT_FOUND,
     loadComponent: () => import('./core/pages/not-found/not-found.component').then((c) => c.NotFoundComponent),
     title: `RSS | ${APP_PATH.NOT_FOUND}`,

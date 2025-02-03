@@ -8,7 +8,6 @@ import { ENVIRONMENT } from '@/environment/environment';
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const ls = inject(WA_LOCAL_STORAGE);
   const accessToken = ls.getItem(STORE_KEYS.ACCESS_TOKEN);
-  const refreshToken = ls.getItem(STORE_KEYS.REFRESH_TOKEN);
 
   if (!req.url.startsWith(ENVIRONMENT.API_URL)) {
     return next(req);
@@ -17,14 +16,6 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   let modifiedReq = req.clone({
     withCredentials: true,
   });
-
-  if (refreshToken) {
-    modifiedReq = modifiedReq.clone({
-      setHeaders: {
-        'X-Refresh-Token': refreshToken,
-      },
-    });
-  }
 
   if (accessToken) {
     modifiedReq = modifiedReq.clone({
