@@ -1,0 +1,44 @@
+<div class="card flex justify-center">
+  <p-drawer [(visible)]="IsVisible" [closable]="false">
+    <ng-template #content>
+      <div class="card flex justify-center">
+        <p-tieredMenu [model]="items" class="p-tieredmenu">
+          <ng-template #item let-item let-hasSubmenu="hasSubmenu">
+            <a pRipple class="flex items-center p-tieredmenu-item-link">
+              <span [class]="item.icon" class="p-tieredmenu-item-icon"></span>
+              <span class="ml-2">{{ item.label }}</span>
+              @if (item.badge) {
+                <p-badge class="ml-auto" [value]="item.badge" />
+              }
+              @if (hasSubmenu) {
+                <i class="pi pi-angle-right ml-auto"></i>
+              }
+            </a>
+          </ng-template>
+        </p-tieredMenu>
+      </div>
+    </ng-template>
+    <ng-template #footer>
+      <div class="flex items-center gap-2">
+        <button
+          pButton
+          [routerLink]="this.APP_ROUTE.PROFILE"
+          label="Profile"
+          icon="pi pi-user"
+          class="w-full"
+          outlined
+        ></button>
+        <button
+          pButton
+          (click)="this.logout()"
+          label="Logout"
+          icon="pi pi-sign-out"
+          class="w-full"
+          severity="danger"
+          outlined
+        ></button>
+      </div>
+    </ng-template>
+  </p-drawer>
+  <button pButton (click)="IsVisible = true" icon="pi pi-plus"></button>
+</div>
