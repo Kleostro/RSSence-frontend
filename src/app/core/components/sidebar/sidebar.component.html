@@ -1,5 +1,5 @@
 <div class="card flex justify-center">
-  <p-drawer [(visible)]="IsVisible" [closable]="false">
+  <p-drawer [(visible)]="isVisible" [closable]="false">
     <ng-template #content>
       <div class="card flex justify-center">
         <p-tieredMenu [model]="items" class="p-tieredmenu">
@@ -21,24 +21,23 @@
     <ng-template #footer>
       <div class="flex items-center gap-2">
         <button
+          class="w-max py-2 px-4"
           pButton
-          [routerLink]="this.APP_ROUTE.PROFILE"
-          label="Profile"
-          icon="pi pi-user"
-          class="w-full"
+          (click)="this.logout(); isVisible = false"
+          icon="pi pi-sign-out"
+          severity="danger"
           outlined
         ></button>
         <button
           pButton
-          (click)="this.logout()"
-          label="Logout"
-          icon="pi pi-sign-out"
+          label="Profile"
+          icon="pi pi-user"
           class="w-full"
-          severity="danger"
           outlined
+          (click)="this.navigationService.navigateToProfile(); isVisible = false"
         ></button>
       </div>
     </ng-template>
   </p-drawer>
-  <button pButton (click)="IsVisible = true" icon="pi pi-plus"></button>
+  <button pButton (click)="isVisible = true" icon="pi pi-plus"></button>
 </div>

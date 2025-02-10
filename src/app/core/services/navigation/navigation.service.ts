@@ -36,6 +36,14 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.HOME]);
   }
 
+  public navigateToProfile(): void {
+    this.router.navigate([APP_ROUTE.PROFILE]);
+  }
+
+  public navigateToProfileSettings(): void {
+    this.router.navigate([APP_ROUTE.PROFILE_SETTINGS]);
+  }
+
   public updateQueryParams(params: Params): void {
     this.router.navigate([], {
       queryParams: params,

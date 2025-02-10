@@ -5,4 +5,6 @@ export const ENDPOINTS = {
   LOGOUT: 'auth/logout',
   GOOGLE: 'auth/google',
   GOOGLE_CALLBACK: 'auth/google/callback',
+  PROFILES: 'profiles',
+  ME: 'me',
 } as const;
