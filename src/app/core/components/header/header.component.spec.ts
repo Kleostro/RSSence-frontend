@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 
 import { HeaderComponent } from '@/app/core/components/header/header.component';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
-import { MessageService } from '@/app/shared/services/message.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
