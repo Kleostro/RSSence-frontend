@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { MenuItem } from 'primeng/api';
 import { BadgeModule } from 'primeng/badge';
@@ -14,7 +15,7 @@ import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switc
 
 @Component({
   selector: 'app-sidebar',
-  imports: [DrawerModule, ButtonModule, TieredMenu, BadgeModule, Ripple],
+  imports: [DrawerModule, ButtonModule, TieredMenu, BadgeModule, Ripple, RouterLink],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +28,14 @@ export class SidebarComponent {
   public readonly APP_ROUTE = APP_ROUTE;
 
   public isVisible = false;
-  public items: MenuItem[] = [];
+  public items: MenuItem[] = [
+    {
+      label: 'Home',
+      icon: 'pi pi-home',
+      routerLink: [APP_ROUTE.HOME],
+    },
+    { separator: true },
+  ];
 
   public logout(): void {
     this.authService.logout().subscribe();

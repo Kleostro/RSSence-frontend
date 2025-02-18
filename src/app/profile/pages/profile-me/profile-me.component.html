@@ -1,3 +1,33 @@
-<p>profile-me works!</p>
-
-<p>{{ this.profileService.currentProfile() | json }}</p>
+@if (!this.loaderService.isProcessing()) {
+  @if (!this.profileService.currentProfile() || formState() === FORM_STATE.UPDATE) {
+    <div class="profile-form-wrapper">
+      <div class="profile-form-preview">
+        <app-profile-preview [profile]="this.profileForPreview()" />
+      </div>
+      <div class="profile-form-form">
+        <app-profile-form
+          [profile]="this.profileService.currentProfile()"
+          (backToProfilePageEvent)="this.formState.set(FORM_STATE.CREATE)"
+          (formSubmitEvent)="this.handleFormSubmit($event)"
+          (updateProfileForPreviewEvent)="this.profileForPreview.set($event)"
+        />
+      </div>
+    </div>
+  } @else {
+    <div class="profile-info">
+      <app-profile-preview [profile]="this.profileService.currentProfile()" />
+      <div class="buttons-wrapper">
+        <p-button
+          severity="success"
+          [disabled]="this.isProcessing()"
+          outlined="true"
+          (click)="this.formState.set(FORM_STATE.UPDATE)"
+          >Update</p-button
+        >
+        <p-button severity="danger" [disabled]="this.isProcessing()" outlined="true" (click)="this.deleteProfile()"
+          >Delete</p-button
+        >
+      </div>
+    </div>
+  }
+}

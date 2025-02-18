@@ -6,8 +6,9 @@ import { MessageService as service } from 'primeng/api';
   providedIn: 'root',
 })
 export class MessageService {
-  private readonly MESSAGE_DURATION = 3000;
   private readonly messageService = inject(service);
+
+  private readonly MESSAGE_DURATION = 3000;
 
   public success(message: string): void {
     this.messageService.add({

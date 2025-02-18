@@ -1,0 +1,31 @@
+.loader {
+  height: 0.4rem;
+}
+
+.buttons-wrapper {
+  display: flex;
+  gap: 2rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.profile-form-wrapper {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.profile-form-preview {
+  width: calc(50% - 1rem);
+}
+
+.profile-form-form {
+  width: calc(50% - 1rem);
+}

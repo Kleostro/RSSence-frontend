@@ -12,7 +12,7 @@ import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { MESSAGE } from '@/app/shared/services/constants/message';
-import { MessageService } from '@/app/shared/services/message.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 
 @Injectable({
   providedIn: 'root',

@@ -3,9 +3,11 @@ import { inject, Injectable, signal } from '@angular/core';
 
 import { catchError, EMPTY, Observable, take, tap } from 'rxjs';
 
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
 import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
-import { MessageService } from '@/app/shared/services/message.service';
+import { MESSAGE } from '@/app/shared/services/constants/message';
+import { MessageService } from '@/app/shared/services/message/message.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,11 +18,12 @@ export class ProfileService {
 
   public readonly currentProfile = signal<ProfilesResponse | null>(null);
 
-  public createProfile(profileDto: FormData): Observable<ProfilesResponse> {
-    return this.profilesService.createProfile(profileDto).pipe(
+  public createProfileMe(profileDto: FormData): Observable<ProfilesResponse> {
+    return this.profilesService.createProfileMe(profileDto).pipe(
       take(1),
       tap((profile: ProfilesResponse) => {
         this.currentProfile.set(profile);
+        this.message.success(MESSAGE.CREATE_PROFILE_SUCCESS);
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
@@ -41,6 +44,7 @@ export class ProfileService {
       take(1),
       tap((profile: ProfilesResponse) => {
         this.currentProfile.set(profile);
+        this.message.success(MESSAGE.UPDATE_PROFILE_SUCCESS);
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
@@ -51,13 +55,21 @@ export class ProfileService {
       take(1),
       tap(() => {
         this.currentProfile.set(null);
+        this.message.success(MESSAGE.DELETE_PROFILE_SUCCESS);
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    this.message.error(error.message);
+  public checkUsernameAvailability(username: string): Observable<boolean> {
+    return this.profilesService.checkUsernameAvailability(username).pipe(
+      take(1),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
+  }
+
+  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
+    this.message.error(error.error.message);
     return EMPTY;
   }
 }

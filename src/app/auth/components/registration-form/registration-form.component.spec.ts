@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
 
 import { RegistrationFormComponent } from '@/app/auth/components/registration-form/registration-form.component';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
-import { MessageService as UserMessageService } from '@/app/shared/services/message.service';
+import { MessageService as UserMessageService } from '@/app/shared/services/message/message.service';
 
 describe('RegistrationFormComponent', () => {
   let component: RegistrationFormComponent;
