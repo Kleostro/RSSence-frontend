@@ -13,8 +13,8 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class ProfilesService {
   private readonly http = inject(HttpClient);
 
-  public createProfile(profile: FormData): Observable<ProfilesResponse> {
-    return this.http.post<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
+  public createProfileMe(profile: FormData): Observable<ProfilesResponse> {
+    return this.http.post<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`, profile);
   }
 
   public getMe(): Observable<ProfilesResponse | null> {
@@ -27,5 +27,11 @@ export class ProfilesService {
 
   public deleteProfileMe(): Observable<ProfilesResponse> {
     return this.http.delete<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`);
+  }
+
+  public checkUsernameAvailability(username: string): Observable<boolean> {
+    return this.http.post<boolean>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.USERNAME_CHECK}`, {
+      username,
+    });
   }
 }
