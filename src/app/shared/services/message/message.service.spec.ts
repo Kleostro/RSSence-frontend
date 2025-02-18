@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MessageService as PrimeNGMessageService } from 'primeng/api';
 
-import { MessageService } from '@/app/shared/services/message.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 
 describe('MessageService', () => {
   let service: MessageService;

@@ -10,7 +10,7 @@ import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { MessageService } from '@/app/shared/services/message.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 
 describe('AuthService', () => {
   let authService: AuthService;

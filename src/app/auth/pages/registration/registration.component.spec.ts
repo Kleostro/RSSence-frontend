@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
 import { RegistrationComponent } from '@/app/auth/pages/registration/registration.component';
-import { MessageService as UserMessageService } from '@/app/shared/services/message.service';
+import { MessageService as UserMessageService } from '@/app/shared/services/message/message.service';
 
 describe('RegistrationComponent', () => {
   let component: RegistrationComponent;

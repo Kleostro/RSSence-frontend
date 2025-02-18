@@ -6,4 +6,7 @@ export const MESSAGE = {
   LOGOUT_SUCCESS: 'Logout was successful',
   LOGOUT_ERROR: 'Logout failed',
   UNKNOWN_ERROR: 'An unknown error occurred',
+  CREATE_PROFILE_SUCCESS: 'Profile was created',
+  DELETE_PROFILE_SUCCESS: 'Profile was deleted',
+  UPDATE_PROFILE_SUCCESS: 'Profile was updated',
 } as const;

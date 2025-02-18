@@ -40,6 +40,10 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.PROFILE]);
   }
 
+  public navigateToProfileMe(): void {
+    this.router.navigate([APP_ROUTE.PROFILE_ME]);
+  }
+
   public navigateToProfileSettings(): void {
     this.router.navigate([APP_ROUTE.PROFILE_SETTINGS]);
   }
