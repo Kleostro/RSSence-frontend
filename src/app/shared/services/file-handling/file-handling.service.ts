@@ -18,6 +18,14 @@ export class FileHandlingService {
     return null;
   }
 
+  public getFileListFromEvent(event: Event): FileList | null {
+    const { target } = event;
+    if (target instanceof HTMLInputElement) {
+      return target.files;
+    }
+    return null;
+  }
+
   public isValidFileSize(file: File, maxSize: number = this.DEFAULT_MAX_SIZE): boolean {
     if (file.size > maxSize) {
       this.message.error(`File size exceeds the maximum limit of ${(maxSize / 1024 / 1024).toString()}MB`);
