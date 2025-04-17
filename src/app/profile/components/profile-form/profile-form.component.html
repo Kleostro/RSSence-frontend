@@ -78,7 +78,7 @@
         </div>
       </div>
       <div class="control">
-        <label for="birthdate" class="control-label">Birthdate</label>
+        <label class="control-label">Birthdate</label>
         <p-icon-field>
           <p-datepicker (onSelect)="onBirthdateSelected($event)" #birthdatePicker [maxDate]="maxAllowedDate" />
           <p-inputicon styleClass="pi pi-calendar" />
@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="control control-textarea-container">
-      <label for="bio" class="control-label">About me</label>
+      <label class="control-label">About me</label>
       <textarea
         rows="5"
         pInputTextarea
@@ -123,11 +123,15 @@
         <span class="control-label-text">Avatar</span>
         <div class="image-preview-container">
           <span class="control-file-label">
-            <i class="pi pi-file-arrow-up text-xl"></i>
-            <span class="control-file-label-text"
-              >Drag and drop image or <span class="control-file-label-text-upload">Upload</span> (resolution up to 5,000
-              x 5,000 px)</span
-            >
+            @if (this.avatarUrl()) {
+              <img [src]="this.avatarUrl()" alt="avatar-preview" class="image-preview" />
+            } @else {
+              <i class="pi pi-file-arrow-up text-xl"></i>
+              <span class="control-file-label-text"
+                >Drag and drop image or <span class="control-file-label-text-upload">Upload</span> (resolution up to
+                5,000 x 5,000 px)</span
+              >
+            }
           </span>
         </div>
       </label>
@@ -146,14 +150,25 @@
       <button
         pButton
         pRipple
+        type="button"
+        [label]="this.profile ? 'Back' : 'Home'"
+        [icon]="this.profile ? 'pi pi-arrow-left' : 'pi pi-home'"
+        [disabled]="isProcessing()"
+        severity="info"
+        outlined="true"
+        (click)="this.profile ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToHome()"
+      ></button>
+
+      <button
+        pButton
+        pRipple
         type="submit"
+        label="Save"
         [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
         [disabled]="form.invalid || isProcessing()"
         severity="success"
         outlined="true"
-      >
-        Save
-      </button>
+      ></button>
     </div>
   </form>
 }

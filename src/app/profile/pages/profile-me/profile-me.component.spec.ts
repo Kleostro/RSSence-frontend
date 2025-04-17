@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
 
 import { MessageService } from 'primeng/api';
 
@@ -12,7 +13,11 @@ describe('ProfileMeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProfileMeComponent],
-      providers: [provideHttpClient(), { provide: MessageService, useValue: {} }],
+      providers: [
+        provideHttpClient(),
+        { provide: MessageService, useValue: {} },
+        { provide: ActivatedRoute, useValue: {} },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProfileMeComponent);

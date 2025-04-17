@@ -15,19 +15,14 @@
     </div>
   } @else {
     <div class="profile-info">
+      <p-speeddial
+        [model]="navigationItems"
+        direction="left"
+        [buttonProps]="{ severity: 'primary', raised: true }"
+        [tooltipOptions]="{ tooltipPosition: 'bottom' }"
+        [style]="{ position: 'absolute', right: '1rem', top: '1rem' }"
+      />
       <app-profile-preview [profile]="this.profileService.currentProfile()" />
-      <div class="buttons-wrapper">
-        <p-button
-          severity="success"
-          [disabled]="this.isProcessing()"
-          outlined="true"
-          (click)="this.formState.set(FORM_STATE.UPDATE)"
-          >Update</p-button
-        >
-        <p-button severity="danger" [disabled]="this.isProcessing()" outlined="true" (click)="this.deleteProfile()"
-          >Delete</p-button
-        >
-      </div>
     </div>
   }
 }

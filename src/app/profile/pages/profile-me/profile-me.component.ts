@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
+import { MenuItem } from 'primeng/api';
+import { SpeedDialModule } from 'primeng/speeddial';
 import { finalize } from 'rxjs';
 
 import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ProfileFormComponent } from '@/app/profile/components/profile-form/profile-form.component';
 import { ProfilePreviewComponent } from '@/app/profile/components/profile-preview/profile-preview.component';
 import { FORM_STATE, FormState } from '@/app/profile/constants/profile-form';
@@ -12,7 +14,7 @@ import { ProfileService } from '@/app/profile/services/profile/profile.service';
 
 @Component({
   selector: 'app-profile-me',
-  imports: [ProfileFormComponent, ProfilePreviewComponent, ButtonModule],
+  imports: [ProfileFormComponent, ProfilePreviewComponent, SpeedDialModule],
   templateUrl: './profile-me.component.html',
   styleUrl: './profile-me.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +22,7 @@ import { ProfileService } from '@/app/profile/services/profile/profile.service';
 export class ProfileMeComponent implements OnInit {
   public readonly profileService = inject(ProfileService);
   public readonly loaderService = inject(LoaderService);
+  public readonly navigationService = inject(NavigationService);
 
   public profileForPreview = signal<ProfilesResponse | null>(null);
 
@@ -27,6 +30,29 @@ export class ProfileMeComponent implements OnInit {
   public formState = signal<FormState>(FORM_STATE.CREATE);
 
   public readonly FORM_STATE = FORM_STATE;
+  public navigationItems: MenuItem[] = [
+    {
+      label: 'Author',
+      icon: 'pi pi-user',
+      command: (): void => {
+        this.navigationService.navigateToAuthor();
+      },
+    },
+    {
+      label: 'Edit',
+      icon: 'pi pi-pencil',
+      command: (): void => {
+        this.formState.set(FORM_STATE.UPDATE);
+      },
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: (): void => {
+        this.deleteProfile();
+      },
+    },
+  ];
 
   public ngOnInit(): void {
     this.loaderService.turnOn();

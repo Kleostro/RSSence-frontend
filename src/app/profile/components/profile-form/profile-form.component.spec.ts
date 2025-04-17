@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
 
 import { ProfileFormComponent } from '@/app/profile/components/profile-form/profile-form.component';
 import { MessageService } from '@/app/shared/services/message/message.service';
@@ -15,6 +16,10 @@ describe('ProfileFormComponent', () => {
         provideHttpClient(),
         {
           provide: MessageService,
+          useValue: {},
+        },
+        {
+          provide: ActivatedRoute,
           useValue: {},
         },
       ],
