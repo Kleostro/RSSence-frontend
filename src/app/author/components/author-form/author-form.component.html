@@ -1,50 +1,6 @@
 @if (form) {
   <form class="form" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="profile-name-controls">
-      <div class="control">
-        <label for="firstname" class="control-label">Firstname <span style="color: red">*</span></label>
-        <input id="firstname" type="text" pInputText formControlName="firstname" class="control-input p-inputtext" />
-        <div class="control-errors">
-          @if (form.controls.firstname.dirty) {
-            @if (form.controls.firstname.errors?.['required']) {
-              <small style="color: red">Please input your firstname!</small>
-            }
-            @if (form.controls.firstname.errors?.['minlength']) {
-              <small style="color: red"
-                >Firstname must be at least {{ FIELD_BOUNDARIES.FIRSTNAME_MIN_LENGTH }} characters long!</small
-              >
-            }
-            @if (form.controls.firstname.errors?.['maxlength']) {
-              <small style="color: red"
-                >Firstname must be at most {{ FIELD_BOUNDARIES.FIRSTNAME_MAX_LENGTH }} characters long!</small
-              >
-            }
-          }
-        </div>
-      </div>
-      <div class="control">
-        <label for="lastname" class="control-label">Lastname <span style="color: red">*</span></label>
-        <input id="lastname" type="text" pInputText formControlName="lastname" class="control-input p-inputtext" />
-        <div class="control-errors">
-          @if (form.controls.lastname.dirty) {
-            @if (form.controls.lastname.errors?.['required']) {
-              <small style="color: red">Please input your lastname!</small>
-            }
-            @if (form.controls.lastname.errors?.['minlength']) {
-              <small style="color: red"
-                >Lastname must be at least {{ FIELD_BOUNDARIES.LASTNAME_MIN_LENGTH }} characters long!</small
-              >
-            }
-            @if (form.controls.lastname.errors?.['maxlength']) {
-              <small style="color: red"
-                >Lastname must be at most {{ FIELD_BOUNDARIES.LASTNAME_MAX_LENGTH }} characters long!</small
-              >
-            }
-          }
-        </div>
-      </div>
-    </div>
-    <div class="profile-credentials-controls">
+    <div class="author-credentials-controls">
       <div class="control">
         <label for="username" class="control-label">Username <span style="color: red">*</span></label>
         <p-icon-field>
@@ -76,13 +32,6 @@
             }
           }
         </div>
-      </div>
-      <div class="control">
-        <label class="control-label">Birthdate</label>
-        <p-icon-field>
-          <p-datepicker (onSelect)="onBirthdateSelected($event)" #birthdatePicker [maxDate]="maxAllowedDate" />
-          <p-inputicon styleClass="pi pi-calendar" />
-        </p-icon-field>
       </div>
     </div>
     <div class="control control-textarea-container">
@@ -151,24 +100,24 @@
         pButton
         pRipple
         type="button"
-        [label]="this.profile ? 'Back' : 'Home'"
-        [icon]="this.profile ? 'pi pi-arrow-left' : 'pi pi-home'"
+        [label]="this.author ? 'Back' : 'Profile'"
+        [icon]="this.author ? 'pi pi-arrow-left' : 'pi pi-user'"
         [disabled]="isProcessing()"
         severity="info"
         outlined="true"
-        (click)="this.profile ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToHome()"
+        (click)="this.author ? this.backToAuthorPageEvent.emit() : this.navigationService.navigateToProfile()"
       ></button>
-
       <button
         pButton
         pRipple
         type="submit"
-        label="Save"
         [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
         [disabled]="form.invalid || isProcessing()"
         severity="success"
         outlined="true"
-      ></button>
+      >
+        Save
+      </button>
     </div>
   </form>
 }

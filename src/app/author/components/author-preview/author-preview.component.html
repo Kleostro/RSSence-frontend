@@ -1,0 +1,15 @@
+<header class="header">
+  <div class="header-top">
+    <div class="avatar-wrapper">
+      <p-avatar class="avatar-img" [image]="author()?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
+    </div>
+    <div class="author-name-wrapper">
+      <span class="author-username">{{ author()?.username?.length ? author()?.username : 'jane_doe' }}</span>
+    </div>
+  </div>
+</header>
+
+<div class="bio">
+  <h2 class="title">About me</h2>
+  <p class="text">{{ author()?.bio ?? '' }}</p>
+</div>

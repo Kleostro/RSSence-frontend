@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 
 import { MessageService } from 'primeng/api';
 
-import { ProfileMeComponent } from '@/app/profile/pages/profile-me/profile-me.component';
+import { AuthorMeComponent } from '@/app/author/pages/author-me/author-me.component';
 
-describe('ProfileMeComponent', () => {
-  let component: ProfileMeComponent;
-  let fixture: ComponentFixture<ProfileMeComponent>;
+describe('AuthorMeComponent', () => {
+  let component: AuthorMeComponent;
+  let fixture: ComponentFixture<AuthorMeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileMeComponent],
+      imports: [AuthorMeComponent],
       providers: [
         provideHttpClient(),
         { provide: MessageService, useValue: {} },
@@ -20,7 +20,7 @@ describe('ProfileMeComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ProfileMeComponent);
+    fixture = TestBed.createComponent(AuthorMeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -21,12 +21,13 @@ import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
 
 import { hasKeyInProfilesResponse, ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_BOUNDARIES } from '@/app/profile/constants/profile-form';
 import { ProfileForm } from '@/app/profile/interfaces/profile-form';
 import { ProfileService } from '@/app/profile/services/profile/profile.service';
-import { usernameAvailability } from '@/app/profile/validators/username-availability';
 import { InputDragAndDropDirective } from '@/app/shared/directives/input-drag-and-drop/input-drag-and-drop.directive';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
+import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
 @Component({
   selector: 'app-profile-form',
@@ -51,6 +52,7 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
   @Output() public formSubmitEvent = new EventEmitter<FormData>();
   @Output() public updateProfileForPreviewEvent = new EventEmitter<ProfilesResponse | null>();
 
+  public readonly navigationService = inject(NavigationService);
   private readonly profileService = inject(ProfileService);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly fb = inject(FormBuilder);
@@ -60,9 +62,9 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
 
   public form!: FormGroup<ProfileForm>;
 
+  public avatarUrl = signal<string | null>(null);
   private avatarFile = signal<File | null>(null);
-  private avatarUrl = signal<string | null>(this.profile?.avatarUrl ?? null);
-  private birthdate = signal<string | null>(this.profile?.birthdate ?? null);
+  private birthdate = signal<string | null>(null);
   private updatedProfile = signal<ProfilesResponse | null>(null);
 
   public isUsernameAvailable = signal<boolean | null>(null);
@@ -76,6 +78,7 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
     this.initForm(this.profile);
 
     if (this.profile) {
+      this.avatarUrl.set(this.profile.avatarUrl);
       this.updatedProfile.set(this.profile);
     }
 
@@ -213,7 +216,7 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
 
   public submit(): void {
     this.form.markAllAsTouched();
-    if (!this.form.valid) {
+    if (this.form.invalid) {
       return;
     }
 

@@ -4,38 +4,37 @@ import { MenuItem } from 'primeng/api';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { finalize } from 'rxjs';
 
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorFormComponent } from '@/app/author/components/author-form/author-form.component';
+import { AuthorPreviewComponent } from '@/app/author/components/author-preview/author-preview.component';
+import { AuthorService } from '@/app/author/services/author/author.service';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { ProfileFormComponent } from '@/app/profile/components/profile-form/profile-form.component';
-import { ProfilePreviewComponent } from '@/app/profile/components/profile-preview/profile-preview.component';
 import { FORM_STATE, FormState } from '@/app/profile/constants/profile-form';
-import { ProfileService } from '@/app/profile/services/profile/profile.service';
 
 @Component({
-  selector: 'app-profile-me',
-  imports: [ProfileFormComponent, ProfilePreviewComponent, SpeedDialModule],
-  templateUrl: './profile-me.component.html',
-  styleUrl: './profile-me.component.scss',
+  selector: 'app-author-me',
+  imports: [AuthorPreviewComponent, AuthorFormComponent, SpeedDialModule],
+  templateUrl: './author-me.component.html',
+  styleUrl: './author-me.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileMeComponent implements OnInit {
-  public readonly profileService = inject(ProfileService);
+export class AuthorMeComponent implements OnInit {
+  public readonly authorService = inject(AuthorService);
   public readonly loaderService = inject(LoaderService);
   public readonly navigationService = inject(NavigationService);
 
-  public profileForPreview = signal<ProfilesResponse | null>(null);
-
+  public authorForPreview = signal<AuthorsResponse | null>(null);
   public isProcessing = signal(false);
   public formState = signal<FormState>(FORM_STATE.CREATE);
 
   public readonly FORM_STATE = FORM_STATE;
   public navigationItems: MenuItem[] = [
     {
-      label: 'Author',
+      label: 'Profile',
       icon: 'pi pi-user',
       command: (): void => {
-        this.navigationService.navigateToAuthor();
+        this.navigationService.navigateToProfile();
       },
     },
     {
@@ -49,34 +48,34 @@ export class ProfileMeComponent implements OnInit {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: (): void => {
-        this.deleteProfile();
+        this.deleteAuthor();
       },
     },
   ];
 
   public ngOnInit(): void {
     this.loaderService.turnOn();
-    this.profileService
-      .getMe()
+    this.authorService
+      .getAuthorMe()
       .pipe(
         finalize(() => {
-          this.profileForPreview.set(this.profileService.currentProfile());
+          this.authorForPreview.set(this.authorService.currentAuthor());
           this.loaderService.turnOff();
         }),
       )
       .subscribe();
   }
 
-  public deleteProfile(): void {
+  public deleteAuthor(): void {
     this.loaderService.turnOn();
     this.isProcessing.set(true);
-    this.profileService
-      .deleteProfileMe()
+    this.authorService
+      .deleteAuthorMe()
       .pipe(
         finalize(() => {
           this.loaderService.turnOff();
           this.isProcessing.set(false);
-          this.profileForPreview.set(this.profileService.currentProfile());
+          this.authorForPreview.set(this.authorService.currentAuthor());
         }),
       )
       .subscribe();
@@ -85,23 +84,23 @@ export class ProfileMeComponent implements OnInit {
   public handleFormSubmit(formData: FormData): void {
     this.loaderService.turnOn();
     if (this.formState() === FORM_STATE.UPDATE) {
-      this.profileService
-        .updateProfileMe(formData)
+      this.authorService
+        .updateAuthorMe(formData)
         .pipe(
           finalize(() => {
             this.loaderService.turnOff();
             this.formState.set(FORM_STATE.CREATE);
-            this.profileForPreview.set(this.profileService.currentProfile());
+            this.authorForPreview.set(this.authorService.currentAuthor());
           }),
         )
         .subscribe();
     } else {
-      this.profileService
-        .createProfileMe(formData)
+      this.authorService
+        .createAuthorMe(formData)
         .pipe(
           finalize(() => {
             this.loaderService.turnOff();
-            this.profileForPreview.set(this.profileService.currentProfile());
+            this.authorForPreview.set(this.authorService.currentAuthor());
           }),
         )
         .subscribe();

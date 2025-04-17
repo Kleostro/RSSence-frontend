@@ -2,23 +2,23 @@
   height: 0.4rem;
 }
 
-.profile-info {
+.author-info {
   position: relative;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
 }
 
-.profile-form-wrapper {
+.author-form-wrapper {
   display: flex;
   gap: 2rem;
   justify-content: space-between;
 }
 
-.profile-form-preview {
+.author-form-preview {
   width: calc(50% - 1rem);
 }
 
-.profile-form-form {
+.author-form-form {
   width: calc(50% - 1rem);
 }

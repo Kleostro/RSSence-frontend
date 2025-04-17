@@ -9,4 +9,7 @@ export const MESSAGE = {
   CREATE_PROFILE_SUCCESS: 'Profile was created',
   DELETE_PROFILE_SUCCESS: 'Profile was deleted',
   UPDATE_PROFILE_SUCCESS: 'Profile was updated',
+  CREATE_AUTHOR_SUCCESS: 'Author was created',
+  DELETE_AUTHOR_SUCCESS: 'Author was deleted',
+  UPDATE_AUTHOR_SUCCESS: 'Author was updated',
 } as const;

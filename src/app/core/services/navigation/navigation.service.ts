@@ -48,6 +48,14 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.PROFILE_SETTINGS]);
   }
 
+  public navigateToAuthor(): void {
+    this.router.navigate([APP_ROUTE.AUTHOR]);
+  }
+
+  public navigateToAuthorMe(): void {
+    this.router.navigate([APP_ROUTE.AUTHOR_ME]);
+  }
+
   public updateQueryParams(params: Params): void {
     this.router.navigate([], {
       queryParams: params,

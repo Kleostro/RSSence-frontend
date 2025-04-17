@@ -49,6 +49,24 @@ export const routes: Routes = [
     ],
   },
   {
+    path: APP_PATH.AUTHOR.toLowerCase(),
+    loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
+    title: `RSS | ${APP_PATH.AUTHOR}`,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: APP_PATH.DEFAULT,
+        redirectTo: APP_PATH.ME.toLowerCase(),
+        pathMatch: 'full',
+      },
+      {
+        path: APP_PATH.ME.toLowerCase(),
+        loadComponent: () => import('./author/pages/author-me/author-me.component').then((c) => c.AuthorMeComponent),
+        title: `RSSence | ${APP_PATH.AUTHOR} | ${APP_PATH.ME}`,
+      },
+    ],
+  },
+  {
     path: APP_PATH.NOT_FOUND,
     loadComponent: () => import('./core/pages/not-found/not-found.component').then((c) => c.NotFoundComponent),
     title: `RSS | ${APP_PATH.NOT_FOUND}`,

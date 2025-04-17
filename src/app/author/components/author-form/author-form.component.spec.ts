@@ -2,16 +2,17 @@ import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 
-import { ProfileFormComponent } from '@/app/profile/components/profile-form/profile-form.component';
-import { MessageService } from '@/app/shared/services/message/message.service';
+import { MessageService } from 'primeng/api';
 
-describe('ProfileFormComponent', () => {
-  let component: ProfileFormComponent;
-  let fixture: ComponentFixture<ProfileFormComponent>;
+import { AuthorFormComponent } from '@/app/author/components/author-form/author-form.component';
+
+describe('AuthorFormComponent', () => {
+  let component: AuthorFormComponent;
+  let fixture: ComponentFixture<AuthorFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileFormComponent],
+      imports: [AuthorFormComponent],
       providers: [
         provideHttpClient(),
         {
@@ -25,7 +26,7 @@ describe('ProfileFormComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ProfileFormComponent);
+    fixture = TestBed.createComponent(AuthorFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,5 +1,4 @@
-.profile-name-controls,
-.profile-credentials-controls {
+.author-credentials-controls {
   display: flex;
   gap: 1rem;
 }
@@ -34,12 +33,6 @@
   color: var(--p-surface-300);
   background: var(--p-surface-800);
   border: 0.1rem solid var(--p-surface-600);
-}
-
-::ng-deep .p-datepicker {
-  width: 100%;
-  color: var(--p-surface-300);
-  background: var(--p-surface-800);
 }
 
 .control-textarea {
