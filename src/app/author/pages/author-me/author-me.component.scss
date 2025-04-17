@@ -1,0 +1,24 @@
+.loader {
+  height: 0.4rem;
+}
+
+.author-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.author-form-wrapper {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.author-form-preview {
+  width: calc(50% - 1rem);
+}
+
+.author-form-form {
+  width: calc(50% - 1rem);
+}
