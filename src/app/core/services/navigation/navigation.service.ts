@@ -16,6 +16,7 @@ export class NavigationService {
 
   public queryParams = signal<Record<string, string>>({});
   public isLoginPage = signal<boolean>(false);
+  public userId = signal<string | null>(null);
 
   constructor() {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
@@ -36,24 +37,24 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.HOME]);
   }
 
+  public navigateToNotFound(): void {
+    this.router.navigate([APP_ROUTE.NOT_FOUND]);
+  }
+
   public navigateToProfile(): void {
     this.router.navigate([APP_ROUTE.PROFILE]);
   }
 
-  public navigateToProfileMe(): void {
-    this.router.navigate([APP_ROUTE.PROFILE_ME]);
-  }
-
-  public navigateToProfileSettings(): void {
-    this.router.navigate([APP_ROUTE.PROFILE_SETTINGS]);
+  public navigateToProfileByUserId(userId: number): void {
+    this.router.navigate([APP_ROUTE.PROFILE, userId]);
   }
 
   public navigateToAuthor(): void {
     this.router.navigate([APP_ROUTE.AUTHOR]);
   }
 
-  public navigateToAuthorMe(): void {
-    this.router.navigate([APP_ROUTE.AUTHOR_ME]);
+  public navigateToAuthorByUserId(userId: number): void {
+    this.router.navigate([APP_ROUTE.AUTHOR, userId]);
   }
 
   public updateQueryParams(params: Params): void {
@@ -62,5 +63,18 @@ export class NavigationService {
       queryParamsHandling: 'merge',
       relativeTo: this.activatedRoute,
     });
+  }
+
+  public parseUserId(userId: string | null): number | null {
+    const parsedUserId = Number(userId) || null;
+
+    if (parsedUserId === null) {
+      if (userId) {
+        this.navigateToNotFound();
+      }
+      return null;
+    }
+
+    return parsedUserId;
   }
 }

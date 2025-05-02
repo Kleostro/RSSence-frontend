@@ -1,0 +1,28 @@
+:host {
+  display: contents;
+}
+
+.post-avatar-img {
+  cursor: pointer;
+  transition: filter 0.3s;
+
+  &:hover {
+    filter: brightness(1.5);
+  }
+}
+
+.post-author-link {
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--p-primary-color);
+  }
+}
+
+.post-createdAt {
+  margin-right: auto;
+  font-size: 0.9rem;
+  color: var(--p-text-muted-color);
+  letter-spacing: 0.05rem;
+}

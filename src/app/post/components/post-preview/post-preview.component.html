@@ -1,0 +1,35 @@
+@let post = this.post();
+@let author = this.author();
+
+@if (post && author) {
+  <div class="post-preview">
+    <a [routerLink]="['/posts', post.id]" class="post-preview-link"> </a>
+    <header class="post-preview-header">
+      <app-post-avatar [post]="post" [author]="author" />
+
+      <div *ngIf="post.coauthorsIds.length" class="post-preview-coauthors-wrapper">
+        <app-coauthors-list [coauthorsIds]="post.coauthorsIds" />
+      </div>
+
+      <div class="post-preview-actions">
+        <a
+          pButton
+          pRipple
+          [routerLink]="['/posts', post.id]"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          outlined="true"
+          rounded="true"
+          severity="info"
+          class="post-preview-read-more"
+        ></a>
+      </div>
+    </header>
+
+    <body class="post-preview-body">
+      <strong class="post-preview-title">{{ post.title }}</strong>
+    </body>
+
+    <footer class="post-preview-footer"></footer>
+  </div>
+}

@@ -5,6 +5,7 @@ import { Injectable, signal } from '@angular/core';
 })
 export class LoaderService {
   public isProcessing = signal(false);
+  public isPageLoading = signal(false);
 
   public turnOn(): void {
     this.isProcessing.set(true);
@@ -12,5 +13,13 @@ export class LoaderService {
 
   public turnOff(): void {
     this.isProcessing.set(false);
+  }
+
+  public turnOnPageLoading(): void {
+    this.isPageLoading.set(true);
+  }
+
+  public turnOffPageLoading(): void {
+    this.isPageLoading.set(false);
   }
 }

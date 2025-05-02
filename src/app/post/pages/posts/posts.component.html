@@ -1,0 +1,30 @@
+@let posts = this.postService.allPosts();
+
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+
+  <button
+    pButton
+    pRipple
+    *ngIf="posts.length"
+    type="button"
+    (click)="this.postsListMode.set(this.postsListMode() === 'preview' ? 'full' : 'preview')"
+    label="Switch to {{ this.postsListMode() }} mode"
+    [icon]="this.postsListMode() === 'preview' ? 'pi pi-eye' : 'pi pi-eye-slash'"
+    class="switch-mode-button"
+    severity="success"
+    outlined="true"
+  ></button>
+
+  <app-posts-list [posts]="posts" [mode]="this.postsListMode()" />
+</div>

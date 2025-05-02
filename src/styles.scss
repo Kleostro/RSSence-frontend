@@ -1,3 +1,5 @@
-@import 'node_modules/modern-normalize/modern-normalize.css';
-@import 'primeicons/primeicons.css';
-@import 'primeflex/primeflex.css';
+@use 'reset';
+@use 'common';
+@use 'node_modules/modern-normalize/modern-normalize.css';
+@use 'primeicons/primeicons.css';
+@use 'primeflex/primeflex.css';
