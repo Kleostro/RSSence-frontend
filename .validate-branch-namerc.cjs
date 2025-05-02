@@ -1,6 +1,6 @@
 module.exports = {
   errorMsg: 'Please use correct branch name',
-  pattern: /^(ci|chore|docs|feat|fix|perf|refactor|style|test)\/RS-0[1-9]-\d{2}\/[a-z_]+$/,
+  pattern: /^(ci|chore|docs|feat|fix|perf|refactor|style|test)\/RS-0[1-9]-\d{2}\/[a-z-]+$/,
 };
 
 // Branch Name Examples:
