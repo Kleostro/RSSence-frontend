@@ -1,16 +1,23 @@
+@let profile = this.profile();
+@let firstname = profile?.firstname?.length ? profile?.firstname : 'Jane';
+@let lastname = profile?.lastname?.length ? profile?.lastname : 'Doe';
+@let username = profile?.username ? '@' + profile?.username : 'jane_doe';
+@let avatar = profile?.avatarUrl ?? 'img/svg/avatar-placeholder.svg';
+@let birthdate = profile?.birthdate?.length ? (profile?.birthdate | date: 'longDate') : '';
+
 <header class="header">
   <div class="header-top">
     <div class="avatar-wrapper">
-      <p-avatar class="avatar-img" [image]="profile()?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
+      <p-avatar class="avatar-img" [image]="avatar" />
     </div>
     <div class="profile-name-wrapper">
       <strong class="profile-name"
-        ><span>{{ profile()?.firstname?.length ? profile()?.firstname : 'Jane' }}</span>
+        ><span>{{ firstname }}</span>
         <span>&nbsp;</span>
-        <span>{{ profile()?.lastname?.length ? profile()?.lastname : 'Doe' }}</span></strong
+        <span>{{ lastname }}</span></strong
       >
-      <span class="profile-username">{{ profile()?.username?.length ? profile()?.username : 'jane_doe' }}</span>
-      <span>{{ profile()?.birthdate?.length ? (profile()?.birthdate | date: 'longDate') : '' }}</span>
+      <span class="profile-username">{{ username }}</span>
+      <span>{{ birthdate }}</span>
     </div>
   </div>
 </header>

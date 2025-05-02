@@ -13,20 +13,20 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class ProfilesService {
   private readonly http = inject(HttpClient);
 
-  public createProfileMe(profile: FormData): Observable<ProfilesResponse> {
-    return this.http.post<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`, profile);
+  public getProfiles(): Observable<ProfilesResponse[]> {
+    return this.http.get<ProfilesResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
   }
 
-  public getMe(): Observable<ProfilesResponse | null> {
-    return this.http.get<ProfilesResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`);
+  public createProfile(profile: FormData): Observable<ProfilesResponse> {
+    return this.http.post<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
   }
 
-  public updateProfileMe(profile: FormData): Observable<ProfilesResponse> {
-    return this.http.patch<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`, profile);
+  public updateProfile(profile: FormData): Observable<ProfilesResponse> {
+    return this.http.patch<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
   }
 
-  public deleteProfileMe(): Observable<ProfilesResponse> {
-    return this.http.delete<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.ME}`);
+  public deleteProfile(): Observable<ProfilesResponse> {
+    return this.http.delete<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
   }
 
   public checkUsernameAvailability(username: string): Observable<boolean> {
