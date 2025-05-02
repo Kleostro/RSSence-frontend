@@ -166,15 +166,4 @@ export default [
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     files: ['*.html'],
   },
-
-  // TypeScript test files configuration
-  {
-    name: 'test files',
-    files: ['**/*.spec.ts'],
-    rules: {
-      '@typescript-eslint/unbound-method': 'off',
-      'max-lines-per-function': 'off',
-      '@typescript-eslint/consistent-type-assertions': 'off',
-    },
-  },
 ];
