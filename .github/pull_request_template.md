@@ -20,10 +20,6 @@ Provide affected modules or areas
 
 Provide any style changes details
 
-#### Testing Strategy 🧼
-
-Describe the testing strategy for the changes
-
 #### Screenshots/Demo 📸
 
 If necessary provide screenshots or a demo link to visually demonstrate the changes
@@ -42,8 +38,6 @@ Specify if any documentation updates are required and provide details on what ne
       [![Pull Request Labeler](https://github.com/kleostro/RSSence-frontend/actions/workflows/labeler.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/labeler.yml)
 - [x] My code doesn't generate any errors or warnings ⚠️
       [![Code Formatter](https://github.com/kleostro/RSSence-frontend/actions/workflows/format.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/format.yml)
-- [x] My code passes all tests 🧪
-      [![Test](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml/badge.svg)](https://github.com/kleostro/RSSence-frontend/actions/workflows/test.yml)
 - [x] My code builds successfully ⚙️
       [![Netlify Status](https://api.netlify.com/api/v1/badges/c2d017fb-a7d0-4279-981d-918587dde979/deploy-status)](https://app.netlify.com/sites/rssence/deploys)
 
