@@ -1,0 +1,16 @@
+@let currentProfile = this.currentProfile();
+@let profileForPreview = this.profileForPreview();
+
+<div class="profile-form-wrapper">
+  <div class="profile-form-preview">
+    <app-profile-preview [profile]="profileForPreview" />
+  </div>
+  <div class="profile-form-form">
+    <app-profile-form
+      [profile]="currentProfile"
+      (backToProfilePageEvent)="backToProfilePage.emit()"
+      (formSubmitEvent)="formSubmit.emit($event)"
+      (updateProfileForPreviewEvent)="updateProfileForPreview.emit($event)"
+    />
+  </div>
+</div>

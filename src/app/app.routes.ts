@@ -25,46 +25,51 @@ export const routes: Routes = [
   },
   {
     path: APP_PATH.PROFILE.toLowerCase(),
+    pathMatch: 'full',
     loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
     title: `RSS | ${APP_PATH.PROFILE}`,
     canActivate: [authGuard],
-    children: [
-      {
-        path: APP_PATH.DEFAULT,
-        redirectTo: APP_PATH.ME.toLowerCase(),
-        pathMatch: 'full',
-      },
-      {
-        path: APP_PATH.ME.toLowerCase(),
-        loadComponent: () =>
-          import('./profile/pages/profile-me/profile-me.component').then((c) => c.ProfileMeComponent),
-        title: `RSSence | ${APP_PATH.PROFILE} | ${APP_PATH.ME}`,
-      },
-      {
-        path: APP_PATH.SETTINGS.toLowerCase(),
-        loadComponent: () =>
-          import('./profile/pages/profile-settings/profile-settings.component').then((c) => c.ProfileSettingsComponent),
-        title: `RSSence | ${APP_PATH.PROFILE} | ${APP_PATH.SETTINGS}`,
-      },
-    ],
+  },
+  {
+    path: `${APP_PATH.PROFILE.toLowerCase()}/:id`,
+    pathMatch: 'full',
+    loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
+    title: `RSS | ${APP_PATH.PROFILE}`,
+    canActivate: [authGuard],
   },
   {
     path: APP_PATH.AUTHOR.toLowerCase(),
+    pathMatch: 'full',
     loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
     title: `RSS | ${APP_PATH.AUTHOR}`,
     canActivate: [authGuard],
-    children: [
-      {
-        path: APP_PATH.DEFAULT,
-        redirectTo: APP_PATH.ME.toLowerCase(),
-        pathMatch: 'full',
-      },
-      {
-        path: APP_PATH.ME.toLowerCase(),
-        loadComponent: () => import('./author/pages/author-me/author-me.component').then((c) => c.AuthorMeComponent),
-        title: `RSSence | ${APP_PATH.AUTHOR} | ${APP_PATH.ME}`,
-      },
-    ],
+  },
+  {
+    path: `${APP_PATH.AUTHOR.toLowerCase()}/:id`,
+    pathMatch: 'full',
+    loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
+    title: `RSSence | ${APP_PATH.AUTHOR}`,
+    canActivate: [authGuard],
+  },
+  {
+    path: `${APP_PATH.AUTHOR.toLowerCase()}/:id/${APP_PATH.POSTS.toLowerCase()}`,
+    pathMatch: 'full',
+    loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
+    title: `RSSence | ${APP_PATH.AUTHOR} | ${APP_PATH.POSTS}`,
+    canActivate: [authGuard],
+  },
+  {
+    path: APP_PATH.POSTS.toLowerCase(),
+    canActivate: [authGuard],
+    pathMatch: 'full',
+    loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
+    title: `RSS | ${APP_PATH.POSTS}`,
+  },
+  {
+    path: `${APP_PATH.POSTS.toLowerCase()}/:id`,
+    loadComponent: () =>
+      import('./post/pages/post-detailed/post-detailed.component').then((c) => c.PostDetailedComponent),
+    title: `RSSence | ${APP_PATH.POSTS.slice(0, -1)}`,
   },
   {
     path: APP_PATH.NOT_FOUND,

@@ -1,0 +1,14 @@
+@if (this.posts(); as posts) {
+  @for (post of posts; track post; let i = $index) {
+    @if (mode() === 'preview') {
+      <app-post-preview [post]="post" [author]="this.authorService.findAuthorById(post.authorId)"></app-post-preview>
+    } @else {
+      <app-post [post]="post" [author]="this.authorService.findAuthorById(post.authorId)"></app-post>
+    }
+  } @empty {
+    <div class="not-found">
+      <p class="not-found-text">Not found any posts</p>
+      <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
+    </div>
+  }
+}

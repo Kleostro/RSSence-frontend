@@ -1,0 +1,10 @@
+.profile-form-wrapper {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.profile-form-preview,
+.profile-form-form {
+  width: calc(50% - 1rem);
+}

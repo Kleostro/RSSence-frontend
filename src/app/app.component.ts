@@ -6,10 +6,11 @@ import { ToastModule } from 'primeng/toast';
 
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { HeaderComponent } from '@/app/core/components/header/header.component';
+import { ModalComponent } from '@/app/shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, ToastModule],
+  imports: [RouterOutlet, HeaderComponent, ToastModule, ModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

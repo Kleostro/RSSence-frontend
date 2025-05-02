@@ -1,0 +1,10 @@
+.author-form-wrapper {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.author-form-preview,
+.author-form-form {
+  width: calc(50% - 1rem);
+}

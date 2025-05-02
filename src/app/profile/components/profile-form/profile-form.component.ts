@@ -5,6 +5,7 @@ import {
   EventEmitter,
   inject,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   signal,
@@ -19,13 +20,16 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
+import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 
 import { hasKeyInProfilesResponse, ProfilesResponse } from '@/app/api/schemas/profiles-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_BOUNDARIES } from '@/app/profile/constants/profile-form';
+import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/profile/constants/profile-form';
 import { ProfileForm } from '@/app/profile/interfaces/profile-form';
+import { ProfileFacadeService } from '@/app/profile/services/profile-facade/profile-facade.service';
 import { ProfileService } from '@/app/profile/services/profile/profile.service';
-import { InputDragAndDropDirective } from '@/app/shared/directives/input-drag-and-drop/input-drag-and-drop.directive';
+import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
+import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
@@ -33,44 +37,47 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
   selector: 'app-profile-form',
   imports: [
     ReactiveFormsModule,
+    FormFieldErrorComponent,
+    FileUploaderComponent,
     InputIcon,
     IconField,
     InputTextModule,
     ButtonModule,
     RippleModule,
     TextareaModule,
-    InputDragAndDropDirective,
     DatePicker,
   ],
   templateUrl: './profile-form.component.html',
   styleUrl: './profile-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileFormComponent implements OnInit, AfterViewInit {
+export class ProfileFormComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public profile: ProfilesResponse | null = null;
   @Output() public backToProfilePageEvent = new EventEmitter<void>();
-  @Output() public formSubmitEvent = new EventEmitter<FormData>();
+  @Output() public formSubmitEvent = new EventEmitter<ProfilesResponse>();
   @Output() public updateProfileForPreviewEvent = new EventEmitter<ProfilesResponse | null>();
 
   public readonly navigationService = inject(NavigationService);
   private readonly profileService = inject(ProfileService);
+  private readonly facade = inject(ProfileFacadeService);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly fb = inject(FormBuilder);
 
-  public readonly FIELD_BOUNDARIES = PROFILE_FORM_FIELD_BOUNDARIES;
+  public readonly PROFILE_FORM_FIELD_CONFIG = PROFILE_FORM_FIELD_CONFIG;
+
   public readonly maxAllowedDate = new Date();
 
   public form!: FormGroup<ProfileForm>;
+
+  public isProcessing = signal<boolean>(false);
+  public hasChanges = signal<boolean>(false);
 
   public avatarUrl = signal<string | null>(null);
   private avatarFile = signal<File | null>(null);
   private birthdate = signal<string | null>(null);
   private updatedProfile = signal<ProfilesResponse | null>(null);
 
-  public isUsernameAvailable = signal<boolean | null>(null);
-
-  public isProcessing = signal<boolean>(false);
-  public hasChanges = signal<boolean>(false);
+  private readonly destroy$ = new Subject<void>();
 
   @ViewChild('birthdatePicker') private birthdatePicker!: DatePicker;
 
@@ -99,39 +106,28 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
         initialValues?.firstname ?? '',
         [
           Validators.required.bind(this),
-          Validators.minLength(this.FIELD_BOUNDARIES.FIRSTNAME_MIN_LENGTH),
-          Validators.maxLength(this.FIELD_BOUNDARIES.FIRSTNAME_MAX_LENGTH),
+          Validators.minLength(this.PROFILE_FORM_FIELD_CONFIG.firstname.min),
+          Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.firstname.max),
         ],
       ],
       lastname: [
         initialValues?.lastname ?? '',
         [
           Validators.required.bind(this),
-          Validators.minLength(this.FIELD_BOUNDARIES.LASTNAME_MIN_LENGTH),
-          Validators.maxLength(this.FIELD_BOUNDARIES.LASTNAME_MAX_LENGTH),
+          Validators.minLength(this.PROFILE_FORM_FIELD_CONFIG.lastname.min),
+          Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.lastname.max),
         ],
       ],
       username: [
         initialValues?.username ?? '',
         [
           Validators.required.bind(this),
-          Validators.minLength(this.FIELD_BOUNDARIES.USERNAME_MIN_LENGTH),
-          Validators.maxLength(this.FIELD_BOUNDARIES.USERNAME_MAX_LENGTH),
+          Validators.minLength(this.PROFILE_FORM_FIELD_CONFIG.username.min),
+          Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.username.max),
         ],
         [usernameAvailability(this.profileService, this.profile?.username ?? null)],
       ],
-      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.FIELD_BOUNDARIES.BIO_MAX_LENGTH)]],
-    });
-
-    this.form.controls.username.statusChanges.subscribe(() => {
-      const usernameControl = this.form.controls.username;
-      if (usernameControl.errors === null && usernameControl.value) {
-        this.isUsernameAvailable.set(true);
-      } else if (usernameControl.errors?.['usernameAvailability']) {
-        this.isUsernameAvailable.set(false);
-      } else {
-        this.isUsernameAvailable.set(null);
-      }
+      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.bio.max)]],
     });
   }
 
@@ -152,7 +148,7 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
 
     const birthdate = this.birthdate();
     if (birthdate) {
-      formData.append(FORM_CONTROL_NAME.BIRTHDATE, new Date(birthdate).toUTCString());
+      formData.append(FORM_CONTROL_NAME.BIRTHDATE, new Date(birthdate).toISOString());
     }
 
     return formData;
@@ -174,16 +170,17 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
     return false;
   }
 
-  public onAvatarSelected(event: Event | File[]): void {
-    const file = Array.isArray(event) ? event[0] : this.fileHandlingService.getFileFromEvent(event);
+  public onAvatarSelected(files: File[]): void {
+    this.avatarFile.set(files[0]);
+    this.hasChanges.set(true);
 
-    if (!file || !this.fileHandlingService.isValidFileSize(file)) {
+    if (!files[0]) {
+      this.avatarUrl.set(null);
+      this.updateProfileForPreview();
       return;
     }
 
-    this.avatarFile.set(file);
-    this.hasChanges.set(true);
-    this.avatarUrl.set(this.fileHandlingService.createObjectURL(file));
+    this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
     this.updateProfileForPreview();
   }
 
@@ -191,7 +188,6 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
     if (this.profile) {
       const newDate = new Date(event).getTime();
       const profileBirthdate = new Date(this.profile.birthdate ?? '').getTime();
-
       if (newDate !== profileBirthdate) {
         this.hasChanges.set(true);
       }
@@ -209,7 +205,7 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
       username,
       bio,
       avatarUrl: this.avatarUrl() ?? this.profile?.avatarUrl ?? null,
-      birthdate: this.birthdate() ?? this.profile?.birthdate ?? '',
+      birthdate: this.birthdate() ?? this.profile?.birthdate ?? null,
     });
     this.updateProfileForPreviewEvent.emit(this.updatedProfile());
   }
@@ -217,20 +213,58 @@ export class ProfileFormComponent implements OnInit, AfterViewInit {
   public submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
+      this.focusFirstInvalidField();
       return;
     }
 
-    this.isProcessing.set(true);
-    this.form.disable();
-    this.birthdatePicker.setDisabledState(true);
-
-    const formData = this.createFormData();
+    this.disableForm();
+    this.handleFormSubmit();
 
     if (this.profile && !this.hasChanges()) {
       this.backToProfilePageEvent.emit();
-      return;
     }
+  }
 
-    this.formSubmitEvent.emit(formData);
+  private handleFormSubmit(): void {
+    const formData = this.createFormData();
+    this.facade
+      .handleProfileFormSubmit(formData, !!this.profile)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(() => {
+          this.enableForm();
+          return EMPTY;
+        }),
+      )
+      .subscribe((newOrUpdatedProfile) => {
+        this.formSubmitEvent.emit(newOrUpdatedProfile);
+      });
+  }
+
+  private focusFirstInvalidField(): void {
+    const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
+    if (invalidControl) {
+      const element = document.querySelector(`[formControlName="${invalidControl}"]`);
+      if (element instanceof HTMLInputElement) {
+        element.focus();
+      }
+    }
+  }
+
+  private enableForm(): void {
+    this.isProcessing.set(false);
+    this.form.enable();
+    this.birthdatePicker.setDisabledState(false);
+  }
+
+  private disableForm(): void {
+    this.isProcessing.set(true);
+    this.form.disable();
+    this.birthdatePicker.setDisabledState(true);
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

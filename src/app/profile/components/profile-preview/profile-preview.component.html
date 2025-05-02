@@ -1,2 +1,5 @@
-<app-profile-header [profile]="profile()"></app-profile-header>
-<app-profile-bio class="bio" [bio]="profile()?.bio ?? ''"></app-profile-bio>
+@let profile = this.profile();
+@let bio = profile?.bio ?? '';
+
+<app-profile-header [profile]="profile"></app-profile-header>
+<app-profile-bio class="bio" [bio]="bio"></app-profile-bio>

@@ -1,0 +1,86 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  margin: 2rem 0;
+  padding: 2rem;
+
+  background-color: var(--p-surface-800);
+  border-radius: 0.5rem;
+
+  &::ng-deep .p-floatlabel {
+    width: 100%;
+  }
+}
+
+.image-url-wrapper,
+.coauthor-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.image-wrapper,
+.coauthor-fg-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+
+  &::ng-deep .p-floatlabel {
+    width: 95%;
+  }
+
+  &::ng-deep .p-inputtext {
+    color: var(--p-surface-300);
+    background: var(--p-surface-800);
+    border: 0.1rem solid var(--p-surface-600);
+  }
+}
+
+.imageUrls,
+.coauthors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 49%;
+}
+
+.title-input,
+.content-input,
+.image-url-input,
+.coauthor-input {
+  color: var(--p-surface-300);
+  background: var(--p-surface-800);
+  border: 0.1rem solid var(--p-surface-600);
+}
+
+.content-input {
+  resize: none;
+  height: 8rem;
+}
+
+.multiple-select {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 1.5rem 0;
+
+  border: 0.1rem solid var(--p-form-field-border-color);
+  border-right: 0;
+  border-left: 0;
+}
+
+.image-control,
+.coauthor-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 92%;
+}
+
+.coauthor-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

@@ -1,0 +1,28 @@
+@let currentAuthor = this.currentAuthor();
+@let isMyPage = this.isMyPage();
+@let navigationItems = this.navigationItems();
+
+<div class="author-info">
+  @if (isMyPage) {
+    <p-speeddial
+      [model]="navigationItems"
+      direction="left"
+      [buttonProps]="{ severity: 'primary', outlined: true }"
+      [tooltipOptions]="{ tooltipPosition: 'bottom' }"
+      [style]="{ position: 'absolute', right: '1rem', top: '1rem' }"
+    />
+  } @else if (currentAuthor) {
+    <button
+      pButton
+      pRipple
+      type="button"
+      class="move-to-profile-button"
+      (click)="navigateToProfile.emit(currentAuthor?.userId)"
+      label="Profile"
+      icon="pi pi-user"
+      severity="info"
+      outlined="true"
+    ></button>
+  }
+  <app-author-preview [author]="currentAuthor" />
+</div>

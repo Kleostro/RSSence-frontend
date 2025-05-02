@@ -1,0 +1,29 @@
+<span class="coauthors-label">coauthors:</span>
+<p-avatar-group class="coauthors-avatar-group">
+  @for (coauthorId of coauthorsIds(); track $index) {
+    <p-avatar
+      class="coauthors-avatar"
+      *ngIf="this.isShortCoauthors() ? $index < 2 : true"
+      [pTooltip]="this.authorService.findAuthorById(coauthorId)?.username"
+      tooltipPosition="bottom"
+      [image]="this.authorService.findAuthorById(coauthorId)?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+      size="normal"
+      [routerLink]="['/author', this.authorService.findAuthorById(coauthorId)?.userId]"
+      shape="circle"
+    ></p-avatar>
+  }
+  <p-avatar
+    class="coauthors-avatar"
+    *ngIf="coauthorsIds().length > 2"
+    [label]="this.isShortCoauthors() ? '+' + (coauthorsIds().length - 2) : ''"
+    [icon]="this.isShortCoauthors() ? 'pi pi-users' : 'pi pi-ellipsis-h'"
+    [style]="{
+      'background-color': 'var(--p-primary-color)',
+      color: 'var(--p-surface-800)',
+      'font-size': '0.9rem',
+    }"
+    shape="circle"
+    size="normal"
+    (click)="this.isShortCoauthors.set(!this.isShortCoauthors())"
+  />
+</p-avatar-group>

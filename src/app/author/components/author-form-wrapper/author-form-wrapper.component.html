@@ -1,0 +1,16 @@
+@let currentAuthor = this.currentAuthor();
+@let authorForPreview = this.authorForPreview();
+
+<div class="author-form-wrapper">
+  <div class="author-form-preview">
+    <app-author-preview [author]="authorForPreview" />
+  </div>
+  <div class="author-form-form">
+    <app-author-form
+      [author]="currentAuthor"
+      (backToAuthorPageEvent)="backToAuthorPage.emit()"
+      (formSubmitEvent)="formSubmit.emit($event)"
+      (updateAuthorForPreviewEvent)="updateAuthorForPreview.emit($event)"
+    />
+  </div>
+</div>

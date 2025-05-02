@@ -5,7 +5,7 @@ import { Directive, EventEmitter, HostBinding, HostListener, Output } from '@ang
   standalone: true,
 })
 export class BaseDragAndDropDirective {
-  @Output() public fileDropped = new EventEmitter<File[]>();
+  @Output() public fileDropped = new EventEmitter<FileList>();
   @HostBinding('class.file-over') public fileOver = false;
 
   @HostListener('dragover', ['$event'])
@@ -30,8 +30,7 @@ export class BaseDragAndDropDirective {
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
-      const fileList: File[] = Array.from(files);
-      this.fileDropped.emit(fileList);
+      this.fileDropped.emit(files);
     }
   }
 }

@@ -1,10 +1,12 @@
 header {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   justify-content: flex-end;
-  padding: 10px;
+  padding: 1rem;
 }
 
 .header-wrapper {
-  padding-bottom: 0.01rem;
+  margin-bottom: 1rem;
+  background-color: var(--p-surface-800);
+  border-bottom: 0.1rem solid var(--p-surface-600);
 }

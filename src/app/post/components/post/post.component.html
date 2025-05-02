@@ -1,0 +1,54 @@
+@let post = this.post();
+@let author = this.author();
+
+@if (post && author) {
+  <div class="post">
+    <header class="post-header">
+      <app-post-avatar [post]="post" [author]="author" />
+
+      <div *ngIf="post.coauthorsIds.length" class="post-coauthors-wrapper">
+        <app-coauthors-list [coauthorsIds]="post.coauthorsIds" />
+      </div>
+
+      <div class="post-actions">
+        <button
+          *ngIf="this.userService.me()?.author?.id === post.authorId"
+          class="post-edit-btn"
+          pButton
+          pRipple
+          type="button"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
+          severity="success"
+          outlined="true"
+          rounded="true"
+          [disabled]="isProcessing()"
+        ></button>
+        <button
+          *ngIf="this.userService.me()?.author?.id === post.authorId"
+          class="post-delete-btn"
+          pButton
+          pRipple
+          type="button"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          severity="danger"
+          outlined="true"
+          rounded="true"
+          [disabled]="isProcessing()"
+          (click)="this.deletePost(post)"
+        ></button>
+      </div>
+    </header>
+
+    <body class="post-body">
+      <h1 class="post-title">{{ post.title }}</h1>
+      <p class="post-content" [innerHTML]="this.sanitizer.bypassSecurityTrustHtml(post.content ?? '')"></p>
+    </body>
+
+    <footer class="post-footer"></footer>
+  </div>
+} @else {
+  <div class="not-found">
+    <p class="not-found-text">Not found post</p>
+    <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
+  </div>
+}

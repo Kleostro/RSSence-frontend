@@ -1,0 +1,26 @@
+<div class="modal" [class]="this.modalService.isModalShow() ? 'show' : ''" (click)="outsideClick($event)">
+  <div
+    #modalDialog
+    class="modal-dialog"
+    appModalPosition
+    [position]="this.modalService.position()"
+    [style.width]="this.modalService.contentWidth()"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <strong class="modal-title">{{ this.modalService.modalTitle() }}</strong>
+        <p-button
+          class="close"
+          icon="pi pi-times"
+          [rounded]="true"
+          [outlined]="true"
+          severity="danger"
+          (click)="modalService.closeModal()"
+        />
+      </div>
+      <div class="modal-body">
+        <ng-container *ngTemplateOutlet="this.modalService.content()"></ng-container>
+      </div>
+    </div>
+  </div>
+</div>

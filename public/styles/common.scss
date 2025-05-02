@@ -1,0 +1,23 @@
+.page {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  &-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: calc(100vh - 5.6rem);
+  }
+}
+
+.not-found-img {
+  display: flex;
+  width: 40rem;
+  height: 40rem;
+}

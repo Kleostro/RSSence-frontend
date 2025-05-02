@@ -7,6 +7,8 @@ export const ENDPOINTS = {
   GOOGLE_CALLBACK: 'auth/google/callback',
   PROFILES: 'profiles',
   AUTHORS: 'authors',
+  POSTS: 'posts',
+  USERS: 'users',
   ME: 'me',
   USERNAME_CHECK: 'username-check',
 } as const;

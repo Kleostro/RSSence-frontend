@@ -1,8 +1,5 @@
 <div class="header-wrapper">
   <header class="header">
-    <p-button (click)="themeSwitchService.toggle()">Toggle</p-button>
-    <p-button [routerLink]="APP_ROUTE.LOGIN">Sign In</p-button>
-    <p-button [routerLink]="APP_ROUTE.SIGN_UP">Sign Up</p-button>
     @if (this.authService.isUserLoggedIn()) {
       <app-sidebar />
     }

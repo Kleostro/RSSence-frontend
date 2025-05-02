@@ -52,6 +52,8 @@ const customRules = {
   curly: ['error', 'all'],
   'dot-notation': 'off',
   'implicit-arrow-linebreak': 'off',
+  'function-paren-newline': 'off',
+  'operator-linebreak': 'off',
   'import/extensions': [
     'error',
     'ignorePackages',
