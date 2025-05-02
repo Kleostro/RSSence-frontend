@@ -10,14 +10,6 @@ export class FileHandlingService {
 
   private readonly DEFAULT_MAX_SIZE = 8 * 1024 * 1024;
 
-  public getFileFromEvent(event: Event): File | null {
-    const { target } = event;
-    if (target instanceof HTMLInputElement) {
-      return target.files?.[0] ?? null;
-    }
-    return null;
-  }
-
   public getFileListFromEvent(event: Event): FileList | null {
     const { target } = event;
     if (target instanceof HTMLInputElement) {

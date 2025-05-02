@@ -1,0 +1,34 @@
+@let fileMaxSize = (this.fileMaxSize() / 1024 / 1024) * 1000 | number;
+
+<label
+  [for]="inputId()"
+  class="control-label"
+  [class]="isProcessing() ? 'disabled' : ''"
+  appInputDragAndDrop
+  (fileDropped)="onFileSelected($event)"
+>
+  <span class="control-label-text">{{ label() }}</span>
+  <div class="image-preview-container">
+    <span class="control-file-label">
+      @if (this.fileUrl()) {
+        <img [src]="this.fileUrl()" alt="image-preview" class="image-preview" />
+      } @else {
+        <i class="pi pi-file-arrow-up text-xl"></i>
+        <span class="control-file-label-text"
+          >Drag and drop image or <span class="control-file-label-text-upload">Upload</span>
+          {{ '(resolution up to ' + fileMaxSize + ' px x ' + fileMaxSize + ' px)' }}</span
+        >
+      }
+    </span>
+  </div>
+</label>
+<input
+  [id]="inputId()"
+  type="file"
+  pInputText
+  [disabled]="isProcessing()"
+  accept="image/*"
+  multiple="true"
+  (change)="onFileSelected($event)"
+  class="control-input p-inputtext control-file"
+/>

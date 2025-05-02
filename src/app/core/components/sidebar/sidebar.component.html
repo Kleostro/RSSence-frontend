@@ -1,15 +1,10 @@
 <div class="card flex justify-center">
-  <p-drawer [(visible)]="isVisible" [closable]="false">
+  <p-drawer [(visible)]="isVisible" [closable]="false" [position]="'left'">
     <ng-template #content>
       <div class="card flex justify-center">
-        <p-tieredMenu [model]="items" class="p-tieredmenu">
+        <p-tieredMenu [model]="items()" class="p-tieredmenu">
           <ng-template #item let-item let-hasSubmenu="hasSubmenu">
-            <a
-              pRipple
-              class="flex items-center p-tieredmenu-item-link"
-              [routerLink]="item.routerLink"
-              (click)="hasSubmenu ? (isVisible = true) : (isVisible = false)"
-            >
+            <a pRipple class="flex items-center p-tieredmenu-item-link" [routerLink]="item.routerLink">
               <span [class]="item.icon" class="p-tieredmenu-item-icon"></span>
               <span class="ml-2">{{ item.label }}</span>
               @if (item.badge) {
@@ -26,23 +21,17 @@
     <ng-template #footer>
       <div class="flex items-center gap-2">
         <button
-          class="w-max py-2 px-4"
           pButton
+          pRipple
+          fluid="true"
+          label="Logout"
           (click)="this.logout(); isVisible = false"
           icon="pi pi-sign-out"
           severity="danger"
           outlined
         ></button>
-        <button
-          pButton
-          label="Profile"
-          icon="pi pi-user"
-          class="w-full"
-          outlined
-          (click)="this.navigationService.navigateToProfile(); isVisible = false"
-        ></button>
       </div>
     </ng-template>
   </p-drawer>
-  <button pButton (click)="isVisible = true" icon="pi pi-bars"></button>
+  <button pButton pRipple outlined="true" rounded="true" (click)="isVisible = true" icon="pi pi-bars"></button>
 </div>

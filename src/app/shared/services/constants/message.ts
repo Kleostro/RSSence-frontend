@@ -12,4 +12,7 @@ export const MESSAGE = {
   CREATE_AUTHOR_SUCCESS: 'Author was created',
   DELETE_AUTHOR_SUCCESS: 'Author was deleted',
   UPDATE_AUTHOR_SUCCESS: 'Author was updated',
+  CREATE_POST_SUCCESS: 'Post was created',
+  UPDATE_POST_SUCCESS: 'Post was updated',
+  DELETE_POST_SUCCESS: 'Post was deleted',
 } as const;

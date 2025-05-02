@@ -1,3 +1,8 @@
+@let firstnameControl = form.controls.firstname;
+@let lastnameControl = form.controls.lastname;
+@let usernameControl = form.controls.username;
+@let bioControl = form.controls.bio;
+
 @if (form) {
   <form class="form" [formGroup]="form" (ngSubmit)="submit()">
     <div class="profile-name-controls">
@@ -5,42 +10,24 @@
         <label for="firstname" class="control-label">Firstname <span style="color: red">*</span></label>
         <input id="firstname" type="text" pInputText formControlName="firstname" class="control-input p-inputtext" />
         <div class="control-errors">
-          @if (form.controls.firstname.dirty) {
-            @if (form.controls.firstname.errors?.['required']) {
-              <small style="color: red">Please input your firstname!</small>
-            }
-            @if (form.controls.firstname.errors?.['minlength']) {
-              <small style="color: red"
-                >Firstname must be at least {{ FIELD_BOUNDARIES.FIRSTNAME_MIN_LENGTH }} characters long!</small
-              >
-            }
-            @if (form.controls.firstname.errors?.['maxlength']) {
-              <small style="color: red"
-                >Firstname must be at most {{ FIELD_BOUNDARIES.FIRSTNAME_MAX_LENGTH }} characters long!</small
-              >
-            }
-          }
+          <app-form-field-error
+            [control]="firstnameControl"
+            field="firstname"
+            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.firstname"
+            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.firstname.messages"
+          ></app-form-field-error>
         </div>
       </div>
       <div class="control">
         <label for="lastname" class="control-label">Lastname <span style="color: red">*</span></label>
         <input id="lastname" type="text" pInputText formControlName="lastname" class="control-input p-inputtext" />
         <div class="control-errors">
-          @if (form.controls.lastname.dirty) {
-            @if (form.controls.lastname.errors?.['required']) {
-              <small style="color: red">Please input your lastname!</small>
-            }
-            @if (form.controls.lastname.errors?.['minlength']) {
-              <small style="color: red"
-                >Lastname must be at least {{ FIELD_BOUNDARIES.LASTNAME_MIN_LENGTH }} characters long!</small
-              >
-            }
-            @if (form.controls.lastname.errors?.['maxlength']) {
-              <small style="color: red"
-                >Lastname must be at most {{ FIELD_BOUNDARIES.LASTNAME_MAX_LENGTH }} characters long!</small
-              >
-            }
-          }
+          <app-form-field-error
+            [control]="lastnameControl"
+            field="lastname"
+            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.lastname"
+            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.lastname.messages"
+          ></app-form-field-error>
         </div>
       </div>
     </div>
@@ -50,30 +37,21 @@
         <p-icon-field>
           <input id="username" type="text" pInputText formControlName="username" class="control-input p-inputtext" />
           <p-inputicon
-            [styleClass]="form.controls.username.errors?.['pending'] ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
+            [styleClass]="usernameControl.dirty && usernameControl.pending ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
           />
         </p-icon-field>
         <div class="control-errors">
-          @if (form.controls.username.dirty) {
-            @if (form.controls.username.errors?.['required']) {
-              <small style="color: red">Please input your username!</small>
-            }
-            @if (form.controls.username.errors?.['minlength']) {
-              <small style="color: red">
-                Username must be at least {{ FIELD_BOUNDARIES.USERNAME_MIN_LENGTH }} characters long!
-              </small>
-            }
-            @if (form.controls.username.errors?.['maxlength']) {
-              <small style="color: red">
-                Username must be at most {{ FIELD_BOUNDARIES.USERNAME_MAX_LENGTH }} characters long!
-              </small>
-            }
-            @if (form.controls.username.errors?.['usernameExists']) {
-              <small style="color: red">Username already exists!</small>
-            }
-            @if (isUsernameAvailable()) {
-              <small style="color: green">Username is available!</small>
-            }
+          <app-form-field-error
+            [control]="usernameControl"
+            field="username"
+            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.username"
+            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.username.messages"
+          ></app-form-field-error>
+
+          @if (usernameControl.dirty && usernameControl.pending) {
+            <small style="color: gray">Checking username availability...</small>
+          } @else if (!usernameControl.errors && !usernameControl.pending) {
+            <small style="color: green">Username is available!</small>
           }
         </div>
       </div>
@@ -97,53 +75,28 @@
       <div class="counter">
         <span
           class="current"
-          [style.color]="form.controls.bio.value.length > FIELD_BOUNDARIES.BIO_MAX_LENGTH ? 'red' : 'inherit'"
-          >{{ form.controls.bio.value.length }}</span
+          [style.color]="bioControl.value.length > PROFILE_FORM_FIELD_CONFIG.bio.max ? 'red' : 'inherit'"
+          >{{ bioControl.value.length }}</span
         >&nbsp;/
-        <span class="total">{{ FIELD_BOUNDARIES.BIO_MAX_LENGTH }}</span>
+        <span class="total">{{ PROFILE_FORM_FIELD_CONFIG.bio.max }}</span>
       </div>
       <div class="control-errors">
-        @if (form.controls.bio.dirty) {
-          @if (form.controls.bio.errors?.['maxlength']) {
-            <small style="color: red"
-              >About me must be at most {{ FIELD_BOUNDARIES.BIO_MAX_LENGTH }} characters long!</small
-            >
-          }
-        }
+        <app-form-field-error
+          [control]="bioControl"
+          field="bio"
+          [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.bio"
+          [errorMessages]="PROFILE_FORM_FIELD_CONFIG.bio.messages"
+        ></app-form-field-error>
       </div>
     </div>
     <div class="control">
-      <label
-        for="avatar"
-        class="control-label"
-        [class]="isProcessing() ? 'disabled' : ''"
-        appInputDragAndDrop
-        (fileDropped)="onAvatarSelected($event)"
-      >
-        <span class="control-label-text">Avatar</span>
-        <div class="image-preview-container">
-          <span class="control-file-label">
-            @if (this.avatarUrl()) {
-              <img [src]="this.avatarUrl()" alt="avatar-preview" class="image-preview" />
-            } @else {
-              <i class="pi pi-file-arrow-up text-xl"></i>
-              <span class="control-file-label-text"
-                >Drag and drop image or <span class="control-file-label-text-upload">Upload</span> (resolution up to
-                5,000 x 5,000 px)</span
-              >
-            }
-          </span>
-        </div>
-      </label>
-      <input
-        id="avatar"
-        type="file"
-        pInputText
-        [disabled]="isProcessing()"
-        accept="image/*"
-        (change)="onAvatarSelected($event)"
-        class="control-input p-inputtext control-file"
-      />
+      <app-file-uploader
+        inputId="avatar"
+        label="Avatar"
+        [fileUrl]="this.avatarUrl()"
+        [isProcessing]="isProcessing()"
+        (fileSelectedEvent)="onAvatarSelected($event)"
+      ></app-file-uploader>
     </div>
 
     <div class="form-footer">
@@ -151,6 +104,7 @@
         pButton
         pRipple
         type="button"
+        fluid="true"
         [label]="this.profile ? 'Back' : 'Home'"
         [icon]="this.profile ? 'pi pi-arrow-left' : 'pi pi-home'"
         [disabled]="isProcessing()"
@@ -163,9 +117,10 @@
         pButton
         pRipple
         type="submit"
+        fluid="true"
         label="Save"
         [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-        [disabled]="form.invalid || isProcessing()"
+        [disabled]="isProcessing()"
         severity="success"
         outlined="true"
       ></button>
