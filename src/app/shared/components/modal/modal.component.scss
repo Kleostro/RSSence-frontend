@@ -1,0 +1,67 @@
+.modal {
+  cursor: pointer;
+
+  position: fixed;
+  z-index: 4;
+  inset: 0;
+
+  visibility: hidden;
+  opacity: 0;
+  background-color: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(2px);
+
+  transition:
+    all 0.3s,
+    -webkit-backdrop-filter 0.3s;
+}
+
+.modal.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-dialog {
+  cursor: auto;
+  position: absolute;
+  overflow-y: scroll;
+  transition: all 0.3s;
+}
+
+.modal-content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 3rem;
+  padding-top: 1rem;
+
+  background-color: var(--p-surface-800);
+  border-radius: 1rem;
+  box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 10%);
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+
+  padding: 2rem 0 1rem;
+
+  background-color: var(--p-surface-800);
+  border-bottom: 0.125rem solid #e5e5e5;
+}
+
+.modal-title {
+  display: flex;
+  justify-content: center;
+}
+
+.close {
+  cursor: pointer;
+  margin-left: auto;
+  font-size: 1rem;
+  font-weight: bold;
+}
