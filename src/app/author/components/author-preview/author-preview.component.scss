@@ -1,3 +1,7 @@
+.header {
+  margin-bottom: 2rem;
+}
+
 .header-top {
   display: flex;
   gap: 2rem;
@@ -29,23 +33,40 @@
 
 .author-name {
   padding: 0.3rem 0.6rem;
+
   font-size: 1.4rem;
   line-height: 125%;
+  color: var(--p-text-color);
   letter-spacing: 0.1rem;
 }
 
 .author-username {
   padding: 0.3rem 0.6rem;
+
   font-size: 1rem;
   font-weight: 100;
+  color: var(--p-surface-400);
   letter-spacing: 0.05rem;
 }
 
 .bio {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--p-surface-800);
   border-bottom: 0.1rem solid var(--p-surface-600);
 }
 
 .title {
-  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+
+  font-size: 1.4rem;
+  line-height: 125%;
+  color: var(--p-text-color);
   letter-spacing: 0.05rem;
+}
+
+.text {
+  font-size: 1rem;
+  line-height: 125%;
+  color: var(--p-text-color);
 }

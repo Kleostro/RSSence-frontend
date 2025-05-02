@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -7,13 +17,16 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
+import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 
 import { AuthorsResponse, hasKeyInAuthorsResponse } from '@/app/api/schemas/authors-response';
-import { AUTHOR_FORM_FIELD_BOUNDARIES, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
+import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
 import { AuthorForm } from '@/app/author/interfaces/author-form';
+import { AuthorFacadeService } from '@/app/author/services/author-facade/author-facade.service';
 import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { InputDragAndDropDirective } from '@/app/shared/directives/input-drag-and-drop/input-drag-and-drop.directive';
+import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
+import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
@@ -21,31 +34,33 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
   selector: 'app-author-form',
   imports: [
     ReactiveFormsModule,
+    FormFieldErrorComponent,
+    FileUploaderComponent,
     InputIcon,
     IconField,
     InputTextModule,
     ButtonModule,
     RippleModule,
     TextareaModule,
-    InputDragAndDropDirective,
   ],
   templateUrl: './author-form.component.html',
   styleUrl: './author-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthorFormComponent implements OnInit {
+export class AuthorFormComponent implements OnInit, OnDestroy {
   @Input() public author: AuthorsResponse | null = null;
   @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorsResponse | null>();
   @Output() public backToAuthorPageEvent = new EventEmitter<void>();
-  @Output() public formSubmitEvent = new EventEmitter<FormData>();
+  @Output() public formSubmitEvent = new EventEmitter<AuthorsResponse>();
 
   public readonly navigationService = inject(NavigationService);
   private readonly authorService = inject(AuthorService);
+  private readonly facade = inject(AuthorFacadeService);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly fb = inject(FormBuilder);
 
   public form!: FormGroup<AuthorForm>;
-  public readonly FIELD_BOUNDARIES = AUTHOR_FORM_FIELD_BOUNDARIES;
+  public readonly AUTHOR_FORM_FIELD_CONFIG = AUTHOR_FORM_FIELD_CONFIG;
 
   public isUsernameAvailable = signal<boolean | null>(null);
   public isProcessing = signal<boolean>(false);
@@ -54,6 +69,7 @@ export class AuthorFormComponent implements OnInit {
   public avatarUrl = signal<string | null>(null);
   private avatarFile = signal<File | null>(null);
   private updatedAuthor = signal<AuthorsResponse | null>(null);
+  private readonly destroy$ = new Subject<void>();
 
   public ngOnInit(): void {
     this.initForm(this.author);
@@ -68,62 +84,35 @@ export class AuthorFormComponent implements OnInit {
     });
   }
 
-  public initForm(initialValues?: AuthorsResponse | null): void {
+  private initForm(initialValues?: AuthorsResponse | null): void {
     this.form = this.fb.nonNullable.group({
+      firstname: [
+        initialValues?.firstname ?? '',
+        [
+          Validators.required.bind(this),
+          Validators.minLength(this.AUTHOR_FORM_FIELD_CONFIG.firstname.min),
+          Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.firstname.max),
+        ],
+      ],
+      lastname: [
+        initialValues?.lastname ?? '',
+        [
+          Validators.required.bind(this),
+          Validators.minLength(this.AUTHOR_FORM_FIELD_CONFIG.lastname.min),
+          Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.lastname.max),
+        ],
+      ],
       username: [
         initialValues?.username ?? '',
         [
           Validators.required.bind(this),
-          Validators.minLength(this.FIELD_BOUNDARIES.USERNAME_MIN_LENGTH),
-          Validators.maxLength(this.FIELD_BOUNDARIES.USERNAME_MAX_LENGTH),
+          Validators.minLength(this.AUTHOR_FORM_FIELD_CONFIG.username.min),
+          Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.username.max),
         ],
         [usernameAvailability(this.authorService, this.author?.username ?? null)],
       ],
-      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.FIELD_BOUNDARIES.BIO_MAX_LENGTH)]],
+      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.bio.max)]],
     });
-
-    this.form.controls.username.statusChanges.subscribe(() => {
-      const usernameControl = this.form.controls.username;
-      if (usernameControl.errors === null && usernameControl.value) {
-        this.isUsernameAvailable.set(true);
-      } else if (usernameControl.errors?.['usernameAvailability']) {
-        this.isUsernameAvailable.set(false);
-      } else {
-        this.isUsernameAvailable.set(null);
-      }
-    });
-  }
-
-  public onAvatarSelected(event: Event | File[]): void {
-    const file = Array.isArray(event) ? event[0] : this.fileHandlingService.getFileFromEvent(event);
-
-    if (!file || !this.fileHandlingService.isValidFileSize(file)) {
-      return;
-    }
-
-    this.avatarFile.set(file);
-    this.hasChanges.set(true);
-    this.avatarUrl.set(this.fileHandlingService.createObjectURL(file));
-    this.updateAuthorForPreview();
-  }
-
-  public submit(): void {
-    this.form.markAllAsTouched();
-    if (this.form.invalid) {
-      return;
-    }
-
-    this.isProcessing.set(true);
-    this.form.disable();
-
-    const formData = this.createFormData();
-
-    if (this.author && !this.hasChanges()) {
-      this.backToAuthorPageEvent.emit();
-      return;
-    }
-
-    this.formSubmitEvent.emit(formData);
   }
 
   private createFormData(): FormData {
@@ -157,13 +146,88 @@ export class AuthorFormComponent implements OnInit {
   }
 
   private updateAuthorForPreview(): void {
-    const { username, bio } = this.form.getRawValue();
+    const { firstname, lastname, username, bio } = this.form.getRawValue();
     this.updatedAuthor.set({
+      id: this.author?.id ?? 0,
       userId: this.author?.userId ?? 0,
+      firstname,
+      lastname,
       username,
       bio,
       avatarUrl: this.avatarUrl() ?? this.author?.avatarUrl ?? null,
+      authoredPosts: this.author?.authoredPosts ?? [],
+      coauthoredPosts: this.author?.coauthoredPosts ?? [],
     });
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());
+  }
+
+  private focusFirstInvalidField(): void {
+    const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
+    if (invalidControl) {
+      const element = document.querySelector(`[formControlName="${invalidControl}"]`);
+      if (element instanceof HTMLInputElement) {
+        element.focus();
+      }
+    }
+  }
+
+  private enableForm(): void {
+    this.isProcessing.set(false);
+    this.form.enable();
+  }
+
+  private disableForm(): void {
+    this.isProcessing.set(true);
+    this.form.disable();
+  }
+
+  private handleFormSubmit(): void {
+    const formData = this.createFormData();
+    this.facade
+      .handleAuthorFormSubmit(formData, !!this.author)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(() => {
+          this.enableForm();
+          return EMPTY;
+        }),
+      )
+      .subscribe((newOrUpdatedAuthor) => {
+        this.formSubmitEvent.emit(newOrUpdatedAuthor);
+      });
+  }
+
+  public onAvatarSelected(files: File[]): void {
+    this.avatarFile.set(files[0]);
+    this.hasChanges.set(true);
+
+    if (!files[0]) {
+      this.avatarUrl.set(null);
+      this.updateAuthorForPreview();
+      return;
+    }
+
+    this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
+    this.updateAuthorForPreview();
+  }
+
+  public submit(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.focusFirstInvalidField();
+      return;
+    }
+
+    this.disableForm();
+    this.handleFormSubmit();
+
+    if (this.author && !this.hasChanges()) {
+      this.backToAuthorPageEvent.emit();
+    }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

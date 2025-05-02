@@ -13,5 +13,5 @@ import { AuthorsResponse } from '@/app/api/schemas/authors-response';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthorPreviewComponent {
-  public author = input.required<AuthorsResponse | null>();
+  public author = input.required<Partial<AuthorsResponse> | null>();
 }

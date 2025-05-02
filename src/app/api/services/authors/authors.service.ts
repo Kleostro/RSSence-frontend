@@ -13,20 +13,20 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class AuthorsService {
   private readonly http = inject(HttpClient);
 
-  public createAuthorMe(author: FormData): Observable<AuthorsResponse> {
-    return this.http.post<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.ME}`, author);
+  public getAuthors(): Observable<AuthorsResponse[]> {
+    return this.http.get<AuthorsResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
   }
 
-  public getAuthorMe(): Observable<AuthorsResponse | null> {
-    return this.http.get<AuthorsResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.ME}`);
+  public createAuthor(author: FormData): Observable<AuthorsResponse> {
+    return this.http.post<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 
-  public updateAuthorMe(author: FormData): Observable<AuthorsResponse> {
-    return this.http.patch<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.ME}`, author);
+  public updateAuthor(author: FormData): Observable<AuthorsResponse> {
+    return this.http.patch<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 
-  public deleteAuthorMe(): Observable<AuthorsResponse> {
-    return this.http.delete<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.ME}`);
+  public deleteAuthor(): Observable<AuthorsResponse> {
+    return this.http.delete<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
   }
 
   public checkUsernameAvailability(username: string): Observable<boolean> {

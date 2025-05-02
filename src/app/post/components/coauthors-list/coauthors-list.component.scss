@@ -1,0 +1,28 @@
+:host {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.coauthors {
+  &-label {
+    font-size: 0.9rem;
+    color: var(--p-text-muted-color);
+    letter-spacing: 0.05rem;
+  }
+
+  &-avatar {
+    cursor: pointer;
+    user-select: none;
+    transition: filter 0.3s;
+
+    &:hover {
+      filter: brightness(1.5);
+    }
+
+    &-group {
+      display: flex;
+    }
+  }
+}

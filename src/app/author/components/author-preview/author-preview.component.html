@@ -4,7 +4,12 @@
       <p-avatar class="avatar-img" [image]="author()?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
     </div>
     <div class="author-name-wrapper">
-      <span class="author-username">{{ author()?.username?.length ? author()?.username : 'jane_doe' }}</span>
+      <strong class="author-name"
+        ><span>{{ author()?.firstname?.length ? author()?.firstname : 'Jane' }}</span>
+        <span>&nbsp;</span>
+        <span>{{ author()?.lastname?.length ? author()?.lastname : 'Doe' }}</span></strong
+      >
+      <span class="author-username">{{ author()?.username?.length ? '@' + author()?.username : 'jane_doe' }}</span>
     </div>
   </div>
 </header>
