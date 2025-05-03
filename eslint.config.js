@@ -1,19 +1,49 @@
 // @ts-check
 import angular from 'angular-eslint';
+import eslintPluginImport from 'eslint-plugin-import';
+import eslintPluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
+import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
 import eslint from '@eslint/js';
 
+import { myEslintRules } from './eslint-rules/my-eslint-rules.js';
+
 export default tseslint.config(
+  {
+    languageOptions: {
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    },
+  },
+  { linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true } },
   {
     files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,
+      eslintPluginImport.flatConfigs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
+      ...tseslint.configs.stylisticTypeChecked,
+      ...tseslint.configs.strictTypeChecked,
       ...angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
+    plugins: {
+      'unused-imports': unusedImports,
+      'no-relative-import-paths': eslintPluginNoRelativeImportPaths,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
+        },
+        alias: {
+          extensions: ['.ts', '.js', '.jsx', '.json'],
+          map: [['@', './src']],
+        },
+      },
+    },
     rules: {
       '@angular-eslint/directive-selector': [
         'error',
@@ -31,6 +61,7 @@ export default tseslint.config(
           style: 'kebab-case',
         },
       ],
+      ...myEslintRules,
     },
   },
   {
