@@ -6,15 +6,15 @@ import { PostPreviewComponent } from '@/app/post/components/post-preview/post-pr
 import { PostComponent } from '@/app/post/components/post/post.component';
 
 @Component({
-  selector: 'app-posts-list',
-  imports: [PostPreviewComponent, PostComponent],
-  templateUrl: './posts-list.component.html',
-  styleUrl: './posts-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PostPreviewComponent, PostComponent],
+  selector: 'app-posts-list',
+  styleUrl: './posts-list.component.scss',
+  templateUrl: './posts-list.component.html',
 })
 export class PostsListComponent {
-  public posts = input<PostsResponse[] | null>(null);
-  public mode = input<'preview' | 'full'>('preview');
-
   public readonly authorService = inject(AuthorService);
+
+  public mode = input<'full' | 'preview'>('preview');
+  public posts = input<null | PostsResponse[]>(null);
 }

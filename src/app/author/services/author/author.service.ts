@@ -21,16 +21,13 @@ export class AuthorService {
   public readonly authorMe = signal<AuthorsResponse | null>(null);
   public readonly authors = signal<AuthorsResponse[]>([]);
 
-  public getAuthors(): Observable<AuthorsResponse[]> {
-    this.loaderService.turnOn();
-    return this.authorsService.getAuthors().pipe(
+  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
+    return throwError(() => error);
+  }
+
+  public checkUsernameAvailability(username: string): Observable<boolean> {
+    return this.authorsService.checkUsernameAvailability(username).pipe(
       take(1),
-      tap((authors: AuthorsResponse[]) => {
-        this.authors.set(authors);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
   }
@@ -42,23 +39,6 @@ export class AuthorService {
       tap((newAuthor: AuthorsResponse) => {
         this.authors.update((authors) => [newAuthor, ...authors]);
         this.message.success(MESSAGE.CREATE_AUTHOR_SUCCESS);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
-  }
-
-  public updateAuthor(dto: FormData): Observable<AuthorsResponse> {
-    this.loaderService.turnOn();
-    return this.authorsService.updateAuthor(dto).pipe(
-      take(1),
-      tap((updatedAuthor: AuthorsResponse) => {
-        this.authors.update((authors) =>
-          authors.map((author) => (author.userId === updatedAuthor.userId ? updatedAuthor : author)),
-        );
-        this.message.success(MESSAGE.UPDATE_AUTHOR_SUCCESS);
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -83,22 +63,42 @@ export class AuthorService {
     );
   }
 
-  public checkUsernameAvailability(username: string): Observable<boolean> {
-    return this.authorsService.checkUsernameAvailability(username).pipe(
-      take(1),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
+  public findAuthorById(authorId: null | number): AuthorsResponse | null {
+    return this.authors().find((author) => author.id === authorId) ?? null;
   }
 
-  public findAuthorById(authorId: number | null): AuthorsResponse | null {
-    return this.authors().find((author) => author.id === authorId) ?? null;
+  public getAuthors(): Observable<AuthorsResponse[]> {
+    this.loaderService.turnOn();
+    return this.authorsService.getAuthors().pipe(
+      take(1),
+      tap((authors: AuthorsResponse[]) => {
+        this.authors.set(authors);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
   }
 
   // public findAuthorByUserId(userId: number): AuthorsResponse | null {
   //   return this.authors().find((author) => author.userId === userId) ?? null;
   // }
 
-  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
-    return throwError(() => error);
+  public updateAuthor(dto: FormData): Observable<AuthorsResponse> {
+    this.loaderService.turnOn();
+    return this.authorsService.updateAuthor(dto).pipe(
+      take(1),
+      tap((updatedAuthor: AuthorsResponse) => {
+        this.authors.update((authors) =>
+          authors.map((author) => (author.userId === updatedAuthor.userId ? updatedAuthor : author)),
+        );
+        this.message.success(MESSAGE.UPDATE_AUTHOR_SUCCESS);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
   }
 }

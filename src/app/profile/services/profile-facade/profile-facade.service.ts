@@ -14,10 +14,24 @@ import { ProfileService } from '@/app/profile/services/profile/profile.service';
   providedIn: 'root',
 })
 export class ProfileFacadeService {
+  private readonly loaderService = inject(LoaderService);
+  private readonly navigationService = inject(NavigationService);
   private readonly profileService = inject(ProfileService);
   private readonly userService = inject(UserService);
-  private readonly navigationService = inject(NavigationService);
-  private readonly loaderService = inject(LoaderService);
+
+  public deleteProfile(): Observable<ProfilesResponse> {
+    return this.profileService.deleteProfile().pipe(
+      tap(() => {
+        const previousMe = this.userService.me();
+        if (previousMe) {
+          this.userService.me.set({
+            ...previousMe,
+            profile: null,
+          });
+        }
+      }),
+    );
+  }
 
   public getNavigationItems(
     navigateToAuthor: () => void,
@@ -26,24 +40,42 @@ export class ProfileFacadeService {
   ): MenuItem[] {
     return [
       {
-        label: 'Author',
-        icon: 'pi pi-user',
         command: navigateToAuthor,
+        icon: 'pi pi-user',
+        label: 'Author',
       },
       {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
         command: editProfile,
+        icon: 'pi pi-pencil',
+        label: 'Edit',
       },
       {
-        label: 'Delete',
-        icon: 'pi pi-trash',
         command: deleteProfile,
+        icon: 'pi pi-trash',
+        label: 'Delete',
       },
     ];
   }
 
-  public loadInitialData(userId: number | null): Observable<UsersResponse | null> {
+  public handleProfileFormSubmit(formData: FormData, isUpdate: boolean): Observable<ProfilesResponse> {
+    const action$ = isUpdate
+      ? this.profileService.updateProfile(formData)
+      : this.profileService.createProfile(formData);
+
+    return action$.pipe(
+      tap((updatedOrNewProfile) => {
+        const previousMe = this.userService.me();
+        if (previousMe) {
+          this.userService.me.set({
+            ...previousMe,
+            profile: updatedOrNewProfile,
+          });
+        }
+      }),
+    );
+  }
+
+  public loadInitialData(userId: null | number): Observable<null | UsersResponse> {
     this.loaderService.turnOnPageLoading();
     return this.userService.getMe().pipe(
       concatMap((userMe) => {
@@ -67,38 +99,6 @@ export class ProfileFacadeService {
       }),
       finalize(() => {
         this.loaderService.turnOffPageLoading();
-      }),
-    );
-  }
-
-  public deleteProfile(): Observable<ProfilesResponse> {
-    return this.profileService.deleteProfile().pipe(
-      tap(() => {
-        const previousMe = this.userService.me();
-        if (previousMe) {
-          this.userService.me.set({
-            ...previousMe,
-            profile: null,
-          });
-        }
-      }),
-    );
-  }
-
-  public handleProfileFormSubmit(formData: FormData, isUpdate: boolean): Observable<ProfilesResponse> {
-    const action$ = isUpdate
-      ? this.profileService.updateProfile(formData)
-      : this.profileService.createProfile(formData);
-
-    return action$.pipe(
-      tap((updatedOrNewProfile) => {
-        const previousMe = this.userService.me();
-        if (previousMe) {
-          this.userService.me.set({
-            ...previousMe,
-            profile: updatedOrNewProfile,
-          });
-        }
       }),
     );
   }

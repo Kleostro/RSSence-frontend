@@ -14,24 +14,23 @@ import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avat
 import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
-  selector: 'app-post',
-  imports: [CoauthorsListComponent, NgIf, ButtonModule, RippleModule, PostAvatarComponent],
-  templateUrl: './post.component.html',
-  styleUrl: './post.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CoauthorsListComponent, NgIf, ButtonModule, RippleModule, PostAvatarComponent],
+  selector: 'app-post',
+  styleUrl: './post.component.scss',
+  templateUrl: './post.component.html',
 })
 export class PostComponent implements OnDestroy {
-  public post = input.required<PostsResponse | null>();
-  public author = input.required<AuthorsResponse | null>();
-  public isProcessing = signal<boolean>(false);
+  private readonly destroy$ = new Subject<void>();
+  private readonly postService = inject(PostService);
 
   public readonly sanitizer = inject(DomSanitizer);
   public readonly userService = inject(UserService);
-  private readonly postService = inject(PostService);
 
+  public author = input.required<AuthorsResponse | null>();
+  public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
-
-  private readonly destroy$ = new Subject<void>();
+  public post = input.required<null | PostsResponse>();
 
   // TBD: fix deleting a post on the detailed page of a post
   public deletePost(post: PostsResponse): void {

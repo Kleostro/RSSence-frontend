@@ -11,22 +11,26 @@ import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
-  selector: 'app-post-detailed',
-  imports: [PostComponent, ButtonModule, RippleModule],
-  templateUrl: './post-detailed.component.html',
-  styleUrl: './post-detailed.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PostComponent, ButtonModule, RippleModule],
+  selector: 'app-post-detailed',
+  styleUrl: './post-detailed.component.scss',
+  templateUrl: './post-detailed.component.html',
 })
-export class PostDetailedComponent implements OnInit, OnDestroy {
-  public postId = input<string | null>(null, { alias: 'id' });
-
-  public readonly navigationService = inject(NavigationService);
-  public readonly authorService = inject(AuthorService);
+export class PostDetailedComponent implements OnDestroy, OnInit {
+  private readonly destroy$ = new Subject<void>();
   private readonly postService = inject(PostService);
 
-  private readonly destroy$ = new Subject<void>();
+  public readonly authorService = inject(AuthorService);
+  public readonly navigationService = inject(NavigationService);
 
-  public currentPost = signal<PostsResponse | null | undefined>(undefined);
+  public currentPost = signal<null | PostsResponse | undefined>(undefined);
+  public postId = input<null | string>(null, { alias: 'id' });
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public ngOnInit(): void {
     const postId = this.postId();
@@ -45,10 +49,5 @@ export class PostDetailedComponent implements OnInit, OnDestroy {
         )
         .subscribe();
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

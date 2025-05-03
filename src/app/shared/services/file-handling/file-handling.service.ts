@@ -6,12 +6,16 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class FileHandlingService {
-  private readonly message = inject(MessageService);
-
+  private static readonly DEFAULT_MAX_SIZE_MB = 8;
   private static readonly KB = 1024;
   private static readonly MB = FileHandlingService.KB ** 2;
-  private static readonly DEFAULT_MAX_SIZE_MB = 8;
   private static readonly DEFAULT_MAX_SIZE = FileHandlingService.DEFAULT_MAX_SIZE_MB * FileHandlingService.MB;
+
+  private readonly message = inject(MessageService);
+
+  public createObjectURL(file: File): string {
+    return URL.createObjectURL(file);
+  }
 
   public getFileListFromEvent(event: Event): FileList | null {
     const { target } = event;
@@ -28,9 +32,5 @@ export class FileHandlingService {
       return false;
     }
     return true;
-  }
-
-  public createObjectURL(file: File): string {
-    return URL.createObjectURL(file);
   }
 }

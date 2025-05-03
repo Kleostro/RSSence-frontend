@@ -23,14 +23,14 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withInterceptors([httpInterceptor])),
     providePrimeNG({
+      ripple: true,
       theme: {
-        preset: MyPreset,
         options: {
           cssLayer: false,
           darkModeSelector: '.app-dark',
         },
+        preset: MyPreset,
       },
-      ripple: true,
     }),
   ],
 };

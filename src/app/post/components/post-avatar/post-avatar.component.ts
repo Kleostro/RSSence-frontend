@@ -8,13 +8,13 @@ import { AuthorsResponse } from '@/app/api/schemas/authors-response';
 import { PostsResponse } from '@/app/api/schemas/posts-response';
 
 @Component({
-  selector: 'app-post-avatar',
-  imports: [Avatar, RouterLink, DatePipe],
-  templateUrl: './post-avatar.component.html',
-  styleUrl: './post-avatar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Avatar, RouterLink, DatePipe],
+  selector: 'app-post-avatar',
+  styleUrl: './post-avatar.component.scss',
+  templateUrl: './post-avatar.component.html',
 })
 export class PostAvatarComponent {
-  public post = input.required<PostsResponse>();
   public author = input.required<AuthorsResponse>();
+  public post = input.required<PostsResponse>();
 }

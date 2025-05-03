@@ -31,7 +31,7 @@ import { FileHandlingService } from '@/app/shared/services/file-handling/file-ha
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
 @Component({
-  selector: 'app-author-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FormFieldErrorComponent,
@@ -43,49 +43,90 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
     RippleModule,
     TextareaModule,
   ],
-  templateUrl: './author-form.component.html',
+  selector: 'app-author-form',
   styleUrl: './author-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './author-form.component.html',
 })
-export class AuthorFormComponent implements OnInit, OnDestroy {
+export class AuthorFormComponent implements OnDestroy, OnInit {
+  private readonly authorService = inject(AuthorService);
+  private readonly avatarFile = signal<File | null>(null);
+  private readonly destroy$ = new Subject<void>();
+  private readonly facade = inject(AuthorFacadeService);
+  private readonly fb = inject(FormBuilder);
+  private readonly fileHandlingService = inject(FileHandlingService);
+  private readonly updatedAuthor = signal<AuthorsResponse | null>(null);
+
   @Input() public author: AuthorsResponse | null = null;
-  @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorsResponse | null>();
   @Output() public backToAuthorPageEvent = new EventEmitter<void>();
   @Output() public formSubmitEvent = new EventEmitter<AuthorsResponse>();
+  @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorsResponse | null>();
 
-  public readonly navigationService = inject(NavigationService);
-  private readonly authorService = inject(AuthorService);
-  private readonly facade = inject(AuthorFacadeService);
-  private readonly fileHandlingService = inject(FileHandlingService);
-  private readonly fb = inject(FormBuilder);
-
-  public form!: FormGroup<AuthorForm>;
   public readonly AUTHOR_FORM_FIELD_CONFIG = AUTHOR_FORM_FIELD_CONFIG;
+  public readonly navigationService = inject(NavigationService);
 
-  public isUsernameAvailable = signal<boolean | null>(null);
-  public isProcessing = signal<boolean>(false);
+  public avatarUrl = signal<null | string>(null);
+  public form!: FormGroup<AuthorForm>;
   public hasChanges = signal<boolean>(false);
+  public isProcessing = signal<boolean>(false);
+  public isUsernameAvailable = signal<boolean | null>(null);
 
-  public avatarUrl = signal<string | null>(null);
-  private avatarFile = signal<File | null>(null);
-  private updatedAuthor = signal<AuthorsResponse | null>(null);
-  private readonly destroy$ = new Subject<void>();
+  private createFormData(): FormData {
+    const formData = new FormData();
 
-  public ngOnInit(): void {
-    this.initForm(this.author);
+    Object.entries(this.form.value).forEach(([key, value]) => {
+      if (value && hasKeyInAuthorsResponse(key) && this.isValueChanged(key, value)) {
+        formData.append(key, value);
+        this.hasChanges.set(true);
+      }
+    });
 
-    if (this.author) {
-      this.avatarUrl.set(this.author.avatarUrl);
-      this.updatedAuthor.set(this.author);
+    const avatar = this.avatarFile();
+    if (avatar) {
+      formData.append(FORM_CONTROL_NAME.AVATAR, avatar);
     }
 
-    this.form.valueChanges.subscribe(() => {
-      this.updateAuthorForPreview();
-    });
+    return formData;
+  }
+
+  private disableForm(): void {
+    this.isProcessing.set(true);
+    this.form.disable();
+  }
+
+  private enableForm(): void {
+    this.isProcessing.set(false);
+    this.form.enable();
+  }
+
+  private focusFirstInvalidField(): void {
+    const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
+    if (invalidControl) {
+      const element = document.querySelector(`[formControlName="${invalidControl}"]`);
+      if (element instanceof HTMLInputElement) {
+        element.focus();
+      }
+    }
+  }
+
+  private handleFormSubmit(): void {
+    const formData = this.createFormData();
+    this.facade
+      .handleAuthorFormSubmit(formData, !!this.author)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(() => {
+          this.enableForm();
+          return EMPTY;
+        }),
+      )
+      .subscribe((newOrUpdatedAuthor) => {
+        this.formSubmitEvent.emit(newOrUpdatedAuthor);
+      });
   }
 
   private initForm(initialValues?: AuthorsResponse | null): void {
     this.form = this.fb.nonNullable.group({
+      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.bio.max)]],
       firstname: [
         initialValues?.firstname ?? '',
         [
@@ -111,26 +152,7 @@ export class AuthorFormComponent implements OnInit, OnDestroy {
         ],
         [usernameAvailability(this.authorService, this.author?.username ?? null)],
       ],
-      bio: [initialValues?.bio ?? '', [Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.bio.max)]],
     });
-  }
-
-  private createFormData(): FormData {
-    const formData = new FormData();
-
-    Object.entries(this.form.value).forEach(([key, value]) => {
-      if (value && hasKeyInAuthorsResponse(key) && this.isValueChanged(key, value)) {
-        formData.append(key, value);
-        this.hasChanges.set(true);
-      }
-    });
-
-    const avatar = this.avatarFile();
-    if (avatar) {
-      formData.append(FORM_CONTROL_NAME.AVATAR, avatar);
-    }
-
-    return formData;
   }
 
   private isValueChanged(key: string, value: string): boolean {
@@ -146,55 +168,37 @@ export class AuthorFormComponent implements OnInit, OnDestroy {
   }
 
   private updateAuthorForPreview(): void {
-    const { firstname, lastname, username, bio } = this.form.getRawValue();
+    const { bio, firstname, lastname, username } = this.form.getRawValue();
     this.updatedAuthor.set({
-      id: this.author?.id ?? 0,
-      userId: this.author?.userId ?? 0,
-      firstname,
-      lastname,
-      username,
-      bio,
-      avatarUrl: this.avatarUrl() ?? this.author?.avatarUrl ?? null,
       authoredPosts: this.author?.authoredPosts ?? [],
+      avatarUrl: this.avatarUrl() ?? this.author?.avatarUrl ?? null,
+      bio,
       coauthoredPosts: this.author?.coauthoredPosts ?? [],
+      firstname,
+      id: this.author?.id ?? 0,
+      lastname,
+      userId: this.author?.userId ?? 0,
+      username,
     });
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());
   }
 
-  private focusFirstInvalidField(): void {
-    const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
-    if (invalidControl) {
-      const element = document.querySelector(`[formControlName="${invalidControl}"]`);
-      if (element instanceof HTMLInputElement) {
-        element.focus();
-      }
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  public ngOnInit(): void {
+    this.initForm(this.author);
+
+    if (this.author) {
+      this.avatarUrl.set(this.author.avatarUrl);
+      this.updatedAuthor.set(this.author);
     }
-  }
 
-  private enableForm(): void {
-    this.isProcessing.set(false);
-    this.form.enable();
-  }
-
-  private disableForm(): void {
-    this.isProcessing.set(true);
-    this.form.disable();
-  }
-
-  private handleFormSubmit(): void {
-    const formData = this.createFormData();
-    this.facade
-      .handleAuthorFormSubmit(formData, !!this.author)
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => {
-          this.enableForm();
-          return EMPTY;
-        }),
-      )
-      .subscribe((newOrUpdatedAuthor) => {
-        this.formSubmitEvent.emit(newOrUpdatedAuthor);
-      });
+    this.form.valueChanges.subscribe(() => {
+      this.updateAuthorForPreview();
+    });
   }
 
   public onAvatarSelected(files: File[]): void {
@@ -224,10 +228,5 @@ export class AuthorFormComponent implements OnInit, OnDestroy {
     if (this.author && !this.hasChanges()) {
       this.backToAuthorPageEvent.emit();
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

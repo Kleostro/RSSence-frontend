@@ -20,7 +20,7 @@ const MIN_LENGTH = 8;
 const MAX_LENGTH = 32;
 
 @Component({
-  selector: 'app-registration-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FloatLabelModule,
@@ -32,23 +32,21 @@ const MAX_LENGTH = 32;
     InputIcon,
     DividerModule,
   ],
-  templateUrl: './registration-form.component.html',
+  selector: 'app-registration-form',
   styleUrl: './registration-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './registration-form.component.html',
 })
 export class RegistrationFormComponent {
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  public isRegistrationInProgress = signal(false);
-
   public APP_ROUTE = APP_ROUTE;
-
+  public isRegistrationInProgress = signal(false);
   public registrationForm = this.fb.nonNullable.group(
     {
+      confirm: ['', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]],
       email: ['', [Validators.email, Validators.required]],
       password: ['', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]],
-      confirm: ['', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]],
     },
     {
       validators: passwordsMatchValidator,

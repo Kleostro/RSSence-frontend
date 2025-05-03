@@ -17,30 +17,24 @@ import { ProfileFacadeService } from '@/app/profile/services/profile-facade/prof
 import { PageLoaderComponent } from '@/app/shared/components/page-loader/page-loader.component';
 
 @Component({
-  selector: 'app-profile',
-  imports: [ProfileFormWrapperComponent, ProfileInfoComponent, ButtonModule, RippleModule, PageLoaderComponent],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ProfileFormWrapperComponent, ProfileInfoComponent, ButtonModule, RippleModule, PageLoaderComponent],
+  selector: 'app-profile',
+  styleUrl: './profile.component.scss',
+  templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnDestroy {
-  public userId = input<string | null>(null, { alias: 'id' });
-
+  private readonly destroy$ = new Subject<void>();
   private readonly facade = inject(ProfileFacadeService);
   private readonly userService = inject(UserService);
+
+  public readonly FORM_STATE = FORM_STATE;
   public readonly loaderService = inject(LoaderService);
   public readonly navigationService = inject(NavigationService);
 
-  private readonly destroy$ = new Subject<void>();
-
+  public currentProfile = signal<null | ProfilesResponse>(null);
   public isMyPage = signal<boolean>(false);
-
-  public currentProfile = signal<ProfilesResponse | null>(null);
-  public profileForPreview = signal<ProfilesResponse | null>(null);
-
-  public readonly FORM_STATE = FORM_STATE;
   public profileFormState = signal<FormState>(FORM_STATE.CREATE);
-
   public navigationItems = this.facade.getNavigationItems(
     () => {
       this.navigationService.navigateToAuthor();
@@ -52,6 +46,8 @@ export class ProfileComponent implements OnDestroy {
       this.deleteProfile();
     },
   );
+  public profileForPreview = signal<null | ProfilesResponse>(null);
+  public userId = input<null | string>(null, { alias: 'id' });
 
   constructor() {
     toObservable(this.userId)
@@ -62,7 +58,7 @@ export class ProfileComponent implements OnDestroy {
       });
   }
 
-  private loadInitialData(userId: number | null): void {
+  private loadInitialData(userId: null | number): void {
     this.facade
       .loadInitialData(userId)
       .pipe(takeUntil(this.destroy$))

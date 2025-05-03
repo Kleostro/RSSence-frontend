@@ -6,12 +6,12 @@ import { AvatarModule } from 'primeng/avatar';
 import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
 
 @Component({
-  selector: 'app-profile-header',
-  imports: [DatePipe, AvatarModule],
-  templateUrl: './profile-header.component.html',
-  styleUrl: './profile-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DatePipe, AvatarModule],
+  selector: 'app-profile-header',
+  styleUrl: './profile-header.component.scss',
+  templateUrl: './profile-header.component.html',
 })
 export class ProfileHeaderComponent {
-  public profile = input.required<ProfilesResponse | null>();
+  public profile = input.required<null | ProfilesResponse>();
 }

@@ -8,17 +8,23 @@ import { ModalPositionDirective } from '@/app/shared/directives/modal-position/m
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet, ButtonModule, RippleModule, ModalPositionDirective],
   selector: 'app-modal',
   standalone: true,
-  imports: [NgTemplateOutlet, ButtonModule, RippleModule, ModalPositionDirective],
-  templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './modal.component.html',
 })
 export class ModalComponent {
+  @ViewChild('modalDialog') public modalDialog!: ElementRef;
+
   public modalService = inject(ModalService);
 
-  @ViewChild('modalDialog') public modalDialog!: ElementRef;
+  public onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.modalService.closeModal();
+    }
+  }
 
   public outsideClick(event: Event): void {
     if (
@@ -28,12 +34,6 @@ export class ModalComponent {
       this.modalDialog.nativeElement instanceof HTMLElement &&
       !this.modalDialog.nativeElement.contains(event.target)
     ) {
-      this.modalService.closeModal();
-    }
-  }
-
-  public onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
       this.modalService.closeModal();
     }
   }

@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const PostsResponseSchema = z.object({
-  id: z.number(),
   authorId: z.number(),
-  title: z.string(),
-  content: z.string().nullable(),
-  imageUrls: z.string().array(),
   coauthorsIds: z.number().array(),
+  content: z.string().nullable(),
   createdAt: z.coerce.date(),
+  id: z.number(),
+  imageUrls: z.string().array(),
+  title: z.string(),
   updatedAt: z.coerce.date(),
 });
 

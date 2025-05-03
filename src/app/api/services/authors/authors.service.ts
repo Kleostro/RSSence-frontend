@@ -13,25 +13,25 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class AuthorsService {
   private readonly http = inject(HttpClient);
 
-  public getAuthors(): Observable<AuthorsResponse[]> {
-    return this.http.get<AuthorsResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
+  public checkUsernameAvailability(username: string): Observable<boolean> {
+    return this.http.post<boolean>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.USERNAME_CHECK}`, {
+      username,
+    });
   }
 
   public createAuthor(author: FormData): Observable<AuthorsResponse> {
     return this.http.post<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 
-  public updateAuthor(author: FormData): Observable<AuthorsResponse> {
-    return this.http.patch<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
-  }
-
   public deleteAuthor(): Observable<AuthorsResponse> {
     return this.http.delete<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
   }
 
-  public checkUsernameAvailability(username: string): Observable<boolean> {
-    return this.http.post<boolean>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${ENDPOINTS.USERNAME_CHECK}`, {
-      username,
-    });
+  public getAuthors(): Observable<AuthorsResponse[]> {
+    return this.http.get<AuthorsResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
+  }
+
+  public updateAuthor(author: FormData): Observable<AuthorsResponse> {
+    return this.http.patch<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 }

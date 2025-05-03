@@ -9,16 +9,16 @@ import { AuthorsResponse } from '@/app/api/schemas/authors-response';
 import { AuthorPreviewComponent } from '@/app/author/components/author-preview/author-preview.component';
 
 @Component({
-  selector: 'app-author-info',
-  imports: [SpeedDialModule, ButtonModule, RippleModule, AuthorPreviewComponent],
-  templateUrl: './author-info.component.html',
-  styleUrl: './author-info.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [SpeedDialModule, ButtonModule, RippleModule, AuthorPreviewComponent],
+  selector: 'app-author-info',
+  styleUrl: './author-info.component.scss',
+  templateUrl: './author-info.component.html',
 })
 export class AuthorInfoComponent {
-  public isMyPage = input.required<boolean>();
-  public currentAuthor = input.required<AuthorsResponse | null>();
-  public navigationItems = input.required<MenuItem[]>();
-
   @Output() public navigateToProfile = new EventEmitter<number>();
+
+  public currentAuthor = input.required<AuthorsResponse | null>();
+  public isMyPage = input.required<boolean>();
+  public navigationItems = input.required<MenuItem[]>();
 }

@@ -7,8 +7,8 @@ import { ProfileService } from '@/app/profile/services/profile/profile.service';
 import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
 
 export function usernameAvailability(
-  service: ProfileService | AuthorService,
-  currentUsername: string | null,
+  service: AuthorService | ProfileService,
+  currentUsername: null | string,
 ): AsyncValidatorFn {
   const DEBOUNCE_TIME = 400;
   return (control: AbstractControl) =>

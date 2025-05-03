@@ -5,17 +5,17 @@ import { AuthorFormComponent } from '@/app/author/components/author-form/author-
 import { AuthorPreviewComponent } from '@/app/author/components/author-preview/author-preview.component';
 
 @Component({
-  selector: 'app-author-form-wrapper',
-  imports: [AuthorPreviewComponent, AuthorFormComponent],
-  templateUrl: './author-form-wrapper.component.html',
-  styleUrl: './author-form-wrapper.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [AuthorPreviewComponent, AuthorFormComponent],
+  selector: 'app-author-form-wrapper',
+  styleUrl: './author-form-wrapper.component.scss',
+  templateUrl: './author-form-wrapper.component.html',
 })
 export class AuthorFormWrapperComponent {
-  public currentAuthor = input.required<AuthorsResponse | null>();
-  public authorForPreview = input.required<AuthorsResponse | null>();
-
   @Output() public backToAuthorPage = new EventEmitter<void>();
   @Output() public formSubmit = new EventEmitter<AuthorsResponse>();
   @Output() public updateAuthorForPreview = new EventEmitter<AuthorsResponse | null>();
+
+  public authorForPreview = input.required<AuthorsResponse | null>();
+  public currentAuthor = input.required<AuthorsResponse | null>();
 }

@@ -16,7 +16,7 @@ export default tseslint.config(
     },
   },
   { linterOptions: { reportUnusedDisableDirectives: true } },
-  { ignores: ['.angular'] },
+  { ignores: ['.angular', 'dist'] },
   {
     files: ['**/*.ts'],
     extends: [

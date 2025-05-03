@@ -11,7 +11,6 @@ import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-to
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
 import { UserService } from '@/app/auth/services/user/user.service';
-import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
@@ -20,27 +19,36 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly signUpService = inject(SignUpService);
   private readonly loginService = inject(LoginService);
   private readonly logoutService = inject(LogoutService);
-  private readonly refreshTokenService = inject(RefreshTokenService);
-  private readonly userService = inject(UserService);
-  private readonly tokenService = inject(TokenService);
-  private readonly loaderService = inject(LoaderService);
-  private readonly navigationService = inject(NavigationService);
   private readonly message = inject(MessageService);
+  private readonly navigationService = inject(NavigationService);
+  private readonly refreshTokenService = inject(RefreshTokenService);
+  private readonly signUpService = inject(SignUpService);
+  private readonly tokenService = inject(TokenService);
+  private readonly userService = inject(UserService);
 
   public isUserLoggedIn = signal(false);
 
-  public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
-    return this.signUpService.register(email, password).pipe(
-      take(1),
-      tap(() => {
-        this.message.success(MESSAGE.REGISTRATION_SUCCESS);
-      }),
-      switchMap(() => this.login({ email, password })),
-      catchError((error: OverriddenHttpErrorResponse) => this.handleAuthError(error)),
-    );
+  private handleAuthError(error: OverriddenHttpErrorResponse): Observable<never> {
+    this.message.error(error.error.message);
+    return EMPTY;
+  }
+
+  private handleAuthSuccess({ accessToken, refreshToken }: AuthResponse): void {
+    this.tokenService.setToken(accessToken, refreshToken);
+    this.isUserLoggedIn.set(true);
+    this.message.success(MESSAGE.LOGIN_SUCCESS);
+  }
+
+  public checkAuth(): boolean {
+    const token = this.tokenService.getToken();
+    if (token) {
+      this.refreshToken().subscribe();
+      return true;
+    }
+    this.isUserLoggedIn.set(false);
+    return false;
   }
 
   public login({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
@@ -87,24 +95,14 @@ export class AuthService {
     );
   }
 
-  public checkAuth(): boolean {
-    const token = this.tokenService.getToken();
-    if (token) {
-      this.refreshToken().subscribe();
-      return true;
-    }
-    this.isUserLoggedIn.set(false);
-    return false;
-  }
-
-  private handleAuthSuccess({ accessToken, refreshToken }: AuthResponse): void {
-    this.tokenService.setToken(accessToken, refreshToken);
-    this.isUserLoggedIn.set(true);
-    this.message.success(MESSAGE.LOGIN_SUCCESS);
-  }
-
-  private handleAuthError(error: OverriddenHttpErrorResponse): Observable<never> {
-    this.message.error(error.error.message);
-    return EMPTY;
+  public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
+    return this.signUpService.register(email, password).pipe(
+      take(1),
+      tap(() => {
+        this.message.success(MESSAGE.REGISTRATION_SUCCESS);
+      }),
+      switchMap(() => this.login({ email, password })),
+      catchError((error: OverriddenHttpErrorResponse) => this.handleAuthError(error)),
+    );
   }
 }

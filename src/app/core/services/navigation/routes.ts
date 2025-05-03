@@ -1,22 +1,22 @@
 export const APP_PATH = {
+  AUTHOR: 'Author',
   DEFAULT: '',
   LOGIN: 'Login',
-  SIGN_UP: 'Sign-up',
+  NO_MATCH: '**',
+  NOT_FOUND: '404',
+  POSTS: 'Posts',
   PROFILE: 'Profile',
   SETTINGS: 'Settings',
-  AUTHOR: 'Author',
-  POSTS: 'Posts',
-  NOT_FOUND: '404',
-  NO_MATCH: '**',
+  SIGN_UP: 'Sign-up',
 } as const;
 
 export const APP_ROUTE = {
+  AUTHOR: `/${APP_PATH.AUTHOR.toLowerCase()}`,
+  HOME: '/',
   LOGIN: `/${APP_PATH.LOGIN.toLowerCase()}`,
-  SIGN_UP: `/${APP_PATH.SIGN_UP.toLowerCase()}`,
+  NOT_FOUND: `/${APP_PATH.NOT_FOUND.toLowerCase()}`,
+  POSTS: `/${APP_PATH.POSTS.toLowerCase()}`,
   PROFILE: `/${APP_PATH.PROFILE.toLowerCase()}`,
   PROFILE_SETTINGS: `/${APP_PATH.PROFILE.toLowerCase()}/${APP_PATH.SETTINGS.toLowerCase()}`,
-  AUTHOR: `/${APP_PATH.AUTHOR.toLowerCase()}`,
-  POSTS: `/${APP_PATH.POSTS.toLowerCase()}`,
-  NOT_FOUND: `/${APP_PATH.NOT_FOUND.toLowerCase()}`,
-  HOME: '/',
+  SIGN_UP: `/${APP_PATH.SIGN_UP.toLowerCase()}`,
 } as const;

@@ -12,17 +12,16 @@ import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coa
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 
 @Component({
-  selector: 'app-post-preview',
-  imports: [CoauthorsListComponent, PostAvatarComponent, RouterLink, ButtonModule, RippleModule, NgIf],
-  templateUrl: './post-preview.component.html',
-  styleUrl: './post-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CoauthorsListComponent, PostAvatarComponent, RouterLink, ButtonModule, RippleModule, NgIf],
+  selector: 'app-post-preview',
+  styleUrl: './post-preview.component.scss',
+  templateUrl: './post-preview.component.html',
 })
 export class PostPreviewComponent {
-  public post = input.required<PostsResponse>();
-  public author = input.required<AuthorsResponse | null>();
-
   public readonly authorService: AuthorService = inject(AuthorService);
 
+  public author = input.required<AuthorsResponse | null>();
   public isShortCoauthors = signal<boolean>(true);
+  public post = input.required<PostsResponse>();
 }

@@ -16,11 +16,45 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class PostService {
-  private readonly postsService = inject(PostsService);
   private readonly loaderService = inject(LoaderService);
   private readonly message = inject(MessageService);
   private readonly navigationService = inject(NavigationService);
+  private readonly postsService = inject(PostsService);
+
   public readonly allPosts = signal<PostsResponse[]>([]);
+
+  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
+    this.message.error(error.error.message);
+    return EMPTY;
+  }
+
+  public createPost(dto: NewPost): Observable<PostsResponse> {
+    this.loaderService.turnOn();
+    return this.postsService.createPost(dto).pipe(
+      take(1),
+      tap(() => {
+        this.message.success(MESSAGE.CREATE_POST_SUCCESS);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
+  }
+
+  public deletePost(postId: number): Observable<PostsResponse> {
+    this.loaderService.turnOn();
+    return this.postsService.deletePost(postId).pipe(
+      take(1),
+      tap(() => {
+        this.message.success(MESSAGE.DELETE_POST_SUCCESS);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
+  }
 
   public getAllPosts(): Observable<PostsResponse[]> {
     this.loaderService.turnOn();
@@ -61,18 +95,11 @@ export class PostService {
     );
   }
 
-  public createPost(dto: NewPost): Observable<PostsResponse> {
-    this.loaderService.turnOn();
-    return this.postsService.createPost(dto).pipe(
-      take(1),
-      tap(() => {
-        this.message.success(MESSAGE.CREATE_POST_SUCCESS);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
+  public refreshPosts(): Observable<PostsResponse[]> {
+    const userId = this.navigationService.userId();
+    const action$ = userId ? this.getPostsByAuthorId(+userId) : this.getAllPosts();
+
+    return action$.pipe(take(1));
   }
 
   public updatePost(dto: FormData): Observable<PostsResponse> {
@@ -87,31 +114,5 @@ export class PostService {
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
-  }
-
-  public deletePost(postId: number): Observable<PostsResponse> {
-    this.loaderService.turnOn();
-    return this.postsService.deletePost(postId).pipe(
-      take(1),
-      tap(() => {
-        this.message.success(MESSAGE.DELETE_POST_SUCCESS);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
-  }
-
-  public refreshPosts(): Observable<PostsResponse[]> {
-    const userId = this.navigationService.userId();
-    const action$ = userId ? this.getPostsByAuthorId(+userId) : this.getAllPosts();
-
-    return action$.pipe(take(1));
-  }
-
-  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
-    this.message.error(error.error.message);
-    return EMPTY;
   }
 }
