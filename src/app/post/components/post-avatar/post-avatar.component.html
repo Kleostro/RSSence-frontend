@@ -7,6 +7,6 @@
   [image]="author.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
   size="normal"
   [routerLink]="['/author', author.userId]"
-></p-avatar>
+/>
 <a [routerLink]="['/author', author.userId]" class="post-author-link">{{ author.username }}</a>
 <span class="post-createdAt">{{ post.createdAt | date: 'medium' }}</span>

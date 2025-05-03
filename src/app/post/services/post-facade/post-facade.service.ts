@@ -14,13 +14,13 @@ import { PostService } from '@/app/post/services/post/post.service';
   providedIn: 'root',
 })
 export class PostFacadeService {
-  private readonly userService = inject(UserService);
   private readonly authorService = inject(AuthorService);
-  private readonly postService = inject(PostService);
-  private readonly navigationService = inject(NavigationService);
   private readonly loaderService = inject(LoaderService);
+  private readonly navigationService = inject(NavigationService);
+  private readonly postService = inject(PostService);
+  private readonly userService = inject(UserService);
 
-  private loadInitialData(userId: number | null): Observable<UsersResponse | null> {
+  private loadInitialData(userId: null | number): Observable<null | UsersResponse> {
     this.loaderService.turnOnPageLoading();
     return this.userService.getMe().pipe(
       switchMap((userMe) => {
@@ -48,14 +48,14 @@ export class PostFacadeService {
     );
   }
 
-  public loadInitialDataWithDependencies(userId: number | null): Observable<{
+  public loadInitialDataWithDependencies(userId: null | number): Observable<{
     posts: PostsResponse[];
   }> {
     this.loaderService.turnOnPageLoading();
     return this.loadInitialData(userId).pipe(
       switchMap((user) => {
         if (!user?.author?.id) {
-          return of({ user, authors: [], posts: [] });
+          return of({ authors: [], posts: [], user });
         }
 
         return forkJoin({

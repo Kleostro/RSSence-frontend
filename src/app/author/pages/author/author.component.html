@@ -26,8 +26,7 @@
         />
       </div>
       <div class="author-actions">
-        <a
-          pButton
+        <p-button
           pRipple
           [routerLink]="allAuthorPostsLink"
           type="button"
@@ -35,9 +34,8 @@
           icon="pi pi-arrow-right"
           severity="primary"
           label="See all posts"
-        ></a>
-        <button
-          pButton
+        />
+        <p-button
           pRipple
           *ngIf="this.isMyPage()"
           type="button"
@@ -46,7 +44,7 @@
           severity="primary"
           label="Create new post"
           (click)="this.setParamsInModal(); this.modalService.openModal(postForm, 'Create new post')"
-        ></button>
+        />
       </div>
 
       <app-posts-list [posts]="this.postService.allPosts()" />

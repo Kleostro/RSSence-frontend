@@ -5,9 +5,9 @@
 
   margin: 2rem 0;
   padding: 2rem;
+  border-radius: 0.5rem;
 
   background-color: var(--p-surface-800);
-  border-radius: 0.5rem;
 
   &::ng-deep .p-floatlabel {
     width: 100%;
@@ -32,9 +32,9 @@
   }
 
   &::ng-deep .p-inputtext {
+    border: 0.1rem solid var(--p-surface-600);
     color: var(--p-surface-300);
     background: var(--p-surface-800);
-    border: 0.1rem solid var(--p-surface-600);
   }
 }
 
@@ -50,9 +50,9 @@
 .content-input,
 .image-url-input,
 .coauthor-input {
+  border: 0.1rem solid var(--p-surface-600);
   color: var(--p-surface-300);
   background: var(--p-surface-800);
-  border: 0.1rem solid var(--p-surface-600);
 }
 
 .content-input {
@@ -65,7 +65,6 @@
   justify-content: space-between;
 
   padding: 1.5rem 0;
-
   border: 0.1rem solid var(--p-form-field-border-color);
   border-right: 0;
   border-left: 0;

@@ -28,7 +28,7 @@
     "isolatedModules": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "eslint.config.js"],
+  "include": ["src/**/*", "eslint.config.js", "types"],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

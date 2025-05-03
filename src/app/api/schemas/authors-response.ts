@@ -3,15 +3,15 @@ import { z } from 'zod';
 import { PostsResponseSchema } from '@/app/api/schemas/posts-response';
 
 export const AuthorsResponseSchema = z.object({
-  id: z.number(),
-  userId: z.number(),
-  firstname: z.string(),
-  lastname: z.string(),
-  username: z.string(),
-  bio: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
   authoredPosts: PostsResponseSchema.array(),
+  avatarUrl: z.string().nullable(),
+  bio: z.string().nullable(),
   coauthoredPosts: PostsResponseSchema.array(),
+  firstname: z.string(),
+  id: z.number(),
+  lastname: z.string(),
+  userId: z.number(),
+  username: z.string(),
 });
 
 export type AuthorsResponse = z.infer<typeof AuthorsResponseSchema>;

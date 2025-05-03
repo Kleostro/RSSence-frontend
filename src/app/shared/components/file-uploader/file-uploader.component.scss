@@ -22,12 +22,11 @@
   width: 100%;
   min-height: 15rem;
   max-height: 15rem;
+  border: 0.1rem dashed var(--p-surface-600);
+  border-radius: 0.5rem;
 
   line-height: 1.5;
   text-align: center;
-
-  border: 0.1rem dashed var(--p-surface-600);
-  border-radius: 0.5rem;
 
   transition: border 0.3s;
 
@@ -53,7 +52,6 @@
 
   width: 10rem;
   height: 10rem;
-
   border-radius: 50%;
 
   img {

@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 export const OverriddenHttpErrorResponseSchema = z.object({
   error: z.object({
-    statusCode: z.number(),
-    path: z.string(),
-    method: z.string(),
-    timestamp: z.string(),
     message: z.string(),
+    method: z.string(),
+    path: z.string(),
+    statusCode: z.number(),
+    timestamp: z.string(),
   }),
 });
 

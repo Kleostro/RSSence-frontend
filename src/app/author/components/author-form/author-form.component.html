@@ -15,7 +15,7 @@
             field="firstname"
             [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.firstname"
             [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.firstname.messages"
-          ></app-form-field-error>
+          />
         </div>
       </div>
       <div class="control">
@@ -27,7 +27,7 @@
             field="lastname"
             [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.lastname"
             [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.lastname.messages"
-          ></app-form-field-error>
+          />
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
             field="username"
             [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.username"
             [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.username.messages"
-          ></app-form-field-error>
+          />
 
           @if (usernameControl.dirty && usernameControl.pending) {
             <small style="color: gray">Checking username availability...</small>
@@ -57,8 +57,9 @@
       </div>
     </div>
     <div class="control control-textarea-container">
-      <label class="control-label">About me</label>
+      <label class="control-label" for="bio">About me</label>
       <textarea
+        id="bio"
         rows="5"
         pInputTextarea
         variant="filled"
@@ -79,7 +80,7 @@
           field="bio"
           [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.bio"
           [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.bio.messages"
-        ></app-form-field-error>
+        />
       </div>
     </div>
     <div class="control">
@@ -89,12 +90,11 @@
         [fileUrl]="this.avatarUrl()"
         [isProcessing]="isProcessing()"
         (fileSelectedEvent)="onAvatarSelected($event)"
-      ></app-file-uploader>
+      />
     </div>
 
     <div class="form-footer">
-      <button
-        pButton
+      <p-button
         pRipple
         type="button"
         fluid="true"
@@ -104,9 +104,8 @@
         severity="info"
         outlined="true"
         (click)="this.author ? this.backToAuthorPageEvent.emit() : this.navigationService.navigateToProfile()"
-      ></button>
-      <button
-        pButton
+      />
+      <p-button
         pRipple
         type="submit"
         fluid="true"
@@ -114,9 +113,8 @@
         [disabled]="isProcessing()"
         severity="success"
         outlined="true"
-      >
-        Save
-      </button>
+        label="Save"
+      />
     </div>
   </form>
 }

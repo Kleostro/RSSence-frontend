@@ -26,7 +26,7 @@ import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
-  selector: 'app-author',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AuthorInfoComponent,
     AuthorFormWrapperComponent,
@@ -39,34 +39,28 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     RouterLink,
     NgIf,
   ],
-  templateUrl: './author.component.html',
+  selector: 'app-author',
   styleUrl: './author.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './author.component.html',
 })
 export class AuthorComponent implements OnDestroy {
-  public userId = input<string | null>(null, { alias: 'id' });
-
+  private readonly destroy$ = new Subject<void>();
   private readonly facade = inject(AuthorFacadeService);
   private readonly userService = inject(UserService);
-  public readonly loaderService = inject(LoaderService);
-  public readonly navigationService = inject(NavigationService);
-  public readonly modalService = inject(ModalService);
-  public readonly postService = inject(PostService);
-
-  private readonly destroy$ = new Subject<void>();
-
-  public isMyPage = signal<boolean>(false);
-
-  public currentAuthor = signal<AuthorsResponse | null>(null);
-  public authorForPreview = signal<AuthorsResponse | null>(null);
 
   public readonly APP_ROUTE = APP_ROUTE;
   public readonly FORM_STATE = FORM_STATE;
-  public authorFormState = signal<FormState>(FORM_STATE.CREATE);
+  public readonly loaderService = inject(LoaderService);
+  public readonly modalService = inject(ModalService);
+  public readonly navigationService = inject(NavigationService);
+  public readonly postService = inject(PostService);
 
   public allAuthorsWithoutCurrent = signal<AuthorsResponse[]>([]);
-  public authorPosts = signal<PostsResponse[] | null>(null);
-
+  public authorFormState = signal<FormState>(FORM_STATE.CREATE);
+  public authorForPreview = signal<AuthorsResponse | null>(null);
+  public authorPosts = signal<null | PostsResponse[]>(null);
+  public currentAuthor = signal<AuthorsResponse | null>(null);
+  public isMyPage = signal<boolean>(false);
   public navigationItems = this.facade.getNavigationItems(
     () => {
       this.navigationService.navigateToProfile();
@@ -78,6 +72,7 @@ export class AuthorComponent implements OnDestroy {
       this.deleteAuthor();
     },
   );
+  public userId = input<null | string>(null, { alias: 'id' });
 
   constructor() {
     toObservable(this.userId)
@@ -88,11 +83,11 @@ export class AuthorComponent implements OnDestroy {
       });
   }
 
-  private loadInitialData(userId: number | null): void {
+  private loadInitialData(userId: null | number): void {
     this.facade
       .loadInitialDataWithDependencies(userId)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(({ user, authors, posts }) => {
+      .subscribe(({ authors, posts, user }) => {
         const me = this.userService.me();
         this.isMyPage.set(!userId || me?.id === userId);
         this.currentAuthor.set(user?.author ?? null);
@@ -100,10 +95,6 @@ export class AuthorComponent implements OnDestroy {
         this.allAuthorsWithoutCurrent.set(authors);
         this.authorPosts.set(posts);
       });
-  }
-
-  public setParamsInModal(): void {
-    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
   }
 
   public deleteAuthor(): void {
@@ -123,6 +114,11 @@ export class AuthorComponent implements OnDestroy {
     this.authorFormState.set(FORM_STATE.CREATE);
   }
 
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   public onCreatePost(): void {
     this.modalService.closeModal();
     const userId = this.userId();
@@ -139,8 +135,7 @@ export class AuthorComponent implements OnDestroy {
     action$.pipe(takeUntil(this.destroy$)).subscribe();
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  public setParamsInModal(): void {
+    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
   }
 }

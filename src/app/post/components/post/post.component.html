@@ -11,10 +11,9 @@
       </div>
 
       <div class="post-actions">
-        <button
+        <p-button
           *ngIf="this.userService.me()?.author?.id === post.authorId"
           class="post-edit-btn"
-          pButton
           pRipple
           type="button"
           [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
@@ -22,11 +21,10 @@
           outlined="true"
           rounded="true"
           [disabled]="isProcessing()"
-        ></button>
-        <button
+        />
+        <p-button
           *ngIf="this.userService.me()?.author?.id === post.authorId"
           class="post-delete-btn"
-          pButton
           pRipple
           type="button"
           [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
@@ -35,7 +33,7 @@
           rounded="true"
           [disabled]="isProcessing()"
           (click)="this.deletePost(post)"
-        ></button>
+        />
       </div>
     </header>
 

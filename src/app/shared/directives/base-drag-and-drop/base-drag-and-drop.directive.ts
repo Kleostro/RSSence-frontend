@@ -8,18 +8,18 @@ export class BaseDragAndDropDirective {
   @Output() public fileDropped = new EventEmitter<FileList>();
   @HostBinding('class.file-over') public fileOver = false;
 
-  @HostListener('dragover', ['$event'])
-  public onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.fileOver = true;
-  }
-
   @HostListener('dragleave', ['$event'])
   public onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.fileOver = false;
+  }
+
+  @HostListener('dragover', ['$event'])
+  public onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.fileOver = true;
   }
 
   @HostListener('drop', ['$event'])

@@ -17,36 +17,12 @@ import { PostService } from '@/app/post/services/post/post.service';
 })
 export class AuthorFacadeService {
   private readonly authorService = inject(AuthorService);
+  private readonly loaderService = inject(LoaderService);
+  private readonly navigationService = inject(NavigationService);
   private readonly postService = inject(PostService);
   private readonly userService = inject(UserService);
-  private readonly navigationService = inject(NavigationService);
-  private readonly loaderService = inject(LoaderService);
 
-  public getNavigationItems(
-    navigateToProfile: () => void,
-    editProfile: () => void,
-    deleteProfile: () => void,
-  ): MenuItem[] {
-    return [
-      {
-        label: 'Profile',
-        icon: 'pi pi-user',
-        command: navigateToProfile,
-      },
-      {
-        label: 'Edit',
-        icon: 'pi pi-pencil',
-        command: editProfile,
-      },
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: deleteProfile,
-      },
-    ];
-  }
-
-  private loadInitialData(userId: number | null): Observable<UsersResponse | null> {
+  private loadInitialData(userId: null | number): Observable<null | UsersResponse> {
     this.loaderService.turnOnPageLoading();
     return this.userService.getMe().pipe(
       concatMap((userMe) => {
@@ -74,44 +50,6 @@ export class AuthorFacadeService {
     );
   }
 
-  public loadInitialDataWithDependencies(userId: number | null): Observable<{
-    user: UsersResponse | null;
-    authors: AuthorsResponse[];
-    posts: PostsResponse[];
-  }> {
-    this.loaderService.turnOnPageLoading();
-    return this.loadInitialData(userId).pipe(
-      concatMap((user) => {
-        if (!user?.author?.id) {
-          return of({ user, authors: [], posts: [] });
-        }
-
-        return forkJoin({
-          authors: this.getAllAuthors(),
-          posts: this.postService.getPostsByAuthorId(user.author.id),
-        }).pipe(
-          map(({ authors, posts }) => ({
-            user,
-            authors: authors.filter((author) => author.id !== user.author?.id),
-            posts,
-          })),
-          finalize(() => {
-            this.loaderService.turnOffPageLoading();
-          }),
-        );
-      }),
-    );
-  }
-
-  public getAllAuthors(): Observable<AuthorsResponse[]> {
-    this.loaderService.turnOnPageLoading();
-    return this.authorService.getAuthors().pipe(
-      finalize(() => {
-        this.loaderService.turnOffPageLoading();
-      }),
-    );
-  }
-
   public deleteAuthor(): Observable<AuthorsResponse> {
     return this.authorService.deleteAuthor().pipe(
       tap(() => {
@@ -126,6 +64,39 @@ export class AuthorFacadeService {
     );
   }
 
+  public getAllAuthors(): Observable<AuthorsResponse[]> {
+    this.loaderService.turnOnPageLoading();
+    return this.authorService.getAuthors().pipe(
+      finalize(() => {
+        this.loaderService.turnOffPageLoading();
+      }),
+    );
+  }
+
+  public getNavigationItems(
+    navigateToProfile: () => void,
+    editProfile: () => void,
+    deleteProfile: () => void,
+  ): MenuItem[] {
+    return [
+      {
+        command: navigateToProfile,
+        icon: 'pi pi-user',
+        label: 'Profile',
+      },
+      {
+        command: editProfile,
+        icon: 'pi pi-pencil',
+        label: 'Edit',
+      },
+      {
+        command: deleteProfile,
+        icon: 'pi pi-trash',
+        label: 'Delete',
+      },
+    ];
+  }
+
   public handleAuthorFormSubmit(formData: FormData, isUpdate: boolean): Observable<AuthorsResponse> {
     const action$ = isUpdate ? this.authorService.updateAuthor(formData) : this.authorService.createAuthor(formData);
 
@@ -138,6 +109,35 @@ export class AuthorFacadeService {
             author: updatedOrNewAuthor,
           });
         }
+      }),
+    );
+  }
+
+  public loadInitialDataWithDependencies(userId: null | number): Observable<{
+    authors: AuthorsResponse[];
+    posts: PostsResponse[];
+    user: null | UsersResponse;
+  }> {
+    this.loaderService.turnOnPageLoading();
+    return this.loadInitialData(userId).pipe(
+      concatMap((user) => {
+        if (!user?.author?.id) {
+          return of({ authors: [], posts: [], user });
+        }
+
+        return forkJoin({
+          authors: this.getAllAuthors(),
+          posts: this.postService.getPostsByAuthorId(user.author.id),
+        }).pipe(
+          map(({ authors, posts }) => ({
+            authors: authors.filter((author) => author.id !== user.author?.id),
+            posts,
+            user,
+          })),
+          finalize(() => {
+            this.loaderService.turnOffPageLoading();
+          }),
+        );
       }),
     );
   }

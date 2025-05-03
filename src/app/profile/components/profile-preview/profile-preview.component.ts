@@ -5,12 +5,12 @@ import { ProfileBioComponent } from '@/app/profile/components/profile-bio/profil
 import { ProfileHeaderComponent } from '@/app/profile/components/profile-header/profile-header.component';
 
 @Component({
-  selector: 'app-profile-preview',
-  imports: [ProfileHeaderComponent, ProfileBioComponent],
-  templateUrl: './profile-preview.component.html',
-  styleUrl: './profile-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ProfileHeaderComponent, ProfileBioComponent],
+  selector: 'app-profile-preview',
+  styleUrl: './profile-preview.component.scss',
+  templateUrl: './profile-preview.component.html',
 })
 export class ProfilePreviewComponent {
-  public profile = input.required<ProfilesResponse | null>();
+  public profile = input.required<null | ProfilesResponse>();
 }

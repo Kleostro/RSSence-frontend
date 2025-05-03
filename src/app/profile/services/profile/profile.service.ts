@@ -14,23 +14,19 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class ProfileService {
-  private readonly profilesService = inject(ProfilesService);
-  private readonly message = inject(MessageService);
   private readonly loaderService = inject(LoaderService);
+  private readonly message = inject(MessageService);
+  private readonly profilesService = inject(ProfilesService);
 
-  public allProfiles = signal<ProfilesResponse[] | null>(null);
+  public allProfiles = signal<null | ProfilesResponse[]>(null);
 
-  public getProfiles(): Observable<ProfilesResponse[]> {
-    this.loaderService.turnOn();
+  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
+    return throwError(() => error);
+  }
 
-    return this.profilesService.getProfiles().pipe(
+  public checkUsernameAvailability(username: string): Observable<boolean | null> {
+    return this.profilesService.checkUsernameAvailability(username).pipe(
       take(1),
-      tap((profiles: ProfilesResponse[]) => {
-        this.allProfiles.set(profiles);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
   }
@@ -41,20 +37,6 @@ export class ProfileService {
       take(1),
       tap(() => {
         this.message.success(MESSAGE.CREATE_PROFILE_SUCCESS);
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
-  }
-
-  public updateProfile(profileDto: FormData): Observable<ProfilesResponse> {
-    this.loaderService.turnOn();
-    return this.profilesService.updateProfile(profileDto).pipe(
-      take(1),
-      tap(() => {
-        this.message.success(MESSAGE.UPDATE_PROFILE_SUCCESS);
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -77,18 +59,36 @@ export class ProfileService {
     );
   }
 
-  public checkUsernameAvailability(username: string): Observable<boolean | null> {
-    return this.profilesService.checkUsernameAvailability(username).pipe(
+  public findProfileByUserId(userId: number): null | ProfilesResponse {
+    return this.allProfiles()?.find((profile) => profile.userId === userId) ?? null;
+  }
+
+  public getProfiles(): Observable<ProfilesResponse[]> {
+    this.loaderService.turnOn();
+
+    return this.profilesService.getProfiles().pipe(
       take(1),
+      tap((profiles: ProfilesResponse[]) => {
+        this.allProfiles.set(profiles);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
   }
 
-  public findProfileByUserId(userId: number): ProfilesResponse | null {
-    return this.allProfiles()?.find((profile) => profile.userId === userId) ?? null;
-  }
-
-  private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
-    return throwError(() => error);
+  public updateProfile(profileDto: FormData): Observable<ProfilesResponse> {
+    this.loaderService.turnOn();
+    return this.profilesService.updateProfile(profileDto).pipe(
+      take(1),
+      tap(() => {
+        this.message.success(MESSAGE.UPDATE_PROFILE_SUCCESS);
+      }),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
   }
 }

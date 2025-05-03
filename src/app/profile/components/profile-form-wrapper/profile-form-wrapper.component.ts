@@ -5,17 +5,17 @@ import { ProfileFormComponent } from '@/app/profile/components/profile-form/prof
 import { ProfilePreviewComponent } from '@/app/profile/components/profile-preview/profile-preview.component';
 
 @Component({
-  selector: 'app-profile-form-wrapper',
-  imports: [ProfilePreviewComponent, ProfileFormComponent],
-  templateUrl: './profile-form-wrapper.component.html',
-  styleUrl: './profile-form-wrapper.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ProfilePreviewComponent, ProfileFormComponent],
+  selector: 'app-profile-form-wrapper',
+  styleUrl: './profile-form-wrapper.component.scss',
+  templateUrl: './profile-form-wrapper.component.html',
 })
 export class ProfileFormWrapperComponent {
-  public currentProfile = input.required<ProfilesResponse | null>();
-  public profileForPreview = input.required<ProfilesResponse | null>();
-
   @Output() public backToProfilePage = new EventEmitter<void>();
   @Output() public formSubmit = new EventEmitter<ProfilesResponse>();
-  @Output() public updateProfileForPreview = new EventEmitter<ProfilesResponse | null>();
+  @Output() public updateProfileForPreview = new EventEmitter<null | ProfilesResponse>();
+
+  public currentProfile = input.required<null | ProfilesResponse>();
+  public profileForPreview = input.required<null | ProfilesResponse>();
 }

@@ -7,18 +7,11 @@ import ModalPositionType from '@/app/shared/models/modal-position';
   providedIn: 'root',
 })
 export class ModalService {
-  public isModalShow = signal(false);
-  public content = signal<TemplateRef<unknown> | null>(null);
-  public modalTitle = signal('');
+  public content = signal<null | TemplateRef<unknown>>(null);
   public contentWidth = signal('80%');
+  public isModalShow = signal(false);
+  public modalTitle = signal('');
   public position = signal<ModalPositionType>(MODAL_POSITION_DIRECTION.CENTER);
-
-  public openModal(content: TemplateRef<unknown>, title = ''): void {
-    this.content.set(content);
-    this.modalTitle.set(title);
-    this.isModalShow.set(true);
-    document.body.style.overflowY = 'hidden';
-  }
 
   public closeModal(): void {
     this.content.set(null);
@@ -27,5 +20,12 @@ export class ModalService {
     this.contentWidth.set('80%');
     this.position.set(MODAL_POSITION_DIRECTION.CENTER);
     document.body.style.overflowY = '';
+  }
+
+  public openModal(content: TemplateRef<unknown>, title = ''): void {
+    this.content.set(content);
+    this.modalTitle.set(title);
+    this.isModalShow.set(true);
+    document.body.style.overflowY = 'hidden';
   }
 }

@@ -23,7 +23,7 @@ interface AutoCompleteCompleteEvent {
 }
 
 @Component({
-  selector: 'app-post-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     InputTextModule,
@@ -36,66 +36,24 @@ interface AutoCompleteCompleteEvent {
     AvatarModule,
     EditorModule,
   ],
-  templateUrl: './post-form.component.html',
+  selector: 'app-post-form',
   styleUrl: './post-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './post-form.component.html',
 })
 export class PostFormComponent implements OnInit {
-  @Input({ required: true }) public authors: AuthorsResponse[] = [];
-
-  @Output() public createPostEvent = new EventEmitter<PostsResponse>();
-
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postService = inject(PostService);
 
-  public form!: FormGroup<PostForm>;
+  @Input({ required: true }) public authors: AuthorsResponse[] = [];
+  @Output() public createPostEvent = new EventEmitter<PostsResponse>();
+
   public filteredAuthors: AuthorsResponse[] = [];
+  public form!: FormGroup<PostForm>;
   public isProcessing = signal<boolean>(false);
 
-  public filterAuthors(event: AutoCompleteCompleteEvent): void {
-    const query = event.query.toLowerCase();
-    const filteredAuthorsSet = new Set(
-      this.authors.filter((author) => author.username.toLowerCase().includes(query)).map((author) => author),
-    );
-
-    this.filteredAuthors = Array.from(filteredAuthorsSet);
-  }
-
-  public ngOnInit(): void {
-    this.initForm();
-  }
-
-  public initForm(): void {
-    this.form = this.fb.group<PostForm>({
-      title: this.fb.control<string>('', [Validators.required, Validators.maxLength(100)]),
-      content: this.fb.control<string | null>(''),
-      imageUrls: this.fb.array<ImageUrlsFGType>([]),
-      coauthors: this.fb.array<CoauthorsFGType>([]),
-    });
-  }
-
-  public addImageUrl(): void {
-    this.form.controls.imageUrls.push(this.fb.group({ imageUrl: this.fb.control('') }));
-  }
-
-  public addCoauthor(): void {
-    this.form.controls.coauthors.push(this.fb.group({ coauthor: this.fb.control<string | AuthorsResponse>('') }));
-  }
-
-  public submit(): void {
-    if (this.form.invalid) {
-      return;
-    }
-
-    this.startProcessing();
-
-    const postData = this.preparePostData(this.getCoauthorIds());
-    this.sendPost(postData);
-  }
-
-  private startProcessing(): void {
-    this.isProcessing.set(true);
-    this.form.disable();
+  private completeProcessing(): void {
+    this.isProcessing.set(false);
+    this.form.enable();
   }
 
   private getCoauthorIds(): number[] {
@@ -112,10 +70,10 @@ export class PostFormComponent implements OnInit {
   private preparePostData(coauthorIds: number[]): NewPost {
     const formValue = this.form.getRawValue();
     return {
-      title: formValue.title,
+      coauthorIds,
       content: formValue.content,
       imageUrls: [],
-      coauthorIds,
+      title: formValue.title,
     };
   }
 
@@ -138,8 +96,50 @@ export class PostFormComponent implements OnInit {
       .subscribe();
   }
 
-  private completeProcessing(): void {
-    this.isProcessing.set(false);
-    this.form.enable();
+  private startProcessing(): void {
+    this.isProcessing.set(true);
+    this.form.disable();
+  }
+
+  public addCoauthor(): void {
+    this.form.controls.coauthors.push(this.fb.group({ coauthor: this.fb.control<AuthorsResponse | string>('') }));
+  }
+
+  public addImageUrl(): void {
+    this.form.controls.imageUrls.push(this.fb.group({ imageUrl: this.fb.control('') }));
+  }
+
+  public filterAuthors(event: AutoCompleteCompleteEvent): void {
+    const query = event.query.toLowerCase();
+    const filteredAuthorsSet = new Set(
+      this.authors.filter((author) => author.username.toLowerCase().includes(query)).map((author) => author),
+    );
+
+    this.filteredAuthors = Array.from(filteredAuthorsSet);
+  }
+
+  public initForm(): void {
+    const MAX_LENGTH = 100;
+    this.form = this.fb.group<PostForm>({
+      coauthors: this.fb.array<CoauthorsFGType>([]),
+      content: this.fb.control<null | string>(''),
+      imageUrls: this.fb.array<ImageUrlsFGType>([]),
+      title: this.fb.control<string>('', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
+    });
+  }
+
+  public ngOnInit(): void {
+    this.initForm();
+  }
+
+  public submit(): void {
+    if (this.form.invalid) {
+      return;
+    }
+
+    this.startProcessing();
+
+    const postData = this.preparePostData(this.getCoauthorIds());
+    this.sendPost(postData);
   }
 }

@@ -11,12 +11,12 @@ import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 })
 export class NavigationService {
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly location = inject(Location);
+  private readonly router = inject(Router);
 
-  public queryParams = signal<Record<string, string>>({});
   public isLoginPage = signal<boolean>(false);
-  public userId = signal<string | null>(null);
+  public queryParams = signal<Record<string, string>>({});
+  public userId = signal<null | string>(null);
 
   constructor() {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
@@ -29,12 +29,20 @@ export class NavigationService {
     this.location.back();
   }
 
-  public navigateToLogin(): void {
-    this.router.navigate([APP_ROUTE.LOGIN]);
+  public navigateToAuthor(): void {
+    this.router.navigate([APP_ROUTE.AUTHOR]);
+  }
+
+  public navigateToAuthorByUserId(userId: number): void {
+    this.router.navigate([APP_ROUTE.AUTHOR, userId]);
   }
 
   public navigateToHome(): void {
     this.router.navigate([APP_ROUTE.HOME]);
+  }
+
+  public navigateToLogin(): void {
+    this.router.navigate([APP_ROUTE.LOGIN]);
   }
 
   public navigateToNotFound(): void {
@@ -49,23 +57,7 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.PROFILE, userId]);
   }
 
-  public navigateToAuthor(): void {
-    this.router.navigate([APP_ROUTE.AUTHOR]);
-  }
-
-  public navigateToAuthorByUserId(userId: number): void {
-    this.router.navigate([APP_ROUTE.AUTHOR, userId]);
-  }
-
-  public updateQueryParams(params: Params): void {
-    this.router.navigate([], {
-      queryParams: params,
-      queryParamsHandling: 'merge',
-      relativeTo: this.activatedRoute,
-    });
-  }
-
-  public parseUserId(userId: string | null): number | null {
+  public parseUserId(userId: null | string): null | number {
     const parsedUserId = Number(userId) || null;
 
     if (parsedUserId === null) {
@@ -76,5 +68,13 @@ export class NavigationService {
     }
 
     return parsedUserId;
+  }
+
+  public updateQueryParams(params: Params): void {
+    this.router.navigate([], {
+      queryParams: params,
+      queryParamsHandling: 'merge',
+      relativeTo: this.activatedRoute,
+    });
   }
 }

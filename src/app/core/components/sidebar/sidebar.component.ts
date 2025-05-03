@@ -15,74 +15,74 @@ import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
 
 @Component({
-  selector: 'app-sidebar',
-  imports: [DrawerModule, ButtonModule, TieredMenu, BadgeModule, RippleModule, RouterLink],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DrawerModule, ButtonModule, TieredMenu, BadgeModule, RippleModule, RouterLink],
+  selector: 'app-sidebar',
+  styleUrl: './sidebar.component.scss',
+  templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
-  public readonly themeSwitchService = inject(ThemeSwitchService);
-  public readonly navigationService = inject(NavigationService);
 
   public readonly APP_ROUTE = APP_ROUTE;
+  public readonly navigationService = inject(NavigationService);
+  public readonly themeSwitchService = inject(ThemeSwitchService);
 
   public isVisible = false;
   // eslint-disable-next-line max-lines-per-function
   public items = computed<MenuItem[]>(() => [
     {
-      label: 'Home',
       icon: 'pi pi-home',
+      label: 'Home',
       routerLink: [APP_ROUTE.HOME],
     },
     {
-      label: 'Feeds',
       icon: 'pi pi-list',
+      label: 'Feeds',
       routerLink: [APP_ROUTE.POSTS],
     },
     { separator: true },
     {
-      label: 'Profile',
       icon: 'pi pi-user',
       items: [
         {
-          label: 'My profile',
           icon: 'pi pi-user',
+          label: 'My profile',
           routerLink: [APP_ROUTE.PROFILE],
         },
       ],
+      label: 'Profile',
     },
     {
-      label: 'Author',
       icon: 'pi pi-pencil',
       items: [
         {
-          label: 'My author',
           icon: 'pi pi-pencil',
+          label: 'My author',
           routerLink: [APP_ROUTE.AUTHOR],
         },
         {
-          label: 'My posts',
           icon: 'pi pi-list',
+          label: 'My posts',
           routerLink: [APP_ROUTE.AUTHOR, this.userService.me()?.id, 'posts'],
           visible: !!this.userService.me()?.author,
         },
       ],
+      label: 'Author',
     },
     {
-      label: 'Settings',
       icon: 'pi pi-cog',
       items: [
         {
-          label: 'Switch theme',
-          icon: 'pi pi-palette',
           command: (): void => {
             this.themeSwitchService.toggle();
           },
+          icon: 'pi pi-palette',
+          label: 'Switch theme',
         },
       ],
+      label: 'Settings',
     },
   ]);
 

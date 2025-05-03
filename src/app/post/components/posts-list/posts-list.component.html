@@ -1,9 +1,9 @@
 @if (this.posts(); as posts) {
   @for (post of posts; track post; let i = $index) {
     @if (mode() === 'preview') {
-      <app-post-preview [post]="post" [author]="this.authorService.findAuthorById(post.authorId)"></app-post-preview>
+      <app-post-preview [post]="post" [author]="this.authorService.findAuthorById(post.authorId)" />
     } @else {
-      <app-post [post]="post" [author]="this.authorService.findAuthorById(post.authorId)"></app-post>
+      <app-post [post]="post" [author]="this.authorService.findAuthorById(post.authorId)" />
     }
   } @empty {
     <div class="not-found">

@@ -7,8 +7,8 @@ import { WA_LOCAL_STORAGE, WA_WINDOW } from '@ng-web-apis/common';
 })
 export class ThemeSwitchService {
   private readonly document = inject(DOCUMENT);
-  private readonly localStorage = inject(WA_LOCAL_STORAGE);
   private readonly key = 'app-theme';
+  private readonly localStorage = inject(WA_LOCAL_STORAGE);
   private readonly media = inject(WA_WINDOW).matchMedia('(prefers-color-scheme: dark)');
 
   private isDarkTheme = false;
@@ -25,10 +25,6 @@ export class ThemeSwitchService {
     this.applyTheme();
   }
 
-  private isDarkPreferred(): boolean {
-    return this.media.matches;
-  }
-
   private applyTheme(): void {
     const htmlElement = this.document.querySelector('html');
     if (this.isDarkTheme) {
@@ -36,6 +32,10 @@ export class ThemeSwitchService {
     } else {
       htmlElement?.classList.remove('app-dark');
     }
+  }
+
+  private isDarkPreferred(): boolean {
+    return this.media.matches;
   }
 
   public toggle(): void {

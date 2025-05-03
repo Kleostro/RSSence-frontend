@@ -16,7 +16,7 @@ import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { trimData } from '@/app/utils/trim-data';
 
 @Component({
-  selector: 'app-login-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     FloatLabelModule,
@@ -28,17 +28,16 @@ import { trimData } from '@/app/utils/trim-data';
     InputIcon,
     DividerModule,
   ],
-  templateUrl: './login-form.component.html',
+  selector: 'app-login-form',
   styleUrl: './login-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './login-form.component.html',
 })
 export class LoginFormComponent {
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  public isLoginInProgress = signal(false);
-
   public APP_ROUTE = APP_ROUTE;
+  public isLoginInProgress = signal(false);
 
   public loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.email, Validators.required]],

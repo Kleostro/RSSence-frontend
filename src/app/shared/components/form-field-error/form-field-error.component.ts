@@ -6,40 +6,32 @@ import { Subject, takeUntil } from 'rxjs';
 import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
 
 @Component({
-  selector: 'app-form-field-error',
-  imports: [],
-  templateUrl: './form-field-error.component.html',
-  styleUrl: './form-field-error.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [],
+  selector: 'app-form-field-error',
+  styleUrl: './form-field-error.component.scss',
+  templateUrl: './form-field-error.component.html',
 })
-export class FormFieldErrorComponent implements OnInit, OnDestroy {
-  public readonly control = input.required<AbstractControl>();
-  public readonly fieldBoundaries = input.required<Record<string, unknown>>();
-  public readonly errorMessages = input.required<Record<string, string | undefined | null>>();
-  public readonly field = input.required<string>();
-  public readonly errorMessage = signal<string | null>(null);
-
+export class FormFieldErrorComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
 
-  public ngOnInit(): void {
-    this.control()
-      .statusChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.errorMessage.set(this.getError());
-      });
-  }
+  public readonly control = input.required<AbstractControl>();
+  public readonly errorMessage = signal<null | string>(null);
+  public readonly errorMessages = input.required<Record<string, null | string | undefined>>();
+  public readonly field = input.required<string>();
+  public readonly fieldBoundaries = input.required<Record<string, unknown>>();
 
   private getDefaultErrorMessage(errorKey: string, fieldBoundaries?: Record<string, unknown>): string {
     const messages: Record<string, string> = {
-      [FIELD_ERROR_KEY.REQUIRED]: 'This field is required.',
-      [FIELD_ERROR_KEY.MIN_LENGTH]: `Minimum length is ${String(fieldBoundaries?.['MIN_LENGTH'])} characters.`,
       [FIELD_ERROR_KEY.MAX_LENGTH]: `Maximum length is ${String(fieldBoundaries?.['MAX_LENGTH'])} characters.`,
+      [FIELD_ERROR_KEY.MIN_LENGTH]: `Minimum length is ${String(fieldBoundaries?.['MIN_LENGTH'])} characters.`,
+      [FIELD_ERROR_KEY.REQUIRED]: 'This field is required.',
       [FIELD_ERROR_KEY.USERNAME_EXISTS]: 'This username is already taken.',
     };
     return messages[errorKey] || 'Something went wrong.';
   }
 
-  private getError(): string | null {
+  private getError(): null | string {
     const control = this.control();
     if (control.errors) {
       const errorKey = Object.keys(control.errors)[0];
@@ -54,12 +46,27 @@ export class FormFieldErrorComponent implements OnInit, OnDestroy {
   }
 
   private interpolateMessage(message: string, params: Record<string, unknown>): string {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/no-unsafe-member-access
-    return message.replace(/{{\s*(\w+)\s*}}/g, (_, key) => String(params[key] ?? ''));
+    return message.replace(/{{\s*(\w+)\s*}}/g, (_, key: string) => {
+      const value = params[key];
+
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+      }
+
+      return '';
+    });
   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public ngOnInit(): void {
+    this.control()
+      .statusChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.errorMessage.set(this.getError());
+      });
   }
 }

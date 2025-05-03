@@ -6,12 +6,12 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
 
 @Component({
-  selector: 'app-author-preview',
-  imports: [AvatarModule, SpeedDialModule],
-  templateUrl: './author-preview.component.html',
-  styleUrl: './author-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [AvatarModule, SpeedDialModule],
+  selector: 'app-author-preview',
+  styleUrl: './author-preview.component.scss',
+  templateUrl: './author-preview.component.html',
 })
 export class AuthorPreviewComponent {
-  public author = input.required<Partial<AuthorsResponse> | null>();
+  public author = input.required<null | Partial<AuthorsResponse>>();
 }

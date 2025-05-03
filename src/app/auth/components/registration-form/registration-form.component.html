@@ -42,8 +42,8 @@
         [disabled]="!registrationForm.valid || isRegistrationInProgress()"
         class="p-mt-2"
         [icon]="isRegistrationInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
-      ></p-button>
-      <p-link pButton [routerLink]="APP_ROUTE.LOGIN" label="Sign In" class="p-button-text p-mt-2"></p-link>
+      />
+      <p-link [routerLink]="APP_ROUTE.LOGIN" label="Sign In" class="p-button-text p-mt-2" />
     </div>
   </footer>
 </form>

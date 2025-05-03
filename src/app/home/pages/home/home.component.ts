@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-home',
-  imports: [],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [],
+  selector: 'app-home',
+  styleUrl: './home.component.scss',
+  templateUrl: './home.component.html',
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class HomeComponent {}

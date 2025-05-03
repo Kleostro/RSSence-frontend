@@ -6,9 +6,16 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class FileHandlingService {
+  private static readonly DEFAULT_MAX_SIZE_MB = 8;
+  private static readonly KB = 1024;
+  private static readonly MB = FileHandlingService.KB ** 2;
+  private static readonly DEFAULT_MAX_SIZE = FileHandlingService.DEFAULT_MAX_SIZE_MB * FileHandlingService.MB;
+
   private readonly message = inject(MessageService);
 
-  private readonly DEFAULT_MAX_SIZE = 8 * 1024 * 1024;
+  public createObjectURL(file: File): string {
+    return URL.createObjectURL(file);
+  }
 
   public getFileListFromEvent(event: Event): FileList | null {
     const { target } = event;
@@ -18,15 +25,12 @@ export class FileHandlingService {
     return null;
   }
 
-  public isValidFileSize(file: File, maxSize: number = this.DEFAULT_MAX_SIZE): boolean {
+  public isValidFileSize(file: File, maxSize: number = FileHandlingService.DEFAULT_MAX_SIZE): boolean {
     if (file.size > maxSize) {
-      this.message.error(`File size exceeds the maximum limit of ${(maxSize / 1024 / 1024).toString()}MB`);
+      const sizeInMB = (maxSize / FileHandlingService.MB).toString();
+      this.message.error(`File size exceeds the maximum limit of ${sizeInMB}MB`);
       return false;
     }
     return true;
-  }
-
-  public createObjectURL(file: File): string {
-    return URL.createObjectURL(file);
   }
 }

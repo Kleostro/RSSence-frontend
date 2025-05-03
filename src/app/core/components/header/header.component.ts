@@ -8,11 +8,11 @@ import { SidebarComponent } from '@/app/core/components/sidebar/sidebar.componen
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 
 @Component({
-  selector: 'app-header',
-  imports: [ButtonModule, SidebarComponent, ProgressBar],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ButtonModule, SidebarComponent, ProgressBar],
+  selector: 'app-header',
+  styleUrl: './header.component.scss',
+  templateUrl: './header.component.html',
 })
 export class HeaderComponent {
   public readonly authService = inject(AuthService);

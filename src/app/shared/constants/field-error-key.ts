@@ -1,7 +1,7 @@
 export const FIELD_ERROR_KEY = {
-  REQUIRED: 'required',
-  MIN_LENGTH: 'minlength',
   MAX_LENGTH: 'maxlength',
+  MIN_LENGTH: 'minlength',
+  REQUIRED: 'required',
   USERNAME_EXISTS: 'usernameExists',
 } as const;
 export type FieldErrorKeyType = (typeof FIELD_ERROR_KEY)[keyof typeof FIELD_ERROR_KEY];

@@ -10,15 +10,15 @@ import { TooltipModule } from 'primeng/tooltip';
 import { AuthorService } from '@/app/author/services/author/author.service';
 
 @Component({
-  selector: 'app-coauthors-list',
-  imports: [Avatar, AvatarGroup, TooltipModule, BadgeModule, RouterLink, NgIf],
-  templateUrl: './coauthors-list.component.html',
-  styleUrl: './coauthors-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Avatar, AvatarGroup, TooltipModule, BadgeModule, RouterLink, NgIf],
+  selector: 'app-coauthors-list',
+  styleUrl: './coauthors-list.component.scss',
+  templateUrl: './coauthors-list.component.html',
 })
 export class CoauthorsListComponent {
-  public coauthorsIds = input<number[]>([]);
   public readonly authorService = inject(AuthorService);
 
+  public coauthorsIds = input<number[]>([]);
   public isShortCoauthors = signal<boolean>(true);
 }

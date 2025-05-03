@@ -1,8 +1,7 @@
 @let post = this.currentPost();
 
 <div class="page">
-  <button
-    pButton
+  <p-button
     pRipple
     class="back-button"
     type="button"
@@ -11,9 +10,9 @@
     icon="pi pi-arrow-left"
     severity="info"
     outlined="true"
-  ></button>
+  />
 
   @if (post !== undefined) {
-    <app-post [post]="post" [author]="this.authorService.findAuthorById(post?.authorId ?? null)"></app-post>
+    <app-post [post]="post" [author]="this.authorService.findAuthorById(post?.authorId ?? null)" />
   }
 </div>

@@ -12,22 +12,21 @@ import { PostFacadeService } from '@/app/post/services/post-facade/post-facade.s
 import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
-  selector: 'app-posts',
-  imports: [PostsListComponent, ButtonModule, RippleModule, NgIf],
-  templateUrl: './posts.component.html',
-  styleUrl: './posts.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PostsListComponent, ButtonModule, RippleModule, NgIf],
+  selector: 'app-posts',
+  styleUrl: './posts.component.scss',
+  templateUrl: './posts.component.html',
 })
 export class PostsComponent implements OnDestroy {
-  public userId = input<string | null>(null, { alias: 'id' });
-
-  public readonly postService = inject(PostService);
-  public readonly navigationService = inject(NavigationService);
+  private readonly destroy$ = new Subject<void>();
   private readonly postFacade = inject(PostFacadeService);
 
-  private readonly destroy$ = new Subject<void>();
+  public readonly navigationService = inject(NavigationService);
+  public readonly postService = inject(PostService);
 
-  public postsListMode = signal<'preview' | 'full'>('preview');
+  public postsListMode = signal<'full' | 'preview'>('preview');
+  public userId = input<null | string>(null, { alias: 'id' });
 
   constructor() {
     toObservable(this.userId)
@@ -39,7 +38,7 @@ export class PostsComponent implements OnDestroy {
       });
   }
 
-  private loadInitialData(userId: number | null): void {
+  private loadInitialData(userId: null | number): void {
     this.postFacade.loadInitialDataWithDependencies(userId).pipe(takeUntil(this.destroy$)).subscribe();
   }
 

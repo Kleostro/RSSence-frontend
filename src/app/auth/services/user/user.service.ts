@@ -13,17 +13,22 @@ import { MessageService } from '@/app/shared/services/message/message.service';
   providedIn: 'root',
 })
 export class UserService {
-  private readonly message = inject(MessageService);
   private readonly loaderService = inject(LoaderService);
+  private readonly message = inject(MessageService);
   private readonly usersService = inject(UsersService);
 
-  public me = signal<UsersResponse | null>(null);
+  public me = signal<null | UsersResponse>(null);
 
-  public getMe(): Observable<UsersResponse | null> {
+  private handleError(error: OverriddenHttpErrorResponse): Observable<null> {
+    this.message.error(error.error.message);
+    return of(null);
+  }
+
+  public getMe(): Observable<null | UsersResponse> {
     this.loaderService.turnOn();
     return this.usersService.getMe().pipe(
       take(1),
-      tap((me: UsersResponse | null) => {
+      tap((me: null | UsersResponse) => {
         this.me.set(me);
       }),
       finalize(() => {
@@ -33,7 +38,7 @@ export class UserService {
     );
   }
 
-  public getUserById(userId: number): Observable<UsersResponse | null> {
+  public getUserById(userId: number): Observable<null | UsersResponse> {
     this.loaderService.turnOn();
     return this.usersService.getUserById(userId).pipe(
       take(1),
@@ -42,10 +47,5 @@ export class UserService {
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
-  }
-
-  private handleError(error: OverriddenHttpErrorResponse): Observable<null> {
-    this.message.error(error.error.message);
-    return of(null);
   }
 }

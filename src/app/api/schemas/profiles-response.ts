@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const ProfilesResponseSchema = z.object({
+  avatarUrl: z.string().nullable(),
+  bio: z.string().nullable(),
+  birthdate: z.string().nullable(),
   firstname: z.string(),
   lastname: z.string(),
-  username: z.string(),
-  bio: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
-  birthdate: z.string().nullable(),
   userId: z.number(),
+  username: z.string(),
 });
 
 export type ProfilesResponse = z.infer<typeof ProfilesResponseSchema>;
