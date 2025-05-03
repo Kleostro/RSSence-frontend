@@ -1,6 +1,7 @@
 import angular from 'angular-eslint';
 import eslintPluginImport from 'eslint-plugin-import';
 import eslintPluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
+import perfectionist from 'eslint-plugin-perfectionist';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
@@ -21,6 +22,7 @@ export default tseslint.config(
     extends: [
       eslint.configs.recommended,
       eslintPluginImport.flatConfigs.recommended,
+      perfectionist.configs['recommended-natural'],
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
       ...tseslint.configs.stylisticTypeChecked,
