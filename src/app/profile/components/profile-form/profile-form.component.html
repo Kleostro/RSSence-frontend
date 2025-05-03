@@ -15,7 +15,7 @@
             field="firstname"
             [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.firstname"
             [errorMessages]="PROFILE_FORM_FIELD_CONFIG.firstname.messages"
-          ></app-form-field-error>
+          />
         </div>
       </div>
       <div class="control">
@@ -27,7 +27,7 @@
             field="lastname"
             [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.lastname"
             [errorMessages]="PROFILE_FORM_FIELD_CONFIG.lastname.messages"
-          ></app-form-field-error>
+          />
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
             field="username"
             [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.username"
             [errorMessages]="PROFILE_FORM_FIELD_CONFIG.username.messages"
-          ></app-form-field-error>
+          />
 
           @if (usernameControl.dirty && usernameControl.pending) {
             <small style="color: gray">Checking username availability...</small>
@@ -56,16 +56,22 @@
         </div>
       </div>
       <div class="control">
-        <label class="control-label">Birthdate</label>
+        <label class="control-label" for="birthday">Birthdate</label>
         <p-icon-field>
-          <p-datepicker (onSelect)="onBirthdateSelected($event)" #birthdatePicker [maxDate]="maxAllowedDate" />
+          <p-datepicker
+            id="birthday"
+            (onSelect)="onBirthdateSelected($event)"
+            #birthdatePicker
+            [maxDate]="maxAllowedDate"
+          />
           <p-inputicon styleClass="pi pi-calendar" />
         </p-icon-field>
       </div>
     </div>
     <div class="control control-textarea-container">
-      <label class="control-label">About me</label>
+      <label class="control-label" for="bio">About me</label>
       <textarea
+        id="bio"
         rows="5"
         pInputTextarea
         variant="filled"
@@ -86,7 +92,7 @@
           field="bio"
           [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.bio"
           [errorMessages]="PROFILE_FORM_FIELD_CONFIG.bio.messages"
-        ></app-form-field-error>
+        />
       </div>
     </div>
     <div class="control">
@@ -96,12 +102,11 @@
         [fileUrl]="this.avatarUrl()"
         [isProcessing]="isProcessing()"
         (fileSelectedEvent)="onAvatarSelected($event)"
-      ></app-file-uploader>
+      />
     </div>
 
     <div class="form-footer">
-      <button
-        pButton
+      <p-button
         pRipple
         type="button"
         fluid="true"
@@ -111,10 +116,9 @@
         severity="info"
         outlined="true"
         (click)="this.profile ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToHome()"
-      ></button>
+      />
 
-      <button
-        pButton
+      <p-button
         pRipple
         type="submit"
         fluid="true"
@@ -123,7 +127,7 @@
         [disabled]="isProcessing()"
         severity="success"
         outlined="true"
-      ></button>
+      />
     </div>
   </form>
 }

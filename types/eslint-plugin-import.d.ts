@@ -1,4 +1,4 @@
 declare module 'eslint-plugin-import' {
-  const plugin: any;
+  const plugin: unknown;
   export default plugin;
 }

@@ -9,5 +9,4 @@ import { ProgressSpinner } from 'primeng/progressspinner';
   styleUrl: './page-loader.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class PageLoaderComponent {}

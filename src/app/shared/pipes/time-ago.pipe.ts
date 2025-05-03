@@ -1,53 +1,39 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-const SECONDS_COUNT = {
-  IN_YEAR: 31536000,
-  IN_MONTH: 2592000,
-  IN_WEEK: 604800,
-  IN_DAY: 86400,
-  IN_HOUR: 3600,
-  IN_MINUTE: 60,
-};
+interface TimeUnit {
+  label: string;
+  seconds: number;
+  fullLabel: string;
+}
+
+const SECOND = 1000;
+
+const TIME_UNITS: TimeUnit[] = [
+  { label: 'y', seconds: 31_536_000, fullLabel: 'year' },
+  { label: 'mo', seconds: 2_592_000, fullLabel: 'month' },
+  { label: 'w', seconds: 604_800, fullLabel: 'week' },
+  { label: 'd', seconds: 86_400, fullLabel: 'day' },
+  { label: 'h', seconds: 3_600, fullLabel: 'hour' },
+  { label: 'm', seconds: 60, fullLabel: 'minute' },
+];
 
 @Pipe({
   name: 'timeAgo',
 })
 export class TimeAgoPipe implements PipeTransform {
   public transform(value: Date): string {
-    const now = new Date();
-    const updatedAt = new Date(value);
-    const seconds = Math.floor((now.getTime() - updatedAt.getTime()) / 1000);
+    const now = Date.now();
+    const updatedAt = new Date(value).getTime();
+    const diffInSeconds = Math.floor((now - updatedAt) / SECOND);
 
-    let interval = Math.floor(seconds / SECONDS_COUNT.IN_YEAR);
-    if (interval > 1) {
-      return `${interval.toString()}y`;
+    for (const unit of TIME_UNITS) {
+      const interval = Math.floor(diffInSeconds / unit.seconds);
+      if (interval >= 1) {
+        const plural = interval === 1 ? unit.fullLabel : `${unit.fullLabel}s`;
+        return `${interval} ${plural} ago`;
+      }
     }
 
-    interval = Math.floor(seconds / SECONDS_COUNT.IN_MONTH);
-    if (interval > 1) {
-      return `${interval.toString()}mo`;
-    }
-
-    interval = Math.floor(seconds / SECONDS_COUNT.IN_WEEK);
-    if (interval > 1) {
-      return `${interval.toString()}w`;
-    }
-
-    interval = Math.floor(seconds / SECONDS_COUNT.IN_DAY);
-    if (interval > 1) {
-      return `${interval.toString()}d`;
-    }
-
-    interval = Math.floor(seconds / SECONDS_COUNT.IN_HOUR);
-    if (interval > 1) {
-      return `${interval.toString()}h`;
-    }
-
-    interval = Math.floor(seconds / SECONDS_COUNT.IN_MINUTE);
-    if (interval > 1) {
-      return `${interval.toString()}m`;
-    }
-
-    return `${seconds.toString()}s`;
+    return `${diffInSeconds} second${diffInSeconds === 1 ? '' : 's'} ago`;
   }
 }

@@ -12,8 +12,7 @@
       [style]="{ position: 'absolute', right: '1rem', top: '1rem' }"
     />
   } @else if (currentProfile) {
-    <button
-      pButton
+    <p-button
       pRipple
       type="button"
       class="move-to-author-button"
@@ -22,7 +21,7 @@
       icon="pi pi-user"
       severity="info"
       outlined="true"
-    ></button>
+    />
   }
   <app-profile-preview [profile]="currentProfile" />
 </div>

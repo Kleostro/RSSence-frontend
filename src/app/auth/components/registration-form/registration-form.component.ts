@@ -16,6 +16,9 @@ import { passwordsMatchValidator } from '@/app/auth/validators/validators';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { trimData } from '@/app/utils/trim-data';
 
+const MIN_LENGTH = 8;
+const MAX_LENGTH = 32;
+
 @Component({
   selector: 'app-registration-form',
   imports: [
@@ -44,8 +47,8 @@ export class RegistrationFormComponent {
   public registrationForm = this.fb.nonNullable.group(
     {
       email: ['', [Validators.email, Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
-      confirm: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
+      password: ['', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]],
+      confirm: ['', [Validators.required, Validators.minLength(MIN_LENGTH), Validators.maxLength(MAX_LENGTH)]],
     },
     {
       validators: passwordsMatchValidator,

@@ -9,5 +9,4 @@ import { LoginFormComponent } from '@/app/auth/components/login-form/login-form.
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class LoginComponent {}

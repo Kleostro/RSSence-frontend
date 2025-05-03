@@ -1,4 +1,3 @@
-// @ts-check
 import angular from 'angular-eslint';
 import eslintPluginImport from 'eslint-plugin-import';
 import eslintPluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
@@ -15,7 +14,8 @@ export default tseslint.config(
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
   },
-  { linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true } },
+  { linterOptions: { reportUnusedDisableDirectives: true } },
+  { ignores: ['.angular'] },
   {
     files: ['**/*.ts'],
     extends: [

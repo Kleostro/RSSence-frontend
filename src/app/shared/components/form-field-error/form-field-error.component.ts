@@ -54,8 +54,15 @@ export class FormFieldErrorComponent implements OnInit, OnDestroy {
   }
 
   private interpolateMessage(message: string, params: Record<string, unknown>): string {
-    // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/no-unsafe-member-access
-    return message.replace(/{{\s*(\w+)\s*}}/g, (_, key) => String(params[key] ?? ''));
+    return message.replace(/{{\s*(\w+)\s*}}/g, (_, key: string) => {
+      const value = params[key];
+
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+      }
+
+      return '';
+    });
   }
 
   public ngOnDestroy(): void {

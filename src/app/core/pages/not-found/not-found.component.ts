@@ -7,5 +7,4 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styleUrl: './not-found.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class NotFoundComponent {}

@@ -27,8 +27,8 @@
         [disabled]="!loginForm.valid || isLoginInProgress()"
         class="p-mt-2"
         [icon]="isLoginInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
-      ></p-button>
-      <p-link pButton [routerLink]="APP_ROUTE.SIGN_UP" label="Sign Up" class="p-button-text p-mt-2"></p-link>
+      />
+      <p-link [routerLink]="APP_ROUTE.SIGN_UP" label="Sign Up" class="p-button-text p-mt-2" />
     </div>
   </footer>
 </form>

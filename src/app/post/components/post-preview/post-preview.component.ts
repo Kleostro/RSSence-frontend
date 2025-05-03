@@ -22,7 +22,7 @@ export class PostPreviewComponent {
   public post = input.required<PostsResponse>();
   public author = input.required<AuthorsResponse | null>();
 
-  public readonly authorService = inject(AuthorService);
+  public readonly authorService: AuthorService = inject(AuthorService);
 
   public isShortCoauthors = signal<boolean>(true);
 }

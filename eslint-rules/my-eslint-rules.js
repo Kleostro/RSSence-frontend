@@ -4,6 +4,7 @@
 export const myEslintRules = {
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
   '@typescript-eslint/explicit-function-return-type': 'error',
+  '@typescript-eslint/no-extraneous-class': 'off',
   '@typescript-eslint/explicit-member-accessibility': [
     'error',
     {
@@ -73,6 +74,17 @@ export const myEslintRules = {
   'no-unused-vars': 'off',
   'object-curly-newline': 'off',
   'unused-imports/no-unused-imports': 'error',
-  'no-magic-numbers': 'off',
-  '@typescript-eslint/no-magic-numbers': 'error',
+  '@angular-eslint/no-input-rename': 'off',
+  '@typescript-eslint/no-magic-numbers': [
+    'error',
+    {
+      ignore: [0, 1, -1, 2],
+      ignoreArrayIndexes: true,
+      ignoreClassFieldInitialValues: true,
+      ignoreReadonlyClassProperties: true,
+      enforceConst: true,
+      ignoreDefaultValues: true,
+    },
+  ],
+  '@typescript-eslint/restrict-template-expressions': 'off',
 };

@@ -9,5 +9,4 @@ import { RegistrationFormComponent } from '@/app/auth/components/registration-fo
   styleUrl: './registration.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RegistrationComponent {}

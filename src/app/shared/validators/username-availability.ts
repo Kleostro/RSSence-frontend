@@ -10,9 +10,10 @@ export function usernameAvailability(
   service: ProfileService | AuthorService,
   currentUsername: string | null,
 ): AsyncValidatorFn {
+  const DEBOUNCE_TIME = 400;
   return (control: AbstractControl) =>
     control.valueChanges.pipe(
-      debounceTime(400),
+      debounceTime(DEBOUNCE_TIME),
       tap(() => {
         const value = String(control.value);
         return value === currentUsername || !control.value ? null : value;

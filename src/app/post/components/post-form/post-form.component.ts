@@ -66,8 +66,9 @@ export class PostFormComponent implements OnInit {
   }
 
   public initForm(): void {
+    const MAX_LENGTH = 100;
     this.form = this.fb.group<PostForm>({
-      title: this.fb.control<string>('', [Validators.required, Validators.maxLength(100)]),
+      title: this.fb.control<string>('', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
       content: this.fb.control<string | null>(''),
       imageUrls: this.fb.array<ImageUrlsFGType>([]),
       coauthors: this.fb.array<CoauthorsFGType>([]),

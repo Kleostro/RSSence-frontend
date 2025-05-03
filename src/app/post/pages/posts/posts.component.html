@@ -1,8 +1,7 @@
 @let posts = this.postService.allPosts();
 
 <div class="page">
-  <button
-    pButton
+  <p-button
     pRipple
     class="back-button"
     type="button"
@@ -11,10 +10,9 @@
     icon="pi pi-arrow-left"
     severity="info"
     outlined="true"
-  ></button>
+  />
 
-  <button
-    pButton
+  <p-button
     pRipple
     *ngIf="posts.length"
     type="button"
@@ -24,7 +22,7 @@
     class="switch-mode-button"
     severity="success"
     outlined="true"
-  ></button>
+  />
 
   <app-posts-list [posts]="posts" [mode]="this.postsListMode()" />
 </div>

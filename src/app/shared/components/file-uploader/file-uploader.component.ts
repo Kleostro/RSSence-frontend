@@ -12,11 +12,16 @@ import { FileHandlingService } from '@/app/shared/services/file-handling/file-ha
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileUploaderComponent {
+  private static readonly KB = 1024;
+  private static readonly MB = FileUploaderComponent.KB ** 2;
+  private static readonly DEFAULT_MAX_SIZE_MB = 5;
+  private static readonly DEFAULT_MAX_SIZE_BYTES = FileUploaderComponent.DEFAULT_MAX_SIZE_MB * FileUploaderComponent.MB;
+
   public readonly inputId = input<string>();
   public readonly label = input<string>();
   public readonly isProcessing = input.required<boolean>();
   public readonly fileUrl = input<string | null>();
-  public readonly fileMaxSize = input<number>(5 * 1024 * 1024); // 5 MB
+  public readonly fileMaxSize = input<number>(FileUploaderComponent.DEFAULT_MAX_SIZE_BYTES);
 
   private readonly fileHandlingService = inject(FileHandlingService);
 

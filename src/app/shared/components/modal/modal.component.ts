@@ -31,4 +31,10 @@ export class ModalComponent {
       this.modalService.closeModal();
     }
   }
+
+  public onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.modalService.closeModal();
+    }
+  }
 }
