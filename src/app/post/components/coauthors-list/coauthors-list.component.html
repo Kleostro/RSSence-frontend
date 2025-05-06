@@ -9,6 +9,7 @@
       [image]="this.authorService.findAuthorById(coauthorId)?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
       size="normal"
       [routerLink]="['/author', this.authorService.findAuthorById(coauthorId)?.userId]"
+      (click)="$event.stopPropagation()"
       shape="circle"
     />
   }
@@ -24,6 +25,6 @@
     }"
     shape="circle"
     size="normal"
-    (click)="this.isShortCoauthors.set(!this.isShortCoauthors())"
+    (click)="$event.stopPropagation(); this.isShortCoauthors.set(!this.isShortCoauthors())"
   />
 </p-avatar-group>

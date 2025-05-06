@@ -3,8 +3,9 @@ import { inject, Injectable, signal } from '@angular/core';
 
 import { catchError, EMPTY, finalize, Observable, take, tap } from 'rxjs';
 
+import { PostsQueryDto } from '@/app/api/interfaces/posts-query';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
@@ -21,14 +22,14 @@ export class PostService {
   private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
 
-  public readonly allPosts = signal<PostsResponse[]>([]);
+  public readonly allPosts = signal<PostResponse[]>([]);
 
   private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
     this.message.error(error.error.message);
     return EMPTY;
   }
 
-  public createPost(dto: NewPost): Observable<PostsResponse> {
+  public createPost(dto: NewPost): Observable<PostResponse> {
     this.loaderService.turnOn();
     return this.postsService.createPost(dto).pipe(
       take(1),
@@ -42,7 +43,7 @@ export class PostService {
     );
   }
 
-  public deletePost(postId: number): Observable<PostsResponse> {
+  public deletePost(postId: number): Observable<PostResponse> {
     this.loaderService.turnOn();
     return this.postsService.deletePost(postId).pipe(
       take(1),
@@ -56,12 +57,15 @@ export class PostService {
     );
   }
 
-  public getAllPosts(): Observable<PostsResponse[]> {
+  public getAllPosts(query?: PostsQueryDto): Observable<PaginatedPostResponse> {
     this.loaderService.turnOn();
-    return this.postsService.getAllPosts().pipe(
+    return this.postsService.getAllPosts(query).pipe(
       take(1),
-      tap((posts) => {
-        this.allPosts.set(posts);
+      tap((response) => {
+        const result = PaginatedPostResponseSchema.safeParse(response);
+        if (result.success) {
+          this.allPosts.set(result.data.items);
+        }
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -70,7 +74,7 @@ export class PostService {
     );
   }
 
-  public getPostById(postId: number): Observable<PostsResponse> {
+  public getPostById(postId: number): Observable<PostResponse> {
     this.loaderService.turnOn();
     return this.postsService.getPostById(postId).pipe(
       take(1),
@@ -81,12 +85,15 @@ export class PostService {
     );
   }
 
-  public getPostsByAuthorId(authorId: number): Observable<PostsResponse[]> {
+  public getPostsByAuthorId(authorId: number, query?: PostsQueryDto): Observable<PaginatedPostResponse> {
     this.loaderService.turnOn();
-    return this.postsService.getPostsByAuthorId(authorId).pipe(
+    return this.postsService.getPostsByAuthorId(authorId, query).pipe(
       take(1),
-      tap((posts) => {
-        this.allPosts.set(posts);
+      tap((response) => {
+        const result = PaginatedPostResponseSchema.safeParse(response);
+        if (result.success) {
+          this.allPosts.set(result.data.items);
+        }
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -95,14 +102,14 @@ export class PostService {
     );
   }
 
-  public refreshPosts(): Observable<PostsResponse[]> {
+  public refreshPosts(): Observable<PaginatedPostResponse> {
     const userId = this.navigationService.userId();
     const action$ = userId ? this.getPostsByAuthorId(+userId) : this.getAllPosts();
 
     return action$.pipe(take(1));
   }
 
-  public updatePost(dto: FormData): Observable<PostsResponse> {
+  public updatePost(dto: FormData): Observable<PostResponse> {
     this.loaderService.turnOn();
     return this.postsService.updatePost(dto).pipe(
       take(1),

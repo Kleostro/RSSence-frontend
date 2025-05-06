@@ -20,7 +20,8 @@
     </ng-template>
     <ng-template #footer>
       <div class="flex items-center gap-2">
-        <p-button
+        <button
+          pButton
           pRipple
           fluid="true"
           label="Logout"
@@ -28,9 +29,9 @@
           icon="pi pi-sign-out"
           severity="danger"
           outlined
-        />
+        ></button>
       </div>
     </ng-template>
   </p-drawer>
-  <p-button pRipple outlined="true" rounded="true" (click)="isVisible = true" icon="pi pi-bars" />
+  <button pButton pRipple outlined="true" rounded="true" (click)="isVisible = true" icon="pi pi-bars"></button>
 </div>

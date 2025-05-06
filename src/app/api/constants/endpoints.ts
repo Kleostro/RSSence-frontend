@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   AUTHORS: 'authors',
   GOOGLE: 'auth/google',
   GOOGLE_CALLBACK: 'auth/google/callback',
+  IMAGES: 'images',
   LOGIN: 'auth/login',
   LOGOUT: 'auth/logout',
   ME: 'me',

@@ -9,7 +9,7 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { Subject, takeUntil } from 'rxjs';
 
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/posts-response';
 import { UserService } from '@/app/auth/services/user/user.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
@@ -58,7 +58,7 @@ export class AuthorComponent implements OnDestroy {
   public allAuthorsWithoutCurrent = signal<AuthorsResponse[]>([]);
   public authorFormState = signal<FormState>(FORM_STATE.CREATE);
   public authorForPreview = signal<AuthorsResponse | null>(null);
-  public authorPosts = signal<null | PostsResponse[]>(null);
+  public authorPosts = signal<null | PostResponse[]>(null);
   public currentAuthor = signal<AuthorsResponse | null>(null);
   public isMyPage = signal<boolean>(false);
   public navigationItems = this.facade.getNavigationItems(
@@ -77,6 +77,7 @@ export class AuthorComponent implements OnDestroy {
   constructor() {
     toObservable(this.userId)
       .pipe(takeUntil(this.destroy$))
+
       .subscribe((userId) => {
         const parsedUserId = this.navigationService.parseUserId(userId);
         this.loadInitialData(parsedUserId);

@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-import { PostsResponseSchema } from '@/app/api/schemas/posts-response';
+import { PostSchema } from '@/app/api/schemas/posts-response';
 
 export const AuthorsResponseSchema = z.object({
-  authoredPosts: PostsResponseSchema.array(),
+  authoredPosts: PostSchema.array(),
   avatarUrl: z.string().nullable(),
   bio: z.string().nullable(),
-  coauthoredPosts: PostsResponseSchema.array(),
+  coauthoredPosts: PostSchema.array(),
   firstname: z.string(),
   id: z.number(),
   lastname: z.string(),

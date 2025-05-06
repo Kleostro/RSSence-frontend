@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 
 import { finalize, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/posts-response';
 import { UsersResponse } from '@/app/api/schemas/users-response';
 import { UserService } from '@/app/auth/services/user/user.service';
 import { AuthorService } from '@/app/author/services/author/author.service';
@@ -49,7 +49,7 @@ export class PostFacadeService {
   }
 
   public loadInitialDataWithDependencies(userId: null | number): Observable<{
-    posts: PostsResponse[];
+    posts: PostResponse[];
   }> {
     this.loaderService.turnOnPageLoading();
     return this.loadInitialData(userId).pipe(
@@ -62,6 +62,9 @@ export class PostFacadeService {
           authors: this.authorService.getAuthors(),
           posts: userId ? this.postService.getPostsByAuthorId(user.author.id) : this.postService.getAllPosts(),
         }).pipe(
+          map(({ authors, posts }) => {
+            return { authors, posts: posts.items, user };
+          }),
           finalize(() => {
             this.loaderService.turnOffPageLoading();
           }),

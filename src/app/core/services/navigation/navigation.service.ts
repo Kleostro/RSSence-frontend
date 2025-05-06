@@ -49,6 +49,10 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.NOT_FOUND]);
   }
 
+  public navigateToPostById(postId: number): void {
+    this.router.navigate([APP_ROUTE.POSTS, postId]);
+  }
+
   public navigateToProfile(): void {
     this.router.navigate([APP_ROUTE.PROFILE]);
   }

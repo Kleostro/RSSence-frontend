@@ -1,5 +1,15 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  input,
+  OnInit,
+  Output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -13,8 +23,9 @@ import { TextareaModule } from 'primeng/textarea';
 import { finalize, map, take } from 'rxjs';
 
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
-import { PostsResponse } from '@/app/api/schemas/posts-response';
-import { CoauthorsFGType, ImageUrlsFGType, NewPost, PostForm } from '@/app/post/interfaces/post-form';
+import { PostResponse } from '@/app/api/schemas/posts-response';
+import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
+import { CoauthorsFGType, NewPost, PostForm } from '@/app/post/interfaces/post-form';
 import { PostService } from '@/app/post/services/post/post.service';
 
 interface AutoCompleteCompleteEvent {
@@ -30,6 +41,7 @@ interface AutoCompleteCompleteEvent {
     ButtonModule,
     RippleModule,
     TextareaModule,
+    PostEditorComponent,
     FloatLabelModule,
     NgIf,
     AutoCompleteModule,
@@ -42,10 +54,13 @@ interface AutoCompleteCompleteEvent {
 })
 export class PostFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder).nonNullable;
+
+  private readonly postEditor = viewChild(PostEditorComponent);
+
   private readonly postService = inject(PostService);
 
-  @Input({ required: true }) public authors: AuthorsResponse[] = [];
-  @Output() public createPostEvent = new EventEmitter<PostsResponse>();
+  @Output() public createPostEvent = new EventEmitter<PostResponse>();
+  public authors = input.required<AuthorsResponse[]>();
 
   public filteredAuthors: AuthorsResponse[] = [];
   public form!: FormGroup<PostForm>;
@@ -72,7 +87,6 @@ export class PostFormComponent implements OnInit {
     return {
       coauthorIds,
       content: formValue.content,
-      imageUrls: [],
       title: formValue.title,
     };
   }
@@ -82,10 +96,9 @@ export class PostFormComponent implements OnInit {
       .createPost(postData)
       .pipe(
         take(1),
-        map((newPost: PostsResponse) => {
+        map((newPost: PostResponse) => {
           this.form.reset();
           this.form.controls.coauthors.clear();
-          this.form.controls.imageUrls.clear();
           this.createPostEvent.emit(newPost);
         }),
         finalize(() => {
@@ -105,14 +118,12 @@ export class PostFormComponent implements OnInit {
     this.form.controls.coauthors.push(this.fb.group({ coauthor: this.fb.control<AuthorsResponse | string>('') }));
   }
 
-  public addImageUrl(): void {
-    this.form.controls.imageUrls.push(this.fb.group({ imageUrl: this.fb.control('') }));
-  }
-
   public filterAuthors(event: AutoCompleteCompleteEvent): void {
     const query = event.query.toLowerCase();
     const filteredAuthorsSet = new Set(
-      this.authors.filter((author) => author.username.toLowerCase().includes(query)).map((author) => author),
+      this.authors()
+        .filter((author) => author.username.toLowerCase().includes(query))
+        .map((author) => author),
     );
 
     this.filteredAuthors = Array.from(filteredAuthorsSet);
@@ -123,7 +134,6 @@ export class PostFormComponent implements OnInit {
     this.form = this.fb.group<PostForm>({
       coauthors: this.fb.array<CoauthorsFGType>([]),
       content: this.fb.control<null | string>(''),
-      imageUrls: this.fb.array<ImageUrlsFGType>([]),
       title: this.fb.control<string>('', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
     });
   }

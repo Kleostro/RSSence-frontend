@@ -81,10 +81,6 @@ export class AuthorService {
     );
   }
 
-  // public findAuthorByUserId(userId: number): AuthorsResponse | null {
-  //   return this.authors().find((author) => author.userId === userId) ?? null;
-  // }
-
   public updateAuthor(dto: FormData): Observable<AuthorsResponse> {
     this.loaderService.turnOn();
     return this.authorsService.updateAuthor(dto).pipe(

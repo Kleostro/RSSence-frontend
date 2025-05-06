@@ -94,7 +94,8 @@
     </div>
 
     <div class="form-footer">
-      <p-button
+      <button
+        pButton
         pRipple
         type="button"
         fluid="true"
@@ -104,8 +105,9 @@
         severity="info"
         outlined="true"
         (click)="this.author ? this.backToAuthorPageEvent.emit() : this.navigationService.navigateToProfile()"
-      />
-      <p-button
+      ></button>
+      <button
+        pButton
         pRipple
         type="submit"
         fluid="true"
@@ -114,7 +116,7 @@
         severity="success"
         outlined="true"
         label="Save"
-      />
+      ></button>
     </div>
   </form>
 }

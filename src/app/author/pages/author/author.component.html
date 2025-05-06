@@ -3,7 +3,6 @@
 @let isAuthorFormStateUpdate = this.authorFormState() === FORM_STATE.UPDATE;
 @let isPageLoading = this.loaderService.isPageLoading();
 @let allAuthorPostsLink = APP_ROUTE.AUTHOR + '/' + this.currentAuthor()?.userId + APP_ROUTE.POSTS;
-
 @if (isPageLoading) {
   <app-page-loader />
 } @else {
@@ -47,7 +46,7 @@
         />
       </div>
 
-      <app-posts-list [posts]="this.postService.allPosts()" />
+      <app-posts-list [posts]="this.postService.allPosts()" [isShowPostActions]="false" />
     }
   </div>
 }

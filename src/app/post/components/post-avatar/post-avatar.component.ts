@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { Avatar } from 'primeng/avatar';
 
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/posts-response';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,5 +16,5 @@ import { PostsResponse } from '@/app/api/schemas/posts-response';
 })
 export class PostAvatarComponent {
   public author = input.required<AuthorsResponse>();
-  public post = input.required<PostsResponse>();
+  public post = input.required<PostResponse>();
 }

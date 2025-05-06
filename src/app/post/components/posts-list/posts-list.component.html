@@ -1,10 +1,17 @@
 @if (this.posts(); as posts) {
   @for (post of posts; track post; let i = $index) {
-    @if (mode() === 'preview') {
-      <app-post-preview [post]="post" [author]="this.authorService.findAuthorById(post.authorId)" />
-    } @else {
-      <app-post [post]="post" [author]="this.authorService.findAuthorById(post.authorId)" />
-    }
+    <div
+      class="post-wrapper"
+      tabindex="0"
+      (click)="this.navigationService.navigateToPostById(post.id)"
+      (keyup)="($event.key === 'Enter' || $event.key === ' ') && this.navigationService.navigateToPostById(post.id)"
+    >
+      <app-post
+        [post]="post"
+        [isShowPostActions]="this.isShowPostActions()"
+        [author]="this.authorService.findAuthorById(post.authorId)"
+      />
+    </div>
   } @empty {
     <div class="not-found">
       <p class="not-found-text">Not found any posts</p>
