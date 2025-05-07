@@ -63,7 +63,7 @@ export class PostFacadeService {
 
         return forkJoin({
           authors: this.authorService.getAuthors(),
-          posts: userId ? this.postService.getPostsByAuthorId(user.author.id) : this.postService.getAllPosts(),
+          posts: this.postService.getAllPosts(userId ? user.author.id : undefined),
         }).pipe(
           map(({ authors, posts }) => {
             return {

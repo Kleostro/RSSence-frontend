@@ -7,7 +7,6 @@ import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
-import { UserService } from '@/app/auth/services/user/user.service';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NewPost } from '@/app/post/interfaces/post-form';
 import { MESSAGE } from '@/app/shared/services/constants/message';
@@ -20,7 +19,6 @@ export class PostService {
   private readonly loaderService = inject(LoaderService);
   private readonly message = inject(MessageService);
   private readonly postsService = inject(PostsService);
-  private readonly userService = inject(UserService);
 
   public readonly paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
@@ -57,9 +55,9 @@ export class PostService {
     );
   }
 
-  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+  public getAllPosts(authorId?: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     this.loaderService.turnOn();
-    return this.postsService.getAllPosts(query).pipe(
+    return this.postsService.getAllPosts(authorId, query).pipe(
       take(1),
       tap((response) => {
         const result = PaginatedPostResponseSchema.safeParse(response);
@@ -83,35 +81,6 @@ export class PostService {
       }),
       catchError((error: HttpErrorResponse) => this.handleError(error)),
     );
-  }
-
-  public getPostsByAuthorId(authorId: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
-    this.loaderService.turnOn();
-    return this.postsService.getPostsByAuthorId(authorId, query).pipe(
-      take(1),
-      tap((response) => {
-        const result = PaginatedPostResponseSchema.safeParse(response);
-        if (result.success) {
-          this.paginatedPostResponse.set(result.data);
-        }
-      }),
-      finalize(() => {
-        this.loaderService.turnOff();
-      }),
-      catchError((error: HttpErrorResponse) => this.handleError(error)),
-    );
-  }
-
-  public refreshPosts(authorId: null | number, query: PaginationQueryDto): Observable<PaginatedPostResponse> {
-    const { limit, page } = query;
-    let action$ = null;
-    if (authorId) {
-      action$ = this.getPostsByAuthorId(authorId, { limit, page });
-    } else {
-      action$ = this.getAllPosts({ limit, page });
-    }
-
-    return action$.pipe(take(1));
   }
 
   public updatePost(dto: FormData): Observable<PostResponse> {

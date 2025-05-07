@@ -117,16 +117,10 @@ export class AuthorComponent implements OnDestroy {
   }
 
   public handlePageChangeEvent(event: PaginatorState): void {
-    const authorId = this.currentAuthor()?.id;
-
-    if (!authorId) {
-      return;
-    }
-
     const { page = 1, rows } = event;
 
     this.postService
-      .refreshPosts(authorId, { limit: rows, page: page + 1 })
+      .getAllPosts(this.currentAuthor()?.id, { limit: rows, page: page + 1 })
       .pipe(takeUntil(this.destroy$))
       .subscribe();
   }
@@ -138,10 +132,7 @@ export class AuthorComponent implements OnDestroy {
 
   public onCreatePost(): void {
     this.modalService.closeModal();
-    this.postService
-      .refreshPosts(this.currentAuthor()?.id ?? null, {})
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
+    this.postService.getAllPosts(this.currentAuthor()?.id).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   public setParamsInModal(): void {

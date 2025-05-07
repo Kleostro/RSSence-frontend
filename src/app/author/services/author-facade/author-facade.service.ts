@@ -127,7 +127,7 @@ export class AuthorFacadeService {
 
         return forkJoin({
           authors: this.getAllAuthors(),
-          posts: this.postService.getPostsByAuthorId(user.author.id),
+          posts: this.postService.getAllPosts(user.author.id),
         }).pipe(
           map(({ authors, posts }) => ({
             authors: authors.filter((author) => author.id !== user.author?.id),

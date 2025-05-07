@@ -24,21 +24,17 @@ export class PostsService {
     return this.http.delete<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
-  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
-    return this.http.get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, { params: { ...query } });
-  }
-
-  public getPostById(postId: number): Observable<PostResponse> {
-    return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
-  }
-
-  public getPostsByAuthorId(authorId: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+  public getAllPosts(authorId?: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     return this.http.get<PaginatedPostResponse>(
-      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/author/${authorId.toString()}`,
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}${authorId ? `/${authorId}` : ''}`,
       {
         params: { ...query },
       },
     );
+  }
+
+  public getPostById(postId: number): Observable<PostResponse> {
+    return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
   public updatePost(post: FormData): Observable<PostResponse> {

@@ -50,11 +50,9 @@ export class PostsComponent implements OnDestroy {
   }
 
   public handlePageChangeEvent(event: PaginatorState): void {
-    const authorId = this.currentAuthor()?.id ?? null;
-
     const { page = 1, rows } = event;
     this.postService
-      .refreshPosts(authorId, { limit: rows, page: page + 1 })
+      .getAllPosts(this.userId() ? this.currentAuthor()?.id : undefined, { limit: rows, page: page + 1 })
       .pipe(takeUntil(this.destroy$))
       .subscribe();
   }
