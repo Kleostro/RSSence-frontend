@@ -46,7 +46,11 @@
         />
       </div>
 
-      <app-posts-list [posts]="this.postService.allPosts()" [isShowPostActions]="false" />
+      <app-posts-list
+        [paginatedPostResponse]="this.postService.paginatedPostResponse()"
+        [isShowPostActions]="false"
+        (pageChangeEvent)="this.handlePageChangeEvent($event)"
+      />
     }
   </div>
 }

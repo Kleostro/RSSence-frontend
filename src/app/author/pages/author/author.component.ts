@@ -4,6 +4,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
+import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { Subject, takeUntil } from 'rxjs';
@@ -115,6 +116,21 @@ export class AuthorComponent implements OnDestroy {
     this.authorFormState.set(FORM_STATE.CREATE);
   }
 
+  public handlePageChangeEvent(event: PaginatorState): void {
+    const authorId = this.currentAuthor()?.id;
+
+    if (!authorId) {
+      return;
+    }
+
+    const { page = 1, rows } = event;
+
+    this.postService
+      .refreshPosts(authorId, { limit: rows, page: page + 1 })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -122,18 +138,10 @@ export class AuthorComponent implements OnDestroy {
 
   public onCreatePost(): void {
     this.modalService.closeModal();
-    const userId = this.userId();
-    const parsedUserId = Number(userId) || null;
-    const authorId = this.userService.me()?.author?.id;
-    let action$ = null;
-
-    if (parsedUserId === null && authorId) {
-      action$ = this.postService.getPostsByAuthorId(authorId);
-    } else {
-      action$ = this.postService.getAllPosts();
-    }
-
-    action$.pipe(takeUntil(this.destroy$)).subscribe();
+    this.postService
+      .refreshPosts(this.currentAuthor()?.id ?? null, {})
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 
   public setParamsInModal(): void {

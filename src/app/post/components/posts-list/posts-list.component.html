@@ -1,5 +1,17 @@
-@if (this.posts(); as posts) {
-  @for (post of posts; track post; let i = $index) {
+@if (this.paginatedPostResponse(); as paginatedPostResponse) {
+  @let posts = paginatedPostResponse.items;
+  @let limit = paginatedPostResponse.limit;
+  @let total = paginatedPostResponse.total;
+
+  <p-paginator
+    class="posts-list-paginator"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
+  @for (post of posts; track post.id; let i = $index) {
     <div
       class="post-wrapper"
       tabindex="0"
@@ -18,4 +30,13 @@
       <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
     </div>
   }
+
+  <p-paginator
+    class="posts-list-paginator"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
 }

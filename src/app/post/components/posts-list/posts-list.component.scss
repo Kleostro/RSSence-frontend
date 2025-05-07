@@ -26,3 +26,9 @@
     outline: 0.1rem solid var(--p-primary-color);
   }
 }
+
+.posts-list-paginator {
+  ::ng-deep.p-paginator-page.p-paginator-page-selected {
+    pointer-events: none;
+  }
+}

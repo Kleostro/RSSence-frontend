@@ -1,4 +1,4 @@
-export class PostsQueryDto {
+export class PaginationQueryDto {
   public limit?: number;
   public page?: number;
   public search?: string;

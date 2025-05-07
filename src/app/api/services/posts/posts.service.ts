@@ -5,7 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { PostsQueryDto } from '@/app/api/interfaces/posts-query';
+import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { PaginatedPostResponse, PostResponse } from '@/app/api/schemas/posts-response';
 import { NewPost } from '@/app/post/interfaces/post-form';
 import { ENVIRONMENT } from '@/environment/environment';
@@ -24,7 +24,7 @@ export class PostsService {
     return this.http.delete<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
-  public getAllPosts(query?: PostsQueryDto): Observable<PaginatedPostResponse> {
+  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     return this.http.get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, { params: { ...query } });
   }
 
@@ -32,7 +32,7 @@ export class PostsService {
     return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
-  public getPostsByAuthorId(authorId: number, query?: PostsQueryDto): Observable<PaginatedPostResponse> {
+  public getPostsByAuthorId(authorId: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     return this.http.get<PaginatedPostResponse>(
       `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/author/${authorId.toString()}`,
       {

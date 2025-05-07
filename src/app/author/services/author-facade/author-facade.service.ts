@@ -33,7 +33,7 @@ export class AuthorFacadeService {
         if (userId) {
           return this.userService.getUserById(userId).pipe(
             map((user) => {
-              if (!user?.profile) {
+              if (!user?.author) {
                 this.navigationService.navigateToNotFound();
                 return null;
               }

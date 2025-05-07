@@ -6,7 +6,7 @@ import hljs from 'highlight.js';
 import * as marked from 'marked';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { concatMap, finalize, Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
@@ -87,7 +87,6 @@ export class PostComponent implements OnDestroy, OnInit {
     this.postService
       .deletePost(post.id)
       .pipe(
-        concatMap(() => this.postService.refreshPosts()),
         takeUntil(this.destroy$),
         finalize(() => {
           this.isProcessing.set(false);
