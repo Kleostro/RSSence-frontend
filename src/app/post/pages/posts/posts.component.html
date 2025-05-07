@@ -12,17 +12,5 @@
     outlined="true"
   />
 
-  <p-button
-    pRipple
-    *ngIf="posts.length"
-    type="button"
-    (click)="this.postsListMode.set(this.postsListMode() === 'preview' ? 'full' : 'preview')"
-    label="Switch to {{ this.postsListMode() }} mode"
-    [icon]="this.postsListMode() === 'preview' ? 'pi pi-eye' : 'pi pi-eye-slash'"
-    class="switch-mode-button"
-    severity="success"
-    outlined="true"
-  />
-
-  <app-posts-list [posts]="posts" [mode]="this.postsListMode()" />
+  <app-posts-list [posts]="posts" />
 </div>

@@ -19,6 +19,6 @@ export const MODAL_POSITION_OFFSETS = {
   'left-bottom': 'bottom: 1rem; left: 1rem;',
   'left-top': 'top: 1rem; left: 1rem;',
   'right-bottom': 'bottom: 1rem; right: 1rem;',
-  'right-top': 'top: 1rem; right: 1rem;',
+  'right-top': 'top: 1rem; right: 1rem',
 };
 export default MODAL_POSITION_DIRECTION;

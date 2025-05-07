@@ -1,5 +1,4 @@
-import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnDestroy } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
@@ -13,7 +12,7 @@ import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PostsListComponent, ButtonModule, RippleModule, NgIf],
+  imports: [PostsListComponent, ButtonModule, RippleModule],
   selector: 'app-posts',
   styleUrl: './posts.component.scss',
   templateUrl: './posts.component.html',
@@ -25,7 +24,6 @@ export class PostsComponent implements OnDestroy {
   public readonly navigationService = inject(NavigationService);
   public readonly postService = inject(PostService);
 
-  public postsListMode = signal<'full' | 'preview'>('preview');
   public userId = input<null | string>(null, { alias: 'id' });
 
   constructor() {

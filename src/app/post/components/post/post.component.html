@@ -1,5 +1,7 @@
 @let post = this.post();
 @let author = this.author();
+@let isSHhowPostAction =
+  this.isShowPostActions() && this.userService.me()?.author?.id === post?.authorId && this.mode() === 'full';
 
 @if (post && author) {
   <div class="post">
@@ -11,9 +13,10 @@
       </div>
 
       <div class="post-actions">
-        <p-button
-          *ngIf="this.userService.me()?.author?.id === post.authorId"
+        <button
+          *ngIf="isSHhowPostAction"
           class="post-edit-btn"
+          pButton
           pRipple
           type="button"
           [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
@@ -21,10 +24,12 @@
           outlined="true"
           rounded="true"
           [disabled]="isProcessing()"
-        />
-        <p-button
-          *ngIf="this.userService.me()?.author?.id === post.authorId"
+          (click)="$event.stopPropagation()"
+        ></button>
+        <button
+          *ngIf="isSHhowPostAction"
           class="post-delete-btn"
+          pButton
           pRipple
           type="button"
           [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
@@ -32,14 +37,30 @@
           outlined="true"
           rounded="true"
           [disabled]="isProcessing()"
-          (click)="this.deletePost(post)"
-        />
+          (click)="$event.stopPropagation(); this.deletePost(post)"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          type="button"
+          (click)="$event.stopPropagation(); this.mode.set(this.mode() === 'preview' ? 'full' : 'preview')"
+          [icon]="
+            this.mode() === 'preview'
+              ? 'pi pi-arrow-up-right-and-arrow-down-left-from-center'
+              : 'pi pi-arrow-down-left-and-arrow-up-right-to-center'
+          "
+          class="switch-mode-button"
+          severity="info"
+          outlined="true"
+          rounded="true"
+        ></button>
       </div>
     </header>
 
     <body class="post-body">
       <h1 class="post-title">{{ post.title }}</h1>
-      <p class="post-content" [innerHTML]="this.sanitizer.bypassSecurityTrustHtml(post.content ?? '')"></p>
+      <p class="post-content" *ngIf="this.mode() === 'full'" [innerHTML]="this.safeHtml()"></p>
     </body>
 
     <footer class="post-footer"></footer>

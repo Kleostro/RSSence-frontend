@@ -3,64 +3,9 @@
   <input class="title-input" pInputText fluid="true" id="title" formControlName="title" autocomplete="off" />
 
   <label for="content">Content</label>
-  <textarea
-    class="content-input"
-    pInputText
-    fluid="true"
-    id="content"
-    formControlName="content"
-    autocomplete="off"
-  ></textarea>
+  <app-post-editor formControlName="content" id="content" />
 
   <div class="multiple-select">
-    <ng-container formArrayName="imageUrls">
-      <div class="imageUrls">
-        <span>Add up to 5 images</span>
-        <div class="image-url-wrapper">
-          @for (imageFG of form.controls.imageUrls.controls; track imageFG; let i = $index) {
-            <div [formGroup]="imageFG">
-              <div class="image-wrapper">
-                <div class="image-control">
-                  <label [for]="'image-' + i">Image {{ i + 1 }}</label>
-                  <input
-                    class="image-url-input"
-                    pInputText
-                    fluid="true"
-                    [id]="'image-' + i"
-                    formControlName="imageUrl"
-                  />
-                </div>
-                <p-button
-                  class="remove-image-btn"
-                  pRipple
-                  type="button"
-                  [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-                  rounded="true"
-                  severity="danger"
-                  outlined="true"
-                  (click)="form.controls.imageUrls.removeAt(i)"
-                />
-              </div>
-            </div>
-          }
-        </div>
-        <div class="buttons-wrapper">
-          <p-button
-            pRipple
-            type="button"
-            fluid="true"
-            label="Add"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
-            severity="success"
-            outlined="true"
-            *ngIf="form.controls.imageUrls.controls.length < 5"
-            (click)="addImageUrl()"
-            [disabled]="isProcessing()"
-          />
-        </div>
-      </div>
-    </ng-container>
-
     <ng-container formArrayName="coauthors">
       <div class="coauthors">
         <span>Add up to 5 coauthors</span>
@@ -119,7 +64,8 @@
   </div>
 
   <div class="form-footer">
-    <p-button
+    <button
+      pButton
       pRipple
       type="submit"
       fluid="true"
@@ -128,6 +74,6 @@
       [disabled]="form.invalid || isProcessing()"
       severity="success"
       outlined="true"
-    />
+    ></button>
   </div>
 </form>

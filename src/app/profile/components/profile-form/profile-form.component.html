@@ -118,7 +118,8 @@
         (click)="this.profile ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToHome()"
       />
 
-      <p-button
+      <button
+        pButton
         pRipple
         type="submit"
         fluid="true"
@@ -127,7 +128,7 @@
         [disabled]="isProcessing()"
         severity="success"
         outlined="true"
-      />
+      ></button>
     </div>
   </form>
 }

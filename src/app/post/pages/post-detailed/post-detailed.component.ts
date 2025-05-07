@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { concatMap, Subject, takeUntil, tap } from 'rxjs';
 
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';
@@ -24,7 +24,7 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
   public readonly authorService = inject(AuthorService);
   public readonly navigationService = inject(NavigationService);
 
-  public currentPost = signal<null | PostsResponse | undefined>(undefined);
+  public currentPost = signal<null | PostResponse | undefined>(undefined);
   public postId = input<null | string>(null, { alias: 'id' });
 
   public ngOnDestroy(): void {
@@ -41,7 +41,7 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
           takeUntil(this.destroy$),
           concatMap(() =>
             this.postService.getPostById(+postId).pipe(
-              tap((post: PostsResponse) => {
+              tap((post: PostResponse) => {
                 this.currentPost.set(post);
               }),
             ),

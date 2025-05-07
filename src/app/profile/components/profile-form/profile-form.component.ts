@@ -256,10 +256,12 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     this.disableForm();
-    this.handleFormSubmit();
 
     if (this.profile && !this.hasChanges()) {
       this.backToProfilePageEvent.emit();
+      return;
     }
+
+    this.handleFormSubmit();
   }
 }

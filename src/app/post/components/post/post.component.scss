@@ -36,6 +36,8 @@
   }
 
   &-actions {
+    position: relative;
+    z-index: 2;
     display: flex;
     gap: 1rem;
   }

@@ -23,7 +23,7 @@
 .modal-dialog {
   cursor: auto;
   position: absolute;
-  overflow-y: scroll;
+  height: max-content;
   transition: all 0.3s;
 }
 
@@ -33,30 +33,34 @@
   display: flex;
   flex-direction: column;
 
-  padding: 3rem;
-  padding-top: 1rem;
-  border-radius: 1rem;
+  padding-bottom: 2rem;
 
   background-color: var(--p-surface-800);
   box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 10%);
+
+  transition: all 0.3s;
 }
 
 .modal-header {
-  position: sticky;
-  top: 0;
-
   display: flex;
   align-items: center;
 
-  padding: 2rem 0 1rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
   border-bottom: 0.125rem solid #e5e5e5;
 
-  background-color: var(--p-surface-800);
+  transition: all 0.3s;
 }
 
 .modal-title {
   display: flex;
   justify-content: center;
+}
+
+.modal-body {
+  overflow-y: scroll;
+  max-height: calc(100dvh - 12.8rem);
+  padding: 0 2rem;
 }
 
 .close {

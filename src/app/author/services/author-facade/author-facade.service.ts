@@ -4,7 +4,7 @@ import { MenuItem } from 'primeng/api';
 import { concatMap, finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 
 import { AuthorsResponse } from '@/app/api/schemas/authors-response';
-import { PostsResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/posts-response';
 import { UsersResponse } from '@/app/api/schemas/users-response';
 import { UserService } from '@/app/auth/services/user/user.service';
 import { AuthorService } from '@/app/author/services/author/author.service';
@@ -115,7 +115,7 @@ export class AuthorFacadeService {
 
   public loadInitialDataWithDependencies(userId: null | number): Observable<{
     authors: AuthorsResponse[];
-    posts: PostsResponse[];
+    posts: PostResponse[];
     user: null | UsersResponse;
   }> {
     this.loaderService.turnOnPageLoading();
@@ -131,7 +131,7 @@ export class AuthorFacadeService {
         }).pipe(
           map(({ authors, posts }) => ({
             authors: authors.filter((author) => author.id !== user.author?.id),
-            posts,
+            posts: posts.items,
             user,
           })),
           finalize(() => {

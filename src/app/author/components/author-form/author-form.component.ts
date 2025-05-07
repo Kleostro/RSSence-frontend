@@ -20,6 +20,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 
 import { AuthorsResponse, hasKeyInAuthorsResponse } from '@/app/api/schemas/authors-response';
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
 import { AuthorForm } from '@/app/author/interfaces/author-form';
 import { AuthorFacadeService } from '@/app/author/services/author-facade/author-facade.service';
@@ -28,6 +29,7 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
 @Component({
@@ -54,6 +56,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
   private readonly facade = inject(AuthorFacadeService);
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
+  private readonly message = inject(MessageService);
   private readonly updatedAuthor = signal<AuthorsResponse | null>(null);
 
   @Input() public author: AuthorsResponse | null = null;
@@ -114,7 +117,8 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
       .handleAuthorFormSubmit(formData, !!this.author)
       .pipe(
         takeUntil(this.destroy$),
-        catchError(() => {
+        catchError((error: OverriddenHttpErrorResponse) => {
+          this.message.error(error.error.message);
           this.enableForm();
           return EMPTY;
         }),
@@ -223,10 +227,12 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
     }
 
     this.disableForm();
-    this.handleFormSubmit();
 
     if (this.author && !this.hasChanges()) {
       this.backToAuthorPageEvent.emit();
+      return;
     }
+
+    this.handleFormSubmit();
   }
 }

@@ -1,0 +1,46 @@
+<div class="post-editor">
+  <div class="editor-toolbar">
+    <button
+      pButton
+      pRipple
+      outlined="true"
+      type="button"
+      severity="info"
+      icon="pi pi-pencil"
+      (click)="this.isPreviewMode.set(false); togglePreview()"
+    >
+      Write
+    </button>
+    <button
+      pButton
+      pRipple
+      outlined="true"
+      type="button"
+      severity="info"
+      icon="pi pi-align-left"
+      (click)="this.isPreviewMode.set(true); togglePreview()"
+    >
+      Preview
+    </button>
+  </div>
+
+  <div *ngIf="!isPreviewMode()" class="editor-container">
+    <textarea
+      #textarea
+      pInputText
+      fluid="true"
+      [id]="this.id()"
+      [(ngModel)]="this.value"
+      [value]="markdownContent()"
+      (input)="onInput($event)"
+      (paste)="onPaste($event)"
+    ></textarea>
+  </div>
+
+  <div
+    *ngIf="isPreviewMode()"
+    class="preview-container"
+    [style]="{ 'pointer-events': isProcessing() ? 'none' : 'all' }"
+    [innerHTML]="previewHtml()"
+  ></div>
+</div>
