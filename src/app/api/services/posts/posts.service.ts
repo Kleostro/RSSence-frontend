@@ -24,13 +24,10 @@ export class PostsService {
     return this.http.delete<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
-  public getAllPosts(authorId?: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
-    return this.http.get<PaginatedPostResponse>(
-      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}${authorId ? `/${authorId}` : ''}`,
-      {
-        params: { ...query },
-      },
-    );
+  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+    return this.http.get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, {
+      params: { ...query },
+    });
   }
 
   public getPostById(postId: number): Observable<PostResponse> {

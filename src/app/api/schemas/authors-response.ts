@@ -1,22 +1,24 @@
 import { z } from 'zod';
 
-import { PostSchema } from '@/app/api/schemas/posts-response';
+import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
 
-export const AuthorsResponseSchema = z.object({
-  authoredPosts: PostSchema.array(),
+export const AuthorSchema = z.object({
   avatarUrl: z.string().nullable(),
   bio: z.string().nullable(),
-  coauthoredPosts: PostSchema.array(),
+  createdAt: z.string(),
   firstname: z.string(),
   id: z.number(),
   lastname: z.string(),
+  updatedAt: z.string(),
   userId: z.number(),
   username: z.string(),
 });
+export type AuthorResponse = z.infer<typeof AuthorSchema>;
 
-export type AuthorsResponse = z.infer<typeof AuthorsResponseSchema>;
+export const PaginatedAuthorResponseSchema = PaginationResponseSchema(AuthorSchema);
+export type PaginatedAuthorResponse = PaginationResponse<z.infer<typeof AuthorSchema>>;
 
-export const hasKeyInAuthorsResponse = (key: string): key is keyof AuthorsResponse => {
-  const keys: string[] = AuthorsResponseSchema.keyof().options;
+export const hasKeyInAuthorResponse = (key: string): key is keyof AuthorResponse => {
+  const keys: string[] = AuthorSchema.keyof().options;
   return keys.includes(key);
 };

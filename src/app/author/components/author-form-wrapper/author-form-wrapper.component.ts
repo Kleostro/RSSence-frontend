@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, input, Output } from '@angular/core';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { AuthorFormComponent } from '@/app/author/components/author-form/author-form.component';
 import { AuthorPreviewComponent } from '@/app/author/components/author-preview/author-preview.component';
 
@@ -13,9 +13,9 @@ import { AuthorPreviewComponent } from '@/app/author/components/author-preview/a
 })
 export class AuthorFormWrapperComponent {
   @Output() public backToAuthorPage = new EventEmitter<void>();
-  @Output() public formSubmit = new EventEmitter<AuthorsResponse>();
-  @Output() public updateAuthorForPreview = new EventEmitter<AuthorsResponse | null>();
+  @Output() public formSubmit = new EventEmitter<AuthorResponse>();
+  @Output() public updateAuthorForPreview = new EventEmitter<AuthorResponse | null>();
 
-  public authorForPreview = input.required<AuthorsResponse | null>();
-  public currentAuthor = input.required<AuthorsResponse | null>();
+  public authorForPreview = input.required<AuthorResponse | null>();
+  public currentAuthor = input.required<AuthorResponse | null>();
 }

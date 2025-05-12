@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { Avatar } from 'primeng/avatar';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
 
 @Component({
@@ -15,6 +15,6 @@ import { PostResponse } from '@/app/api/schemas/posts-response';
   templateUrl: './post-avatar.component.html',
 })
 export class PostAvatarComponent {
-  public author = input.required<AuthorsResponse>();
+  public author = input.required<AuthorResponse | null>();
   public post = input.required<PostResponse>();
 }

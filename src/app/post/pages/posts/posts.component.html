@@ -11,7 +11,7 @@
   />
 
   <app-posts-list
-    [paginatedPostResponse]="this.postService.paginatedPostResponse()"
+    [paginatedPostResponse]="this.paginatedPostResponse()"
     (pageChangeEvent)="this.handlePageChangeEvent($event)"
   />
 </div>

@@ -18,8 +18,10 @@
                   <p-autocomplete
                     formControlName="coauthor"
                     fluid="true"
-                    [suggestions]="filteredAuthors"
+                    [suggestions]="filteredAuthors()"
                     (completeMethod)="filterAuthors($event)"
+                    [delay]="400"
+                    emptyMessage="The author was not found"
                     field="username"
                   >
                     <ng-template let-coauthor #item>

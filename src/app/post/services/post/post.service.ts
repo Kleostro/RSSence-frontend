@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { catchError, EMPTY, finalize, Observable, take, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
-import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NewPost } from '@/app/post/interfaces/post-form';
@@ -19,8 +19,6 @@ export class PostService {
   private readonly loaderService = inject(LoaderService);
   private readonly message = inject(MessageService);
   private readonly postsService = inject(PostsService);
-
-  public readonly paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
   private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
     this.message.error(error.error.message);
@@ -55,16 +53,10 @@ export class PostService {
     );
   }
 
-  public getAllPosts(authorId?: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     this.loaderService.turnOn();
-    return this.postsService.getAllPosts(authorId, query).pipe(
+    return this.postsService.getAllPosts(query).pipe(
       take(1),
-      tap((response) => {
-        const result = PaginatedPostResponseSchema.safeParse(response);
-        if (result.success) {
-          this.paginatedPostResponse.set(result.data);
-        }
-      }),
       finalize(() => {
         this.loaderService.turnOff();
       }),

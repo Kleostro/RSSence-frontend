@@ -25,7 +25,8 @@
         />
       </div>
       <div class="author-actions">
-        <p-button
+        <button
+          pButton
           pRipple
           [routerLink]="allAuthorPostsLink"
           type="button"
@@ -33,8 +34,9 @@
           icon="pi pi-arrow-right"
           severity="primary"
           label="See all posts"
-        />
-        <p-button
+        ></button>
+        <button
+          pButton
           pRipple
           *ngIf="this.isMyPage()"
           type="button"
@@ -43,12 +45,11 @@
           severity="primary"
           label="Create new post"
           (click)="this.setParamsInModal(); this.modalService.openModal(postForm, 'Create new post')"
-        />
+        ></button>
       </div>
 
       <app-posts-list
-        [paginatedPostResponse]="this.postService.paginatedPostResponse()"
-        [isShowPostActions]="false"
+        [paginatedPostResponse]="this.paginatedPostResponse()"
         (pageChangeEvent)="this.handlePageChangeEvent($event)"
       />
     }
@@ -56,5 +57,5 @@
 }
 
 <ng-template #postForm>
-  <app-post-form [authors]="this.allAuthorsWithoutCurrent()" (createPostEvent)="this.onCreatePost()" />
+  <app-post-form (createPostEvent)="this.onCreatePost()" />
 </ng-template>

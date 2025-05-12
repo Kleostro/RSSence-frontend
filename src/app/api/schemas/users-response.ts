@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { AuthorsResponseSchema } from '@/app/api/schemas/authors-response';
+import { AuthorSchema } from '@/app/api/schemas/authors-response';
 import { ProfilesResponseSchema } from '@/app/api/schemas/profiles-response';
 
 export const UsersResponseSchema = z.object({
-  author: AuthorsResponseSchema.nullable().optional(),
+  author: AuthorSchema.nullable().optional(),
   createdAt: z.coerce.date(),
   email: z.string(),
   id: z.number(),

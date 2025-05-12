@@ -8,9 +8,10 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { finalize, Subject, takeUntil } from 'rxjs';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { UserService } from '@/app/auth/services/user/user.service';
+import { AuthorService } from '@/app/author/services/author/author.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 import { PostService } from '@/app/post/services/post/post.service';
@@ -28,10 +29,10 @@ export class PostComponent implements OnDestroy, OnInit {
   public readonly sanitizer = inject(DomSanitizer);
 
   public readonly userService = inject(UserService);
-  public author = input.required<AuthorsResponse | null>();
+  public authorService = inject(AuthorService);
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
-  public isShowPostActions = input<boolean>(true);
+  public isShowPostActions = signal<boolean>(true);
   public mode = signal<'full' | 'preview'>('preview');
   public post = input.required<null | PostResponse>();
 
@@ -93,6 +94,18 @@ export class PostComponent implements OnDestroy, OnInit {
         }),
       )
       .subscribe();
+  }
+
+  public getAuthor(): AuthorResponse | null {
+    return this.post()?.authors.find((author) => author.isMainAuthor)?.author ?? null;
+  }
+
+  public getCoauthors(): AuthorResponse[] {
+    return (
+      this.post()
+        ?.authors.filter((author) => !author.isMainAuthor)
+        .map((author) => author.author) ?? []
+    );
   }
 
   public ngOnDestroy(): void {

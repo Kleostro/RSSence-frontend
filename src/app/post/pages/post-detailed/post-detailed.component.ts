@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, s
 
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { concatMap, Subject, takeUntil, tap } from 'rxjs';
+import { Subject, takeUntil, tap } from 'rxjs';
 
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorService } from '@/app/author/services/author/author.service';
@@ -35,17 +35,13 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     const postId = this.postId();
     if (postId) {
-      this.authorService
-        .getAuthors()
+      this.postService
+        .getPostById(+postId)
         .pipe(
           takeUntil(this.destroy$),
-          concatMap(() =>
-            this.postService.getPostById(+postId).pipe(
-              tap((post: PostResponse) => {
-                this.currentPost.set(post);
-              }),
-            ),
-          ),
+          tap((post: PostResponse) => {
+            this.currentPost.set(post);
+          }),
         )
         .subscribe();
     }

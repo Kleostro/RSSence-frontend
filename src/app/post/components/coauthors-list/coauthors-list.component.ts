@@ -7,6 +7,7 @@ import { AvatarGroup } from 'primeng/avatargroup';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { AuthorService } from '@/app/author/services/author/author.service';
 
 @Component({
@@ -19,6 +20,6 @@ import { AuthorService } from '@/app/author/services/author/author.service';
 export class CoauthorsListComponent {
   public readonly authorService = inject(AuthorService);
 
-  public coauthorsIds = input<number[]>([]);
+  public coauthors = input<AuthorResponse[]>([]);
   public isShortCoauthors = signal<boolean>(true);
 }
