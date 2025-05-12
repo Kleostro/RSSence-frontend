@@ -13,6 +13,6 @@
   />
 
   @if (post !== undefined) {
-    <app-post [post]="post" [author]="this.authorService.findAuthorById(post?.authorId ?? null)" />
+    <app-post [post]="post" />
   }
 </div>

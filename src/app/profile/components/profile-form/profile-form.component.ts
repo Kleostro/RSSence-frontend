@@ -22,15 +22,16 @@ import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
 import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { hasKeyInProfilesResponse, ProfilesResponse } from '@/app/api/schemas/profiles-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/profile/constants/profile-form';
 import { ProfileForm } from '@/app/profile/interfaces/profile-form';
-import { ProfileFacadeService } from '@/app/profile/services/profile-facade/profile-facade.service';
 import { ProfileService } from '@/app/profile/services/profile/profile.service';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
+import { MessageService } from '@/app/shared/services/message/message.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
 
 @Component({
@@ -55,9 +56,9 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
   private readonly avatarFile = signal<File | null>(null);
   private readonly birthdate = signal<null | string>(null);
   private readonly destroy$ = new Subject<void>();
-  private readonly facade = inject(ProfileFacadeService);
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
+  private readonly message = inject(MessageService);
   private readonly profileService = inject(ProfileService);
   private readonly updatedProfile = signal<null | ProfilesResponse>(null);
 
@@ -123,11 +124,15 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
 
   private handleFormSubmit(): void {
     const formData = this.createFormData();
-    this.facade
-      .handleProfileFormSubmit(formData, !!this.profile)
+    const action$ = this.profile
+      ? this.profileService.updateProfile(formData)
+      : this.profileService.createProfile(formData);
+
+    action$
       .pipe(
         takeUntil(this.destroy$),
-        catchError(() => {
+        catchError((error: OverriddenHttpErrorResponse) => {
+          this.message.error(error.error.message);
           this.enableForm();
           return EMPTY;
         }),

@@ -1,15 +1,14 @@
 @let post = this.post();
-@let author = this.author();
 @let isSHhowPostAction =
-  this.isShowPostActions() && this.userService.me()?.author?.id === post?.authorId && this.mode() === 'full';
+  this.isShowPostActions() && this.userService.me()?.author?.id === this.getAuthor()?.id && this.mode() === 'full';
 
-@if (post && author) {
+@if (post) {
   <div class="post">
     <header class="post-header">
-      <app-post-avatar [post]="post" [author]="author" />
+      <app-post-avatar [post]="post" [author]="this.getAuthor()" />
 
-      <div *ngIf="post.coauthorsIds.length" class="post-coauthors-wrapper">
-        <app-coauthors-list [coauthorsIds]="post.coauthorsIds" />
+      <div *ngIf="this.getCoauthors().length" class="post-coauthors-wrapper">
+        <app-coauthors-list [coauthors]="this.getCoauthors()" />
       </div>
 
       <div class="post-actions">

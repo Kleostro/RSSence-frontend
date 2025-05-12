@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { SpeedDialModule } from 'primeng/speeddial';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { AuthorPreviewComponent } from '@/app/author/components/author-preview/author-preview.component';
 
 @Component({
@@ -18,7 +18,7 @@ import { AuthorPreviewComponent } from '@/app/author/components/author-preview/a
 export class AuthorInfoComponent {
   @Output() public navigateToProfile = new EventEmitter<number>();
 
-  public currentAuthor = input.required<AuthorsResponse | null>();
+  public currentAuthor = input.required<AuthorResponse | null>();
   public isMyPage = input.required<boolean>();
   public navigationItems = input.required<MenuItem[]>();
 }

@@ -1,11 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
-import { catchError, finalize, Observable, take, tap, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, take, tap, throwError } from 'rxjs';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { AuthorResponse, PaginatedAuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
+import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
@@ -17,9 +20,7 @@ export class AuthorService {
   private readonly authorsService = inject(AuthorsService);
   private readonly loaderService = inject(LoaderService);
   private readonly message = inject(MessageService);
-
-  public readonly authorMe = signal<AuthorsResponse | null>(null);
-  public readonly authors = signal<AuthorsResponse[]>([]);
+  private readonly userService = inject(UsersService);
 
   private handleError(error: OverriddenHttpErrorResponse): Observable<never> {
     return throwError(() => error);
@@ -32,13 +33,13 @@ export class AuthorService {
     );
   }
 
-  public createAuthor(dto: FormData): Observable<AuthorsResponse> {
+  public createAuthor(dto: FormData): Observable<AuthorResponse> {
     this.loaderService.turnOn();
     return this.authorsService.createAuthor(dto).pipe(
       take(1),
-      tap((newAuthor: AuthorsResponse) => {
-        this.authors.update((authors) => [newAuthor, ...authors]);
+      tap(() => {
         this.message.success(MESSAGE.CREATE_AUTHOR_SUCCESS);
+        this.userService.getMe().subscribe();
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -47,14 +48,13 @@ export class AuthorService {
     );
   }
 
-  public deleteAuthor(): Observable<AuthorsResponse> {
+  public deleteAuthor(): Observable<AuthorResponse> {
     this.loaderService.turnOn();
     return this.authorsService.deleteAuthor().pipe(
       take(1),
-      tap((deletedAuthor: AuthorsResponse) => {
-        this.authors.update((authors) => authors.filter((author) => author.userId !== deletedAuthor.userId));
-        this.authorMe.set(null);
+      tap(() => {
         this.message.success(MESSAGE.DELETE_AUTHOR_SUCCESS);
+        this.userService.getMe().subscribe();
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -63,16 +63,24 @@ export class AuthorService {
     );
   }
 
-  public findAuthorById(authorId: null | number): AuthorsResponse | null {
-    return this.authors().find((author) => author.id === authorId) ?? null;
-  }
-
-  public getAuthors(): Observable<AuthorsResponse[]> {
+  public getAuthorById(authorId: number): Observable<AuthorResponse | null> {
     this.loaderService.turnOn();
-    return this.authorsService.getAuthors().pipe(
+    return this.authorsService.getAuthorById(authorId).pipe(
       take(1),
-      tap((authors: AuthorsResponse[]) => {
-        this.authors.set(authors);
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
+  }
+
+  public getAuthorPosts(authorId: number, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
+    this.loaderService.turnOn();
+    return this.authorsService.getAuthorPosts(authorId, query).pipe(
+      take(1),
+      map((response: PaginatedPostResponse) => {
+        const result = PaginatedPostResponseSchema.safeParse(response);
+        return result.success ? result.data : null;
       }),
       finalize(() => {
         this.loaderService.turnOff();
@@ -81,15 +89,24 @@ export class AuthorService {
     );
   }
 
-  public updateAuthor(dto: FormData): Observable<AuthorsResponse> {
+  public getAuthors(query?: PaginationQueryDto): Observable<PaginatedAuthorResponse> {
+    this.loaderService.turnOn();
+    return this.authorsService.getAuthors(query).pipe(
+      take(1),
+      finalize(() => {
+        this.loaderService.turnOff();
+      }),
+      catchError((error: HttpErrorResponse) => this.handleError(error)),
+    );
+  }
+
+  public updateAuthor(dto: FormData): Observable<AuthorResponse> {
     this.loaderService.turnOn();
     return this.authorsService.updateAuthor(dto).pipe(
       take(1),
-      tap((updatedAuthor: AuthorsResponse) => {
-        this.authors.update((authors) =>
-          authors.map((author) => (author.userId === updatedAuthor.userId ? updatedAuthor : author)),
-        );
+      tap(() => {
         this.message.success(MESSAGE.UPDATE_AUTHOR_SUCCESS);
+        this.userService.getMe().subscribe();
       }),
       finalize(() => {
         this.loaderService.turnOff();

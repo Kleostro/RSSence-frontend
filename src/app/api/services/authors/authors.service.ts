@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-misused-spread */
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { AuthorResponse, PaginatedAuthorResponse } from '@/app/api/schemas/authors-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -19,19 +22,34 @@ export class AuthorsService {
     });
   }
 
-  public createAuthor(author: FormData): Observable<AuthorsResponse> {
-    return this.http.post<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
+  public createAuthor(author: FormData): Observable<AuthorResponse> {
+    return this.http.post<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 
-  public deleteAuthor(): Observable<AuthorsResponse> {
-    return this.http.delete<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
+  public deleteAuthor(): Observable<AuthorResponse> {
+    return this.http.delete<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
   }
 
-  public getAuthors(): Observable<AuthorsResponse[]> {
-    return this.http.get<AuthorsResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
+  public getAuthorById(authorId: number): Observable<AuthorResponse | null> {
+    return this.http.get<AuthorResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${authorId}`);
   }
 
-  public updateAuthor(author: FormData): Observable<AuthorsResponse> {
-    return this.http.patch<AuthorsResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
+  public getAuthorPosts(authorId: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+    return this.http.get<PaginatedPostResponse>(
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${authorId}/${ENDPOINTS.POSTS}`,
+      {
+        params: { ...query },
+      },
+    );
+  }
+
+  public getAuthors(query?: PaginationQueryDto): Observable<PaginatedAuthorResponse> {
+    return this.http.get<PaginatedAuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, {
+      params: { ...query },
+    });
+  }
+
+  public updateAuthor(author: FormData): Observable<AuthorResponse> {
+    return this.http.patch<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 }

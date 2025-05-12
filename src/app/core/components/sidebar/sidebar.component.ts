@@ -70,6 +70,7 @@ export class SidebarComponent {
         },
       ],
       label: 'Author',
+      visible: !!this.userService.me()?.profile,
     },
     {
       icon: 'pi pi-cog',

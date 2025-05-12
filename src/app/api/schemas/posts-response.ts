@@ -1,10 +1,17 @@
 import { z } from 'zod';
 
+import { AuthorSchema } from '@/app/api/schemas/authors-response';
 import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
 
 export const PostSchema = z.object({
-  authorId: z.number(),
-  coauthorsIds: z.array(z.number()),
+  authors: z.array(
+    z.object({
+      author: AuthorSchema,
+      authorId: z.number(),
+      isMainAuthor: z.boolean(),
+      postId: z.number(),
+    }),
+  ),
   content: z.string(),
   createdAt: z.string(),
   id: z.number(),

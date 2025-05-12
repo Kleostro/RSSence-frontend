@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AvatarModule } from 'primeng/avatar';
 import { SpeedDialModule } from 'primeng/speeddial';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,5 +13,5 @@ import { AuthorsResponse } from '@/app/api/schemas/authors-response';
   templateUrl: './author-preview.component.html',
 })
 export class AuthorPreviewComponent {
-  public author = input.required<null | Partial<AuthorsResponse>>();
+  public author = input.required<null | Partial<AuthorResponse>>();
 }

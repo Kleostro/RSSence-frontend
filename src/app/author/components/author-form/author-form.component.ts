@@ -19,11 +19,10 @@ import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
 import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 
-import { AuthorsResponse, hasKeyInAuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse, hasKeyInAuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
 import { AuthorForm } from '@/app/author/interfaces/author-form';
-import { AuthorFacadeService } from '@/app/author/services/author-facade/author-facade.service';
 import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
@@ -53,16 +52,15 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
   private readonly authorService = inject(AuthorService);
   private readonly avatarFile = signal<File | null>(null);
   private readonly destroy$ = new Subject<void>();
-  private readonly facade = inject(AuthorFacadeService);
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly message = inject(MessageService);
-  private readonly updatedAuthor = signal<AuthorsResponse | null>(null);
+  private readonly updatedAuthor = signal<AuthorResponse | null>(null);
 
-  @Input() public author: AuthorsResponse | null = null;
+  @Input() public author: AuthorResponse | null = null;
   @Output() public backToAuthorPageEvent = new EventEmitter<void>();
-  @Output() public formSubmitEvent = new EventEmitter<AuthorsResponse>();
-  @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorsResponse | null>();
+  @Output() public formSubmitEvent = new EventEmitter<AuthorResponse>();
+  @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorResponse | null>();
 
   public readonly AUTHOR_FORM_FIELD_CONFIG = AUTHOR_FORM_FIELD_CONFIG;
   public readonly navigationService = inject(NavigationService);
@@ -77,7 +75,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
     const formData = new FormData();
 
     Object.entries(this.form.value).forEach(([key, value]) => {
-      if (value && hasKeyInAuthorsResponse(key) && this.isValueChanged(key, value)) {
+      if (value && hasKeyInAuthorResponse(key) && this.isValueChanged(key, value)) {
         formData.append(key, value);
         this.hasChanges.set(true);
       }
@@ -113,8 +111,9 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
 
   private handleFormSubmit(): void {
     const formData = this.createFormData();
-    this.facade
-      .handleAuthorFormSubmit(formData, !!this.author)
+    const action$ = this.author ? this.authorService.updateAuthor(formData) : this.authorService.createAuthor(formData);
+
+    action$
       .pipe(
         takeUntil(this.destroy$),
         catchError((error: OverriddenHttpErrorResponse) => {
@@ -128,7 +127,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
       });
   }
 
-  private initForm(initialValues?: AuthorsResponse | null): void {
+  private initForm(initialValues?: AuthorResponse | null): void {
     this.form = this.fb.nonNullable.group({
       bio: [initialValues?.bio ?? '', [Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.bio.max)]],
       firstname: [
@@ -160,7 +159,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
   }
 
   private isValueChanged(key: string, value: string): boolean {
-    if (hasKeyInAuthorsResponse(key)) {
+    if (hasKeyInAuthorResponse(key)) {
       const { author } = this;
       if (!author) {
         return true;
@@ -174,13 +173,13 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
   private updateAuthorForPreview(): void {
     const { bio, firstname, lastname, username } = this.form.getRawValue();
     this.updatedAuthor.set({
-      authoredPosts: this.author?.authoredPosts ?? [],
       avatarUrl: this.avatarUrl() ?? this.author?.avatarUrl ?? null,
       bio,
-      coauthoredPosts: this.author?.coauthoredPosts ?? [],
+      createdAt: this.author?.createdAt ?? '',
       firstname,
       id: this.author?.id ?? 0,
       lastname,
+      updatedAt: this.author?.updatedAt ?? '',
       userId: this.author?.userId ?? 0,
       username,
     });

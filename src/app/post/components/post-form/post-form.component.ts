@@ -1,15 +1,5 @@
 import { NgIf } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  inject,
-  input,
-  OnInit,
-  Output,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -20,10 +10,12 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, take } from 'rxjs';
+import { finalize, map, take, tap } from 'rxjs';
 
-import { AuthorsResponse } from '@/app/api/schemas/authors-response';
+import { AuthorResponse, PaginatedAuthorResponseSchema } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
+import { UserService } from '@/app/auth/services/user/user.service';
+import { AuthorService } from '@/app/author/services/author/author.service';
 import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
 import { CoauthorsFGType, NewPost, PostForm } from '@/app/post/interfaces/post-form';
 import { PostService } from '@/app/post/services/post/post.service';
@@ -53,16 +45,14 @@ interface AutoCompleteCompleteEvent {
   templateUrl: './post-form.component.html',
 })
 export class PostFormComponent implements OnInit {
+  private readonly authorService = inject(AuthorService);
   private readonly fb = inject(FormBuilder).nonNullable;
-
-  private readonly postEditor = viewChild(PostEditorComponent);
-
   private readonly postService = inject(PostService);
+  private readonly userService = inject(UserService);
 
   @Output() public createPostEvent = new EventEmitter<PostResponse>();
-  public authors = input.required<AuthorsResponse[]>();
 
-  public filteredAuthors: AuthorsResponse[] = [];
+  public filteredAuthors = signal<AuthorResponse[]>([]);
   public form!: FormGroup<PostForm>;
   public isProcessing = signal<boolean>(false);
 
@@ -79,7 +69,7 @@ export class PostFormComponent implements OnInit {
     );
 
     const coauthorsArray = Array.from(coauthorsSet);
-    return coauthorsArray.map((coauthor: AuthorsResponse) => coauthor.id);
+    return coauthorsArray.map((coauthor: AuthorResponse) => coauthor.id);
   }
 
   private preparePostData(coauthorIds: number[]): NewPost {
@@ -115,18 +105,26 @@ export class PostFormComponent implements OnInit {
   }
 
   public addCoauthor(): void {
-    this.form.controls.coauthors.push(this.fb.group({ coauthor: this.fb.control<AuthorsResponse | string>('') }));
+    this.form.controls.coauthors.push(this.fb.group({ coauthor: this.fb.control<string>('') }));
   }
 
   public filterAuthors(event: AutoCompleteCompleteEvent): void {
     const query = event.query.toLowerCase();
-    const filteredAuthorsSet = new Set(
-      this.authors()
-        .filter((author) => author.username.toLowerCase().includes(query))
-        .map((author) => author),
-    );
 
-    this.filteredAuthors = Array.from(filteredAuthorsSet);
+    this.authorService
+      .getAuthors({ search: query, searchField: 'username' })
+      .pipe(
+        tap((response) => {
+          const result = PaginatedAuthorResponseSchema.safeParse(response);
+          const authorMeId = this.userService.me()?.author?.id;
+          if (result.success) {
+            this.filteredAuthors.set(result.data.items.filter((author) => author.id !== authorMeId));
+          } else {
+            this.filteredAuthors.set([]);
+          }
+        }),
+      )
+      .subscribe();
   }
 
   public initForm(): void {

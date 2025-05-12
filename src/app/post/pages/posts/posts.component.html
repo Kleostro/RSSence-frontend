@@ -1,5 +1,3 @@
-@let posts = this.postService.allPosts();
-
 <div class="page">
   <p-button
     pRipple
@@ -12,5 +10,8 @@
     outlined="true"
   />
 
-  <app-posts-list [posts]="posts" />
+  <app-posts-list
+    [paginatedPostResponse]="this.paginatedPostResponse()"
+    (pageChangeEvent)="this.handlePageChangeEvent($event)"
+  />
 </div>
