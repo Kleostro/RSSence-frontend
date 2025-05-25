@@ -1,29 +1,13 @@
 @let currentProfile = this.currentProfile();
-@let isMyPage = this.isMyPage();
-@let isProfileFormStateUpdate = this.profileFormState() === FORM_STATE.UPDATE;
-@let isPageLoading = this.loaderService.isPageLoading();
 
-@if (isPageLoading) {
-  <app-page-loader />
-} @else {
-  <div class="page">
-    @if ((isMyPage && !currentProfile) || isProfileFormStateUpdate) {
-      <app-profile-form-wrapper
+<div class="page">
+  @if (currentProfile) {
+    <div class="profile-info">
+      <app-profile-info
+        [isMyPage]="false"
         [currentProfile]="currentProfile"
-        [profileForPreview]="profileForPreview()"
-        (backToProfilePage)="profileFormState.set(FORM_STATE.CREATE)"
-        (formSubmit)="handleProfileFormSubmit($event)"
-        (updateProfileForPreview)="profileForPreview.set($event)"
+        (navigateToAuthor)="navigationService.navigateToAuthorByUsername($event)"
       />
-    } @else {
-      <div class="profile-info">
-        <app-profile-info
-          [isMyPage]="isMyPage"
-          [currentProfile]="currentProfile"
-          [navigationItems]="navigationItems"
-          (navigateToAuthor)="navigationService.navigateToAuthorByUserId($event)"
-        />
-      </div>
-    }
-  </div>
-}
+    </div>
+  }
+</div>

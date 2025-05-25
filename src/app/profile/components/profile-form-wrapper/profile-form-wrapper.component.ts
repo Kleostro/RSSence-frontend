@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, input, Output } from '@angular/core';
 
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ProfileFormComponent } from '@/app/profile/components/profile-form/profile-form.component';
 import { ProfilePreviewComponent } from '@/app/profile/components/profile-preview/profile-preview.component';
 
@@ -13,9 +13,9 @@ import { ProfilePreviewComponent } from '@/app/profile/components/profile-previe
 })
 export class ProfileFormWrapperComponent {
   @Output() public backToProfilePage = new EventEmitter<void>();
-  @Output() public formSubmit = new EventEmitter<ProfilesResponse>();
-  @Output() public updateProfileForPreview = new EventEmitter<null | ProfilesResponse>();
+  @Output() public formSubmit = new EventEmitter<ProfileResponse>();
+  @Output() public updateProfileForPreview = new EventEmitter<null | ProfileResponse>();
 
-  public currentProfile = input.required<null | ProfilesResponse>();
-  public profileForPreview = input.required<null | ProfilesResponse>();
+  public currentProfile = input.required<null | ProfileResponse>();
+  public profileForPreview = input.required<null | ProfileResponse>();
 }

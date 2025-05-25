@@ -1,0 +1,22 @@
+@let currentProfile = this.currentProfile();
+@let isProfileFormStateUpdate = this.profileFormState() === FORM_STATE.UPDATE;
+
+<div class="page">
+  @if (!currentProfile || isProfileFormStateUpdate) {
+    <app-profile-form-wrapper
+      [currentProfile]="currentProfile"
+      [profileForPreview]="previewProfile()"
+      (backToProfilePage)="profileFormState.set(FORM_STATE.CREATE)"
+      (formSubmit)="handleProfileFormSubmit($event)"
+      (updateProfileForPreview)="previewProfile.set($event)"
+    />
+  } @else {
+    <div class="profile-info">
+      <app-profile-info
+        [currentProfile]="currentProfile"
+        [navigationItems]="navigationItems"
+        (navigateToAuthor)="navigationService.navigateToAuthorByUsername($event)"
+      />
+    </div>
+  }
+</div>
