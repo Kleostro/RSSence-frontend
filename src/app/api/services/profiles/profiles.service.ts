@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -19,19 +19,23 @@ export class ProfilesService {
     });
   }
 
-  public createProfile(profile: FormData): Observable<ProfilesResponse> {
-    return this.http.post<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
+  public createProfile(profile: FormData): Observable<ProfileResponse> {
+    return this.http.post<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
   }
 
-  public deleteProfile(): Observable<ProfilesResponse> {
-    return this.http.delete<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
+  public deleteProfile(): Observable<ProfileResponse> {
+    return this.http.delete<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
   }
 
-  public getProfiles(): Observable<ProfilesResponse[]> {
-    return this.http.get<ProfilesResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
+  public getProfileByUsername(username: string): Observable<ProfileResponse> {
+    return this.http.get<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${username}`);
   }
 
-  public updateProfile(profile: FormData): Observable<ProfilesResponse> {
-    return this.http.patch<ProfilesResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
+  public getProfiles(): Observable<ProfileResponse[]> {
+    return this.http.get<ProfileResponse[]>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`);
+  }
+
+  public updateProfile(profile: FormData): Observable<ProfileResponse> {
+    return this.http.patch<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile);
   }
 }

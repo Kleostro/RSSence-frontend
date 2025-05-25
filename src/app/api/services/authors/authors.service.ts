@@ -26,17 +26,17 @@ export class AuthorsService {
     return this.http.post<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
   }
 
-  public deleteAuthor(): Observable<AuthorResponse> {
-    return this.http.delete<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`);
+  public deleteAuthor(username: string): Observable<AuthorResponse> {
+    return this.http.delete<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`);
   }
 
-  public getAuthorById(authorId: number): Observable<AuthorResponse | null> {
-    return this.http.get<AuthorResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${authorId}`);
+  public getAuthorByUsername(username: string): Observable<AuthorResponse | null> {
+    return this.http.get<AuthorResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`);
   }
 
-  public getAuthorPosts(authorId: number, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
+  public getAuthorPosts(username: string, query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
     return this.http.get<PaginatedPostResponse>(
-      `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${authorId}/${ENDPOINTS.POSTS}`,
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.POSTS}`,
       {
         params: { ...query },
       },
@@ -49,7 +49,7 @@ export class AuthorsService {
     });
   }
 
-  public updateAuthor(author: FormData): Observable<AuthorResponse> {
-    return this.http.patch<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author);
+  public updateAuthor(username: string, author: FormData): Observable<AuthorResponse> {
+    return this.http.patch<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`, author);
   }
 }

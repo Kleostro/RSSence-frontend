@@ -1,6 +1,6 @@
 import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
 
-import { debounceTime, first, map, switchMap, tap } from 'rxjs';
+import { debounceTime, first, map, of, switchMap } from 'rxjs';
 
 import { AuthorService } from '@/app/author/services/author/author.service';
 import { ProfileService } from '@/app/profile/services/profile/profile.service';
@@ -14,11 +14,10 @@ export function usernameAvailability(
   return (control: AbstractControl) =>
     control.valueChanges.pipe(
       debounceTime(DEBOUNCE_TIME),
-      tap(() => {
+      switchMap(() => {
         const value = String(control.value);
-        return value === currentUsername || !control.value ? null : value;
+        return value === currentUsername ? of(true) : service.checkUsernameAvailability(value);
       }),
-      switchMap((value: string) => service.checkUsernameAvailability(value)),
       map((unique: boolean | null) => (unique ? null : { [FIELD_ERROR_KEY.USERNAME_EXISTS]: true })),
       first(),
     );

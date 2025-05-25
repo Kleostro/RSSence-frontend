@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, Observable, switchMap, take, tap } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, tap } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
@@ -53,7 +53,6 @@ export class AuthService {
 
   public login({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
     return this.loginService.login(email, password).pipe(
-      take(1),
       tap((data) => {
         this.handleAuthSuccess(data);
         this.navigationService.navigateToHome();
@@ -64,7 +63,6 @@ export class AuthService {
 
   public logout(): Observable<LogoutResponse> {
     return this.logoutService.logout().pipe(
-      take(1),
       tap(() => {
         this.isUserLoggedIn.set(false);
         this.userService.me.set(null);
@@ -81,7 +79,6 @@ export class AuthService {
 
   public refreshToken(): Observable<AuthResponse> {
     return this.refreshTokenService.refreshToken().pipe(
-      take(1),
       tap((data) => {
         this.handleAuthSuccess(data);
       }),
@@ -97,7 +94,6 @@ export class AuthService {
 
   public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
     return this.signUpService.register(email, password).pipe(
-      take(1),
       tap(() => {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),
