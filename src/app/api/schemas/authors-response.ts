@@ -9,8 +9,8 @@ export const AuthorSchema = z.object({
   firstname: z.string(),
   id: z.number(),
   lastname: z.string(),
+  profileUsername: z.string().nullable(),
   updatedAt: z.string(),
-  userId: z.number(),
   username: z.string(),
 });
 export type AuthorResponse = z.infer<typeof AuthorSchema>;

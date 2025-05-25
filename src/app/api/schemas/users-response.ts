@@ -1,21 +1,22 @@
 import { z } from 'zod';
 
 import { AuthorSchema } from '@/app/api/schemas/authors-response';
-import { ProfilesResponseSchema } from '@/app/api/schemas/profiles-response';
+import { ProfileSchema } from '@/app/api/schemas/profiles-response';
 
-export const UsersResponseSchema = z.object({
+export const UserSchema = z.object({
   author: AuthorSchema.nullable().optional(),
   createdAt: z.coerce.date(),
   email: z.string(),
   id: z.number(),
-  profile: ProfilesResponseSchema.nullable().optional(),
+  profile: ProfileSchema.nullable().optional(),
+  profileUsername: z.string().optional(),
   roles: z.string().array(),
   updatedAt: z.coerce.date(),
 });
 
-export type UsersResponse = z.infer<typeof UsersResponseSchema>;
+export type UserResponse = z.infer<typeof UserSchema>;
 
-export const hasKeyInUsersResponse = (key: string): key is keyof UsersResponse => {
-  const keys: string[] = UsersResponseSchema.keyof().options;
+export const hasKeyInUserResponse = (key: string): key is keyof UserResponse => {
+  const keys: string[] = UserSchema.keyof().options;
   return keys.includes(key);
 };
