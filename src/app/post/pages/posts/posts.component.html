@@ -11,6 +11,7 @@
   />
 
   <app-posts-list
+    [isShowPostActions]="false"
     [paginatedPostResponse]="this.paginatedPostResponse()"
     (pageChangeEvent)="this.handlePageChangeEvent($event)"
   />

@@ -1,5 +1,14 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -10,7 +19,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, take, tap } from 'rxjs';
+import { finalize, map, Subject, take, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse, PaginatedAuthorResponseSchema } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
@@ -44,8 +53,9 @@ interface AutoCompleteCompleteEvent {
   styleUrl: './post-form.component.scss',
   templateUrl: './post-form.component.html',
 })
-export class PostFormComponent implements OnInit {
+export class PostFormComponent implements OnDestroy, OnInit {
   private readonly authorService = inject(AuthorService);
+  private readonly destroy$ = new Subject<void>();
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postService = inject(PostService);
   private readonly userService = inject(UserService);
@@ -110,18 +120,16 @@ export class PostFormComponent implements OnInit {
 
   public filterAuthors(event: AutoCompleteCompleteEvent): void {
     const query = event.query.toLowerCase();
+    const authorMeId = this.userService.me()?.author?.id;
 
     this.authorService
       .getAuthors({ search: query, searchField: 'username' })
       .pipe(
+        take(1),
+        takeUntil(this.destroy$),
         tap((response) => {
-          const result = PaginatedAuthorResponseSchema.safeParse(response);
-          const authorMeId = this.userService.me()?.author?.id;
-          if (result.success) {
-            this.filteredAuthors.set(result.data.items.filter((author) => author.id !== authorMeId));
-          } else {
-            this.filteredAuthors.set([]);
-          }
+          const { data, success } = PaginatedAuthorResponseSchema.safeParse(response);
+          this.filteredAuthors.set(success ? data.items.filter((author) => author.id !== authorMeId) : []);
         }),
       )
       .subscribe();
@@ -134,6 +142,11 @@ export class PostFormComponent implements OnInit {
       content: this.fb.control<null | string>(''),
       title: this.fb.control<string>('', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public ngOnInit(): void {

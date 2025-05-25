@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, input, linkedSignal, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  input,
+  linkedSignal,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -15,11 +24,11 @@ import { PostComponent } from '@/app/post/components/post/post.component';
   styleUrl: './posts-list.component.scss',
   templateUrl: './posts-list.component.html',
 })
-export class PostsListComponent {
+export class PostsListComponent implements OnInit {
   @Output() public pageChangeEvent = new EventEmitter<PaginatorState>();
+  @Output() public postDeleteEvent = new EventEmitter<unknown>();
   public readonly authorService = inject(AuthorService);
   public readonly navigationService = inject(NavigationService);
-
   public first = 0;
 
   public paginatedPostResponse = input<null | PaginatedPostResponse>(null);
@@ -28,6 +37,12 @@ export class PostsListComponent {
     computation: () => true,
     source: this.paginatedPostResponse,
   });
+
+  public isShowPostActions = input<boolean>(true);
+
+  public ngOnInit(): void {
+    this.isPostsLoaded.set(false);
+  }
 
   public onPageChange(event: PaginatorState): void {
     this.first = event.first ?? 0;

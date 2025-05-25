@@ -62,12 +62,6 @@ export class SidebarComponent {
           label: 'My author',
           routerLink: [APP_ROUTE.AUTHOR],
         },
-        {
-          icon: 'pi pi-list',
-          label: 'My posts',
-          routerLink: [APP_ROUTE.AUTHOR, this.userService.me()?.id, 'posts'],
-          visible: !!this.userService.me()?.author,
-        },
       ],
       label: 'Author',
       visible: !!this.userService.me()?.profile,
