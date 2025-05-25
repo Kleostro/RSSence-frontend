@@ -6,10 +6,12 @@ import { ToastModule } from 'primeng/toast';
 
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { HeaderComponent } from '@/app/core/components/header/header.component';
+import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { ModalComponent } from '@/app/shared/components/modal/modal.component';
+import { PageLoaderComponent } from '@/app/shared/components/page-loader/page-loader.component';
 
 @Component({
-  imports: [RouterOutlet, HeaderComponent, ToastModule, ModalComponent],
+  imports: [RouterOutlet, HeaderComponent, ToastModule, ModalComponent, PageLoaderComponent],
   selector: 'app-root',
   styleUrl: './app.component.scss',
   templateUrl: './app.component.html',
@@ -17,6 +19,7 @@ import { ModalComponent } from '@/app/shared/components/modal/modal.component';
 export class AppComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly primeng = inject(PrimeNG);
+  public readonly loaderService = inject(LoaderService);
 
   public ngOnInit(): void {
     this.primeng.ripple.set(true);
