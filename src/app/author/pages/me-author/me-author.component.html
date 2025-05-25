@@ -1,0 +1,45 @@
+@let currentAuthor = this.currentAuthor();
+@let isAuthorFormStateUpdate = this.authorFormState() === FORM_STATE.UPDATE;
+@let modalTitle = 'Create new post';
+
+<div class="page">
+  @if (!currentAuthor || isAuthorFormStateUpdate) {
+    <app-author-form-wrapper
+      [currentAuthor]="currentAuthor"
+      [authorForPreview]="previewAuthor()"
+      (backToAuthorPage)="authorFormState.set(FORM_STATE.CREATE)"
+      (formSubmit)="handleAuthorFormSubmit($event)"
+      (updateAuthorForPreview)="previewAuthor.set($event)"
+    />
+  } @else {
+    <div class="author-info">
+      <app-author-info
+        [currentAuthor]="currentAuthor"
+        [navigationItems]="navigationItems"
+        (navigateToProfile)="navigationService.navigateToProfileByUsername($event)"
+      />
+    </div>
+    <div class="author-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        class="post-form-button"
+        icon="pi pi-plus"
+        severity="primary"
+        [label]="modalTitle"
+        (click)="this.setParamsInModal(); this.modalService.openModal(postForm, modalTitle)"
+      ></button>
+    </div>
+
+    <app-posts-list
+      (postDeleteEvent)="this.onPostDelete()"
+      [paginatedPostResponse]="this.paginatedPostResponse()"
+      (pageChangeEvent)="this.handlePageChangeEvent($event)"
+    />
+  }
+</div>
+
+<ng-template #postForm>
+  <app-post-form (createPostEvent)="this.onCreatePost()" />
+</ng-template>

@@ -16,9 +16,8 @@ import { AuthorPreviewComponent } from '@/app/author/components/author-preview/a
   templateUrl: './author-info.component.html',
 })
 export class AuthorInfoComponent {
-  @Output() public navigateToProfile = new EventEmitter<number>();
-
+  @Output() public navigateToProfile = new EventEmitter<null | string>();
   public currentAuthor = input.required<AuthorResponse | null>();
-  public isMyPage = input.required<boolean>();
-  public navigationItems = input.required<MenuItem[]>();
+  public isMyPage = input<boolean>(true);
+  public navigationItems = input<MenuItem[]>([]);
 }

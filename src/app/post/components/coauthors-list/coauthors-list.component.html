@@ -8,7 +8,7 @@
       tooltipPosition="bottom"
       [image]="coauthor.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
       size="normal"
-      [routerLink]="['/author', coauthor.userId]"
+      [routerLink]="['/author', coauthor.username]"
       (click)="$event.stopPropagation()"
       shape="circle"
     />
