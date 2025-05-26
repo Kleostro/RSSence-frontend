@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PaginationResponseSchema = <T extends z.ZodTypeAny>(
+export const PaginationResponseSchema = <T extends z.ZodSchema>(
   schema: T,
 ): z.ZodObject<{
   hasMore: z.ZodBoolean;
@@ -12,13 +12,11 @@ export const PaginationResponseSchema = <T extends z.ZodTypeAny>(
 }> =>
   z.object({
     hasMore: z.boolean(),
-    items: schema.array(),
+    items: z.array(schema),
     limit: z.number(),
     page: z.number(),
     total: z.number(),
     totalPages: z.number(),
   });
 
-export type PaginationResponse<T> = z.infer<
-  ReturnType<typeof PaginationResponseSchema<T extends z.ZodTypeAny ? T : z.ZodTypeAny>>
->;
+export type PaginationResponse<T extends z.ZodSchema> = z.infer<ReturnType<typeof PaginationResponseSchema<T>>>;

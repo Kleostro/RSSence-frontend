@@ -1,5 +1,5 @@
 @let post = this.post();
-@let isSHhowPostAction = this.isShowPostActions() && this.userService.me()?.author?.id === this.getAuthor()?.id;
+@let isSHhowPostAction = this.isShowPostActions() && this.usersService.me()?.author?.id === this.getAuthor()?.id;
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">

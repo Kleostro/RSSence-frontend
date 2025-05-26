@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Avatar } from 'primeng/avatar';
@@ -8,7 +8,6 @@ import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { AuthorService } from '@/app/author/services/author/author.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,8 +17,6 @@ import { AuthorService } from '@/app/author/services/author/author.service';
   templateUrl: './coauthors-list.component.html',
 })
 export class CoauthorsListComponent {
-  public readonly authorService = inject(AuthorService);
-
   public coauthors = input<AuthorResponse[]>([]);
   public isShortCoauthors = signal<boolean>(true);
 }

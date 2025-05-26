@@ -5,14 +5,14 @@ import { ResolveFn } from '@angular/router';
 import { map, of, switchMap, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { UserService } from '@/app/auth/services/user/user.service';
-import { AuthorService } from '@/app/author/services/author/author.service';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 export const meAuthorResolver: ResolveFn<AuthorResponse | null> = () => {
-  const userService = inject(UserService);
+  const usersService = inject(UsersService);
   const title = inject(Title);
-  return userService.getMe().pipe(
+  return usersService.getMe().pipe(
     map((me) => me?.author ?? null),
     tap((author) => {
       title.setTitle('RSS | ' + (author?.username ?? 'Author'));
@@ -21,17 +21,17 @@ export const meAuthorResolver: ResolveFn<AuthorResponse | null> = () => {
 };
 
 export const authorResolver: ResolveFn<AuthorResponse | null> = (route) => {
-  const userService = inject(UserService);
-  const authorService = inject(AuthorService);
+  const usersService = inject(UsersService);
+  const authorsService = inject(AuthorsService);
   const navigationService = inject(NavigationService);
   const title = inject(Title);
 
   const { id } = route.params;
   if (typeof id === 'string') {
-    return userService.getMe().pipe(
+    return usersService.getMe().pipe(
       map((me) => me?.author ?? null),
       switchMap((meAuthor) =>
-        authorService.getAuthorByUsername(id).pipe(
+        authorsService.getAuthorByUsername(id).pipe(
           tap((author) => {
             if (meAuthor?.username === author?.username) {
               navigationService.navigateToAuthor();

@@ -8,8 +8,8 @@ import { DrawerModule } from 'primeng/drawer';
 import { RippleModule } from 'primeng/ripple';
 import { TieredMenu } from 'primeng/tieredmenu';
 
+import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
-import { UserService } from '@/app/auth/services/user/user.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
@@ -23,7 +23,7 @@ import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switc
 })
 export class SidebarComponent {
   private readonly authService = inject(AuthService);
-  private readonly userService = inject(UserService);
+  private readonly usersService = inject(UsersService);
 
   public readonly APP_ROUTE = APP_ROUTE;
   public readonly navigationService = inject(NavigationService);
@@ -64,7 +64,7 @@ export class SidebarComponent {
         },
       ],
       label: 'Author',
-      visible: !!this.userService.me()?.profile,
+      visible: !!this.usersService.me()?.profile,
     },
     {
       icon: 'pi pi-cog',

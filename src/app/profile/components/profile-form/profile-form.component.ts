@@ -24,10 +24,10 @@ import { catchError, EMPTY, Subject, takeUntil, tap } from 'rxjs';
 
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { hasKeyInProfileResponse, ProfileResponse } from '@/app/api/schemas/profiles-response';
+import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/profile/constants/profile-form';
 import { ProfileForm } from '@/app/profile/interfaces/profile-form';
-import { ProfileService } from '@/app/profile/services/profile/profile.service';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
@@ -59,7 +59,7 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly message = inject(MessageService);
-  private readonly profileService = inject(ProfileService);
+  private readonly profilesService = inject(ProfilesService);
   private readonly updatedProfile = signal<null | ProfileResponse>(null);
 
   @Output() public backToProfilePageEvent = new EventEmitter<void>();
@@ -124,8 +124,8 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
 
   private handleFormSubmit(formData: FormData): void {
     const action$ = this.profile
-      ? this.profileService.updateProfile(formData)
-      : this.profileService.createProfile(formData);
+      ? this.profilesService.updateProfile(formData)
+      : this.profilesService.createProfile(formData);
 
     action$
       .pipe(
@@ -168,7 +168,7 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
           Validators.minLength(this.PROFILE_FORM_FIELD_CONFIG.username.min),
           Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.username.max),
         ],
-        [usernameAvailability(this.profileService, this.profile?.username ?? null)],
+        [usernameAvailability(this.profilesService, this.profile?.username ?? null)],
       ],
     });
   }

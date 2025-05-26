@@ -13,7 +13,6 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
 
 import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
-import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';
 
@@ -27,7 +26,6 @@ import { PostComponent } from '@/app/post/components/post/post.component';
 export class PostsListComponent implements OnInit {
   @Output() public pageChangeEvent = new EventEmitter<PaginatorState>();
   @Output() public postDeleteEvent = new EventEmitter<unknown>();
-  public readonly authorService = inject(AuthorService);
   public readonly navigationService = inject(NavigationService);
   public first = 0;
 

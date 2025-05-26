@@ -4,17 +4,17 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
-import { UserService } from '@/app/auth/services/user/user.service';
+import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
 import { FORM_STATE } from '@/app/author/constants/author-form';
 import { getNavigationAuthorPage } from '@/app/author/constants/navigation-author-page';
-import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
@@ -37,10 +37,10 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   templateUrl: './me-author.component.html',
 })
 export class MeAuthorComponent implements OnDestroy, OnInit {
-  private readonly authorService = inject(AuthorService);
+  private readonly authorsService = inject(AuthorsService);
   private readonly destroy$ = new Subject<void>();
   private readonly route = inject(ActivatedRoute);
-  private readonly userService = inject(UserService);
+  private readonly usersService = inject(UsersService);
   public readonly FORM_STATE = FORM_STATE;
   public readonly modalService = inject(ModalService);
   public readonly navigationService = inject(NavigationService);
@@ -61,12 +61,10 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
   public previewAuthor = signal<AuthorResponse | null>(null);
 
   private loadAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.authorService.getAuthorPosts(username, query).pipe(
+    return this.authorsService.getAuthorPosts(username, query).pipe(
       takeUntil(this.destroy$),
-      map((response) => {
-        const result = PaginatedPostResponseSchema.safeParse(response);
-        this.paginatedPostResponse.set(result.data ?? null);
-        return result.success ? result.data : null;
+      tap((data) => {
+        this.paginatedPostResponse.set(data);
       }),
     );
   }
@@ -77,11 +75,11 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
       return;
     }
 
-    this.authorService
+    this.authorsService
       .deleteAuthor(username)
       .pipe(
         takeUntil(this.destroy$),
-        switchMap(() => this.userService.getMe()),
+        switchMap(() => this.usersService.getMe()),
       )
       .subscribe(() => {
         this.currentAuthor.set(null);

@@ -3,13 +3,13 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal }
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
-import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
-import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,17 +20,15 @@ import { PostService } from '@/app/post/services/post/post.service';
 })
 export class PostsComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
+  private readonly postsService = inject(PostsService);
   public readonly navigationService = inject(NavigationService);
-  public readonly postService = inject(PostService);
 
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
   private loadAllPosts(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.postService.getAllPosts(query).pipe(
-      map((response) => {
-        const result = PaginatedPostResponseSchema.safeParse(response);
-        this.paginatedPostResponse.set(result.data ?? null);
-        return result.success ? result.data : null;
+    return this.postsService.getAllPosts(query).pipe(
+      tap((data) => {
+        this.paginatedPostResponse.set(data);
       }),
     );
   }

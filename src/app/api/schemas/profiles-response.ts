@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
+
 export const ProfileSchema = z.object({
   authorUsername: z.string().nullable(),
   avatarUrl: z.string().nullable(),
@@ -12,6 +14,9 @@ export const ProfileSchema = z.object({
 });
 
 export type ProfileResponse = z.infer<typeof ProfileSchema>;
+
+export const PaginatedProfileResponseSchema = PaginationResponseSchema(ProfileSchema);
+export type PaginatedProfileResponse = PaginationResponse<typeof ProfileSchema>;
 
 export const hasKeyInProfileResponse = (key: string): key is keyof ProfileResponse => {
   const keys: string[] = ProfileSchema.keyof().options;

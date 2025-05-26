@@ -4,13 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { ProfileResponse, ProfileSchema } from '@/app/api/schemas/profiles-response';
+import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 // eslint-disable-next-line max-len
 import { ProfileFormWrapperComponent } from '@/app/profile/components/profile-form-wrapper/profile-form-wrapper.component';
 import { ProfileInfoComponent } from '@/app/profile/components/profile-info/profile-info.component';
 import { getNavigationProfilePage } from '@/app/profile/constants/navigation-profile-page';
 import { FORM_STATE, FormState } from '@/app/profile/constants/profile-form';
-import { ProfileService } from '@/app/profile/services/profile/profile.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ import { ProfileService } from '@/app/profile/services/profile/profile.service';
 })
 export class MeProfileComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
-  private readonly profileService = inject(ProfileService);
+  private readonly profilesService = inject(ProfilesService);
   private readonly route = inject(ActivatedRoute);
   public readonly FORM_STATE = FORM_STATE;
   public readonly navigationService = inject(NavigationService);
@@ -42,7 +42,7 @@ export class MeProfileComponent implements OnDestroy, OnInit {
   public previewProfile = signal<null | ProfileResponse>(null);
 
   public deleteProfile(): void {
-    this.profileService
+    this.profilesService
       .deleteProfile()
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {

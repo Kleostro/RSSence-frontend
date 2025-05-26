@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { AuthorSchema } from '@/app/api/schemas/authors-response';
+import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
 import { ProfileSchema } from '@/app/api/schemas/profiles-response';
 
 export const UserSchema = z.object({
@@ -15,6 +16,9 @@ export const UserSchema = z.object({
 });
 
 export type UserResponse = z.infer<typeof UserSchema>;
+
+export const PaginatedUserResponseSchema = PaginationResponseSchema(UserSchema);
+export type PaginatedUserResponse = PaginationResponse<typeof UserSchema>;
 
 export const hasKeyInUserResponse = (key: string): key is keyof UserResponse => {
   const keys: string[] = UserSchema.keyof().options;

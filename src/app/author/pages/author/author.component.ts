@@ -5,13 +5,13 @@ import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { SpeedDialModule } from 'primeng/speeddial';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
-import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 
@@ -23,7 +23,7 @@ import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.
   templateUrl: './author.component.html',
 })
 export class AuthorComponent implements OnDestroy, OnInit {
-  private readonly authorService = inject(AuthorService);
+  private readonly authorsService = inject(AuthorsService);
   private readonly destroy$ = new Subject<void>();
   private readonly route = inject(ActivatedRoute);
   public readonly navigationService = inject(NavigationService);
@@ -32,11 +32,9 @@ export class AuthorComponent implements OnDestroy, OnInit {
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
   private loadAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.authorService.getAuthorPosts(username, query).pipe(
-      map((response) => {
-        const result = PaginatedPostResponseSchema.safeParse(response);
-        this.paginatedPostResponse.set(result.data ?? null);
-        return result.success ? result.data : null;
+    return this.authorsService.getAuthorPosts(username, query).pipe(
+      tap((data) => {
+        this.paginatedPostResponse.set(data);
       }),
     );
   }

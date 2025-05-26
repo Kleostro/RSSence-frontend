@@ -22,13 +22,12 @@ import { finalize, Subject, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
-import { UserService } from '@/app/auth/services/user/user.service';
-import { AuthorService } from '@/app/author/services/author/author.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 import { getPostActions } from '@/app/post/constants/post-actions';
-import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,11 +39,10 @@ import { PostService } from '@/app/post/services/post/post.service';
 export class PostComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
   private readonly navigationService = inject(NavigationService);
-  private readonly postService = inject(PostService);
+  private readonly postsService = inject(PostsService);
   @Output() public postDeleteEvent = new EventEmitter<unknown>();
   public readonly sanitizer = inject(DomSanitizer);
-  public readonly userService = inject(UserService);
-  public authorService = inject(AuthorService);
+  public readonly usersService = inject(UsersService);
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostActions = input<boolean>(true);
@@ -112,7 +110,7 @@ export class PostComponent implements OnDestroy, OnInit {
       return;
     }
     this.isProcessing.set(true);
-    this.postService
+    this.postsService
       .deletePost(post.id)
       .pipe(
         takeUntil(this.destroy$),

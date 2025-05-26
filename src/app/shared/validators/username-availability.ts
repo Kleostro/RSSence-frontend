@@ -2,12 +2,12 @@ import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
 
 import { debounceTime, first, map, of, switchMap } from 'rxjs';
 
-import { AuthorService } from '@/app/author/services/author/author.service';
-import { ProfileService } from '@/app/profile/services/profile/profile.service';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
 import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
 
 export function usernameAvailability(
-  service: AuthorService | ProfileService,
+  service: AuthorsService | ProfilesService,
   currentUsername: null | string,
 ): AsyncValidatorFn {
   const DEBOUNCE_TIME = 400;
