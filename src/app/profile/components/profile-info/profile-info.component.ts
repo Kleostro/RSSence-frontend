@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { SpeedDialModule } from 'primeng/speeddial';
 
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ProfilePreviewComponent } from '@/app/profile/components/profile-preview/profile-preview.component';
 
 @Component({
@@ -16,9 +16,9 @@ import { ProfilePreviewComponent } from '@/app/profile/components/profile-previe
   templateUrl: './profile-info.component.html',
 })
 export class ProfileInfoComponent {
-  @Output() public navigateToAuthor = new EventEmitter<number>();
+  @Output() public navigateToAuthor = new EventEmitter<null | string>();
 
-  public currentProfile = input.required<null | ProfilesResponse>();
-  public isMyPage = input.required<boolean>();
-  public navigationItems = input.required<MenuItem[]>();
+  public currentProfile = input.required<null | ProfileResponse>();
+  public isMyPage = input<boolean>(true);
+  public navigationItems = input<MenuItem[]>([]);
 }

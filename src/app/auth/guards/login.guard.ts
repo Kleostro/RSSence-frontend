@@ -4,7 +4,7 @@ import { WA_LOCAL_STORAGE } from '@ng-web-apis/common';
 
 import { catchError, map, of } from 'rxjs';
 
-import { UserService } from '@/app/auth/services/user/user.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { STORE_KEYS } from '@/app/constants/store-keys';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 
@@ -22,9 +22,9 @@ export const loginGuard: CanActivateFn = () => {
 
 export const meGuard: CanActivateFn = () => {
   const router = inject(Router);
-  const userService = inject(UserService);
+  const usersService = inject(UsersService);
 
-  return userService.getMe().pipe(
+  return usersService.getMe().pipe(
     map((me) => {
       if (me) {
         return true;

@@ -2,12 +2,14 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
-import { PaginatedPostResponse, PostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
 import { NewPost } from '@/app/post/interfaces/post-form';
+import { MESSAGE } from '@/app/shared/services/constants/message';
+import { MessageService } from '@/app/shared/services/message/message.service';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -15,19 +17,35 @@ import { ENVIRONMENT } from '@/environment/environment';
 })
 export class PostsService {
   private readonly http = inject(HttpClient);
+  private readonly message = inject(MessageService);
 
   public createPost(post: NewPost): Observable<PostResponse> {
-    return this.http.post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post);
+    return this.http.post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post).pipe(
+      tap(() => {
+        this.message.success(MESSAGE.CREATE_POST_SUCCESS);
+      }),
+    );
   }
 
   public deletePost(postId: number): Observable<PostResponse> {
-    return this.http.delete<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
+    return this.http.delete<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`).pipe(
+      tap(() => {
+        this.message.success(MESSAGE.DELETE_POST_SUCCESS);
+      }),
+    );
   }
 
-  public getAllPosts(query?: PaginationQueryDto): Observable<PaginatedPostResponse> {
-    return this.http.get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, {
-      params: { ...query },
-    });
+  public getAllPosts(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
+    return this.http
+      .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, {
+        params: { ...query },
+      })
+      .pipe(
+        map((response: PaginatedPostResponse) => {
+          const { data, success } = PaginatedPostResponseSchema.safeParse(response);
+          return success ? data : null;
+        }),
+      );
   }
 
   public getPostById(postId: number): Observable<PostResponse> {
@@ -35,6 +53,10 @@ export class PostsService {
   }
 
   public updatePost(post: FormData): Observable<PostResponse> {
-    return this.http.patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post);
+    return this.http.patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post).pipe(
+      tap(() => {
+        this.message.success(MESSAGE.UPDATE_POST_SUCCESS);
+      }),
+    );
   }
 }

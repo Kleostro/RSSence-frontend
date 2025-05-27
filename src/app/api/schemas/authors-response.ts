@@ -9,14 +9,14 @@ export const AuthorSchema = z.object({
   firstname: z.string(),
   id: z.number(),
   lastname: z.string(),
+  profileUsername: z.string().nullable(),
   updatedAt: z.string(),
-  userId: z.number(),
   username: z.string(),
 });
 export type AuthorResponse = z.infer<typeof AuthorSchema>;
 
 export const PaginatedAuthorResponseSchema = PaginationResponseSchema(AuthorSchema);
-export type PaginatedAuthorResponse = PaginationResponse<z.infer<typeof AuthorSchema>>;
+export type PaginatedAuthorResponse = PaginationResponse<typeof AuthorSchema>;
 
 export const hasKeyInAuthorResponse = (key: string): key is keyof AuthorResponse => {
   const keys: string[] = AuthorSchema.keyof().options;

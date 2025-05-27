@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ProfileBioComponent } from '@/app/profile/components/profile-bio/profile-bio.component';
 import { ProfileHeaderComponent } from '@/app/profile/components/profile-header/profile-header.component';
 
@@ -12,5 +12,5 @@ import { ProfileHeaderComponent } from '@/app/profile/components/profile-header/
   templateUrl: './profile-preview.component.html',
 })
 export class ProfilePreviewComponent {
-  public profile = input.required<null | ProfilesResponse>();
+  public profile = input.required<null | ProfileResponse>();
 }

@@ -1,10 +1,18 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, input, linkedSignal, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  input,
+  linkedSignal,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
 
 import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
-import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';
 
@@ -15,11 +23,10 @@ import { PostComponent } from '@/app/post/components/post/post.component';
   styleUrl: './posts-list.component.scss',
   templateUrl: './posts-list.component.html',
 })
-export class PostsListComponent {
+export class PostsListComponent implements OnInit {
   @Output() public pageChangeEvent = new EventEmitter<PaginatorState>();
-  public readonly authorService = inject(AuthorService);
+  @Output() public postDeleteEvent = new EventEmitter<unknown>();
   public readonly navigationService = inject(NavigationService);
-
   public first = 0;
 
   public paginatedPostResponse = input<null | PaginatedPostResponse>(null);
@@ -28,6 +35,12 @@ export class PostsListComponent {
     computation: () => true,
     source: this.paginatedPostResponse,
   });
+
+  public isShowPostActions = input<boolean>(true);
+
+  public ngOnInit(): void {
+    this.isPostsLoaded.set(false);
+  }
 
   public onPageChange(event: PaginatorState): void {
     this.first = event.first ?? 0;

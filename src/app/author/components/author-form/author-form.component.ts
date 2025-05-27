@@ -17,13 +17,14 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse, hasKeyInAuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
 import { AuthorForm } from '@/app/author/interfaces/author-form';
-import { AuthorService } from '@/app/author/services/author/author.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
@@ -49,13 +50,14 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
   templateUrl: './author-form.component.html',
 })
 export class AuthorFormComponent implements OnDestroy, OnInit {
-  private readonly authorService = inject(AuthorService);
+  private readonly authorsService = inject(AuthorsService);
   private readonly avatarFile = signal<File | null>(null);
   private readonly destroy$ = new Subject<void>();
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly message = inject(MessageService);
   private readonly updatedAuthor = signal<AuthorResponse | null>(null);
+  private readonly usersService = inject(UsersService);
 
   @Input() public author: AuthorResponse | null = null;
   @Output() public backToAuthorPageEvent = new EventEmitter<void>();
@@ -109,22 +111,26 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
     }
   }
 
-  private handleFormSubmit(): void {
-    const formData = this.createFormData();
-    const action$ = this.author ? this.authorService.updateAuthor(formData) : this.authorService.createAuthor(formData);
+  private handleFormSubmit(formData: FormData): void {
+    const username = this.author?.username ?? '';
+    const action$ = this.author
+      ? this.authorsService.updateAuthor(username, formData)
+      : this.authorsService.createAuthor(formData);
 
     action$
       .pipe(
         takeUntil(this.destroy$),
+        tap((newOrUpdatedAuthor) => {
+          this.formSubmitEvent.emit(newOrUpdatedAuthor);
+        }),
+        switchMap(() => this.usersService.getMe()),
         catchError((error: OverriddenHttpErrorResponse) => {
           this.message.error(error.error.message);
           this.enableForm();
           return EMPTY;
         }),
       )
-      .subscribe((newOrUpdatedAuthor) => {
-        this.formSubmitEvent.emit(newOrUpdatedAuthor);
-      });
+      .subscribe();
   }
 
   private initForm(initialValues?: AuthorResponse | null): void {
@@ -153,7 +159,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
           Validators.minLength(this.AUTHOR_FORM_FIELD_CONFIG.username.min),
           Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.username.max),
         ],
-        [usernameAvailability(this.authorService, this.author?.username ?? null)],
+        [usernameAvailability(this.authorsService, this.author?.username ?? null)],
       ],
     });
   }
@@ -179,8 +185,8 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
       firstname,
       id: this.author?.id ?? 0,
       lastname,
+      profileUsername: this.author?.profileUsername ?? null,
       updatedAt: this.author?.updatedAt ?? '',
-      userId: this.author?.userId ?? 0,
       username,
     });
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());
@@ -226,12 +232,12 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
     }
 
     this.disableForm();
-
+    const formData = this.createFormData();
     if (this.author && !this.hasChanges()) {
       this.backToAuthorPageEvent.emit();
       return;
     }
 
-    this.handleFormSubmit();
+    this.handleFormSubmit(formData);
   }
 }

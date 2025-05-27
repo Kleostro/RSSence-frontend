@@ -1,8 +1,17 @@
 .post {
   position: relative;
+
   padding: 1rem;
   border-radius: 0.5rem;
+
   background-color: var(--p-surface-800);
+
+  transition: opacity 0.3s;
+
+  &-processing {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 
   &-header {
     display: flex;

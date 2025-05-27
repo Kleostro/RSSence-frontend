@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 
-import { loginGuard, meGuard } from '@/app/auth/guards/login.guard';
+import { authGuard, loginGuard, meGuard } from '@/app/auth/guards/login.guard';
+import { authorResolver, meAuthorResolver } from '@/app/author/resolvers/author.resolver';
 import { APP_PATH } from '@/app/core/services/navigation/routes';
+import { meProfileResolver, profileResolver } from '@/app/profile/resolvers/profile.resolver';
 
 export const routes: Routes = [
   {
@@ -24,45 +26,33 @@ export const routes: Routes = [
     title: `RSS | ${APP_PATH.SIGN_UP}`,
   },
   {
-    canActivate: [meGuard],
-    loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
+    canActivate: [authGuard],
+    loadComponent: () => import('./profile/pages/me-profile/me-profile.component').then((c) => c.MeProfileComponent),
     path: APP_PATH.PROFILE.toLowerCase(),
-    pathMatch: 'full',
-    title: `RSS | ${APP_PATH.PROFILE}`,
+    resolve: { profile: meProfileResolver },
   },
   {
-    canActivate: [meGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
     path: `${APP_PATH.PROFILE.toLowerCase()}/:id`,
-    pathMatch: 'full',
-    title: `RSS | ${APP_PATH.PROFILE}`,
+    resolve: { profile: profileResolver },
   },
   {
-    canActivate: [meGuard],
-    loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
+    canActivate: [authGuard],
+    loadComponent: () => import('./author/pages/me-author/me-author.component').then((c) => c.MeAuthorComponent),
     path: APP_PATH.AUTHOR.toLowerCase(),
-    pathMatch: 'full',
-    title: `RSS | ${APP_PATH.AUTHOR}`,
+    resolve: { author: meAuthorResolver },
   },
   {
-    canActivate: [meGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
     path: `${APP_PATH.AUTHOR.toLowerCase()}/:id`,
-    pathMatch: 'full',
-    title: `RSSence | ${APP_PATH.AUTHOR}`,
-  },
-  {
-    canActivate: [meGuard],
-    loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
-    path: `${APP_PATH.AUTHOR.toLowerCase()}/:id/${APP_PATH.POSTS.toLowerCase()}`,
-    pathMatch: 'full',
-    title: `RSSence | ${APP_PATH.AUTHOR} | ${APP_PATH.POSTS}`,
+    resolve: { author: authorResolver },
   },
   {
     canActivate: [meGuard],
     loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
     path: APP_PATH.POSTS.toLowerCase(),
-    pathMatch: 'full',
     title: `RSS | ${APP_PATH.POSTS}`,
   },
   {

@@ -1,41 +1,63 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import hljs from 'highlight.js';
 import * as marked from 'marked';
+import { MenuItemCommandEvent } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { SpeedDialModule } from 'primeng/speeddial';
+import { finalize, Subject, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
-import { UserService } from '@/app/auth/services/user/user.service';
-import { AuthorService } from '@/app/author/services/author/author.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
+import { UsersService } from '@/app/api/services/users/users.service';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
-import { PostService } from '@/app/post/services/post/post.service';
+import { getPostActions } from '@/app/post/constants/post-actions';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CoauthorsListComponent, NgIf, ButtonModule, RippleModule, PostAvatarComponent],
+  imports: [CoauthorsListComponent, NgIf, ButtonModule, RippleModule, PostAvatarComponent, SpeedDialModule],
   selector: 'app-post',
   styleUrl: './post.component.scss',
   templateUrl: './post.component.html',
 })
 export class PostComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
-  private readonly postService = inject(PostService);
+  private readonly navigationService = inject(NavigationService);
+  private readonly postsService = inject(PostsService);
+  @Output() public postDeleteEvent = new EventEmitter<unknown>();
   public readonly sanitizer = inject(DomSanitizer);
-
-  public readonly userService = inject(UserService);
-  public authorService = inject(AuthorService);
+  public readonly usersService = inject(UsersService);
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
-  public isShowPostActions = signal<boolean>(true);
+  public isShowPostActions = input<boolean>(true);
   public mode = signal<'full' | 'preview'>('preview');
   public post = input.required<null | PostResponse>();
 
+  public postActionsItems = getPostActions(
+    (event: MenuItemCommandEvent) => {
+      event.originalEvent?.stopPropagation();
+    },
+    (event: MenuItemCommandEvent) => {
+      event.originalEvent?.stopPropagation();
+      this.deletePost();
+    },
+  );
   public safeHtml = signal<SafeHtml>('');
 
   constructor() {
@@ -82,13 +104,23 @@ export class PostComponent implements OnDestroy, OnInit {
         `;
   }
 
-  // TBD: fix deleting a post on the detailed page of a post
-  public deletePost(post: PostResponse): void {
+  public deletePost(): void {
+    const post = this.post();
+    if (!post) {
+      return;
+    }
     this.isProcessing.set(true);
-    this.postService
+    this.postsService
       .deletePost(post.id)
       .pipe(
         takeUntil(this.destroy$),
+        tap(() => {
+          if (this.navigationService.isPostDetailedPage()) {
+            this.navigationService.goBack();
+          } else {
+            this.postDeleteEvent.emit();
+          }
+        }),
         finalize(() => {
           this.isProcessing.set(false);
         }),
@@ -103,8 +135,8 @@ export class PostComponent implements OnDestroy, OnInit {
   public getCoauthors(): AuthorResponse[] {
     return (
       this.post()
-        ?.authors.filter((author) => !author.isMainAuthor)
-        .map((author) => author.author) ?? []
+        ?.authors.filter((postAuthor) => !postAuthor.isMainAuthor)
+        .map((postAuthor) => postAuthor.author) ?? []
     );
   }
 

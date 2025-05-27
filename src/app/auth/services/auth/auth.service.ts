@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, Observable, switchMap, take, tap } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, tap } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
@@ -10,7 +10,7 @@ import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
 import { SignUpService } from '@/app/api/services/sign-up/sign-up.service';
 import { TokenService } from '@/app/api/services/token/token.service';
-import { UserService } from '@/app/auth/services/user/user.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
@@ -26,7 +26,7 @@ export class AuthService {
   private readonly refreshTokenService = inject(RefreshTokenService);
   private readonly signUpService = inject(SignUpService);
   private readonly tokenService = inject(TokenService);
-  private readonly userService = inject(UserService);
+  private readonly usersService = inject(UsersService);
 
   public isUserLoggedIn = signal(false);
 
@@ -53,7 +53,6 @@ export class AuthService {
 
   public login({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
     return this.loginService.login(email, password).pipe(
-      take(1),
       tap((data) => {
         this.handleAuthSuccess(data);
         this.navigationService.navigateToHome();
@@ -64,10 +63,9 @@ export class AuthService {
 
   public logout(): Observable<LogoutResponse> {
     return this.logoutService.logout().pipe(
-      take(1),
       tap(() => {
         this.isUserLoggedIn.set(false);
-        this.userService.me.set(null);
+        this.usersService.me.set(null);
         this.tokenService.removeToken();
         this.navigationService.navigateToLogin();
         this.message.success(MESSAGE.LOGOUT_SUCCESS);
@@ -81,7 +79,6 @@ export class AuthService {
 
   public refreshToken(): Observable<AuthResponse> {
     return this.refreshTokenService.refreshToken().pipe(
-      take(1),
       tap((data) => {
         this.handleAuthSuccess(data);
       }),
@@ -97,7 +94,6 @@ export class AuthService {
 
   public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
     return this.signUpService.register(email, password).pipe(
-      take(1),
       tap(() => {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),

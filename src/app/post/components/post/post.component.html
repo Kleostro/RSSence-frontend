@@ -1,9 +1,8 @@
 @let post = this.post();
-@let isSHhowPostAction =
-  this.isShowPostActions() && this.userService.me()?.author?.id === this.getAuthor()?.id && this.mode() === 'full';
+@let isSHhowPostAction = this.isShowPostActions() && this.usersService.me()?.author?.id === this.getAuthor()?.id;
 
 @if (post) {
-  <div class="post">
+  <div class="post" [class.post-processing]="isProcessing()">
     <header class="post-header">
       <app-post-avatar [post]="post" [author]="this.getAuthor()" />
 
@@ -12,32 +11,15 @@
       </div>
 
       <div class="post-actions">
-        <button
+        <p-speeddial
           *ngIf="isSHhowPostAction"
-          class="post-edit-btn"
-          pButton
-          pRipple
-          type="button"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
-          severity="success"
-          outlined="true"
-          rounded="true"
           [disabled]="isProcessing()"
-          (click)="$event.stopPropagation()"
-        ></button>
-        <button
-          *ngIf="isSHhowPostAction"
-          class="post-delete-btn"
-          pButton
-          pRipple
-          type="button"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-          severity="danger"
-          outlined="true"
-          rounded="true"
-          [disabled]="isProcessing()"
-          (click)="$event.stopPropagation(); this.deletePost(post)"
-        ></button>
+          (onClick)="$event.stopPropagation()"
+          [model]="postActionsItems"
+          direction="left"
+          [buttonProps]="{ severity: 'primary', outlined: true }"
+          [tooltipOptions]="{ tooltipPosition: 'bottom' }"
+        />
 
         <button
           pButton

@@ -16,11 +16,11 @@
       pRipple
       type="button"
       class="move-to-profile-button"
-      (click)="navigateToProfile.emit(currentAuthor?.userId)"
       label="Profile"
       icon="pi pi-user"
       severity="info"
       outlined="true"
+      (click)="navigateToProfile.emit(currentAuthor?.profileUsername)"
     />
   }
   <app-author-preview [author]="currentAuthor" />

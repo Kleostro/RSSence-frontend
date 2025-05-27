@@ -1,5 +1,14 @@
 import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -10,15 +19,15 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, take, tap } from 'rxjs';
+import { finalize, map, Subject, take, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse, PaginatedAuthorResponseSchema } from '@/app/api/schemas/authors-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
-import { UserService } from '@/app/auth/services/user/user.service';
-import { AuthorService } from '@/app/author/services/author/author.service';
+import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
 import { CoauthorsFGType, NewPost, PostForm } from '@/app/post/interfaces/post-form';
-import { PostService } from '@/app/post/services/post/post.service';
 
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -44,11 +53,12 @@ interface AutoCompleteCompleteEvent {
   styleUrl: './post-form.component.scss',
   templateUrl: './post-form.component.html',
 })
-export class PostFormComponent implements OnInit {
-  private readonly authorService = inject(AuthorService);
+export class PostFormComponent implements OnDestroy, OnInit {
+  private readonly authorsService = inject(AuthorsService);
+  private readonly destroy$ = new Subject<void>();
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly postService = inject(PostService);
-  private readonly userService = inject(UserService);
+  private readonly postsService = inject(PostsService);
+  private readonly usersService = inject(UsersService);
 
   @Output() public createPostEvent = new EventEmitter<PostResponse>();
 
@@ -82,7 +92,7 @@ export class PostFormComponent implements OnInit {
   }
 
   private sendPost(postData: NewPost): void {
-    this.postService
+    this.postsService
       .createPost(postData)
       .pipe(
         take(1),
@@ -110,18 +120,16 @@ export class PostFormComponent implements OnInit {
 
   public filterAuthors(event: AutoCompleteCompleteEvent): void {
     const query = event.query.toLowerCase();
+    const authorMeId = this.usersService.me()?.author?.id;
 
-    this.authorService
+    this.authorsService
       .getAuthors({ search: query, searchField: 'username' })
       .pipe(
+        take(1),
+        takeUntil(this.destroy$),
         tap((response) => {
-          const result = PaginatedAuthorResponseSchema.safeParse(response);
-          const authorMeId = this.userService.me()?.author?.id;
-          if (result.success) {
-            this.filteredAuthors.set(result.data.items.filter((author) => author.id !== authorMeId));
-          } else {
-            this.filteredAuthors.set([]);
-          }
+          const { data, success } = PaginatedAuthorResponseSchema.safeParse(response);
+          this.filteredAuthors.set(success ? data.items.filter((author) => author.id !== authorMeId) : []);
         }),
       )
       .subscribe();
@@ -134,6 +142,11 @@ export class PostFormComponent implements OnInit {
       content: this.fb.control<null | string>(''),
       title: this.fb.control<string>('', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public ngOnInit(): void {

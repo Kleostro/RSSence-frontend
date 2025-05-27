@@ -7,7 +7,7 @@ export const PostSchema = z.object({
   authors: z.array(
     z.object({
       author: AuthorSchema,
-      authorId: z.number(),
+      authorUsername: z.string(),
       isMainAuthor: z.boolean(),
       postId: z.number(),
     }),
@@ -21,4 +21,4 @@ export const PostSchema = z.object({
 export type PostResponse = z.infer<typeof PostSchema>;
 
 export const PaginatedPostResponseSchema = PaginationResponseSchema(PostSchema);
-export type PaginatedPostResponse = PaginationResponse<z.infer<typeof PostSchema>>;
+export type PaginatedPostResponse = PaginationResponse<typeof PostSchema>;

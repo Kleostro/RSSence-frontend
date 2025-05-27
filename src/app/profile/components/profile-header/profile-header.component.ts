@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { AvatarModule } from 'primeng/avatar';
 
-import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
+import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,5 +13,5 @@ import { ProfilesResponse } from '@/app/api/schemas/profiles-response';
   templateUrl: './profile-header.component.html',
 })
 export class ProfileHeaderComponent {
-  public profile = input.required<null | ProfilesResponse>();
+  public profile = input.required<null | ProfileResponse>();
 }

@@ -5,10 +5,9 @@ import { RippleModule } from 'primeng/ripple';
 import { Subject, takeUntil, tap } from 'rxjs';
 
 import { PostResponse } from '@/app/api/schemas/posts-response';
-import { AuthorService } from '@/app/author/services/author/author.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';
-import { PostService } from '@/app/post/services/post/post.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,9 +18,7 @@ import { PostService } from '@/app/post/services/post/post.service';
 })
 export class PostDetailedComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
-  private readonly postService = inject(PostService);
-
-  public readonly authorService = inject(AuthorService);
+  private readonly postsService = inject(PostsService);
   public readonly navigationService = inject(NavigationService);
 
   public currentPost = signal<null | PostResponse | undefined>(undefined);
@@ -35,7 +32,7 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     const postId = this.postId();
     if (postId) {
-      this.postService
+      this.postsService
         .getPostById(+postId)
         .pipe(
           takeUntil(this.destroy$),

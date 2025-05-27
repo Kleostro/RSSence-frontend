@@ -1,61 +1,16 @@
 @let currentAuthor = this.currentAuthor();
-@let isMyPage = this.isMyPage();
-@let isAuthorFormStateUpdate = this.authorFormState() === FORM_STATE.UPDATE;
-@let isPageLoading = this.loaderService.isPageLoading();
-@let allAuthorPostsLink = APP_ROUTE.AUTHOR + '/' + this.currentAuthor()?.userId + APP_ROUTE.POSTS;
-@if (isPageLoading) {
-  <app-page-loader />
-} @else {
-  <div class="page">
-    @if ((isMyPage && !currentAuthor) || isAuthorFormStateUpdate) {
-      <app-author-form-wrapper
-        [currentAuthor]="currentAuthor"
-        [authorForPreview]="authorForPreview()"
-        (backToAuthorPage)="authorFormState.set(FORM_STATE.CREATE)"
-        (formSubmit)="handleAuthorFormSubmit($event)"
-        (updateAuthorForPreview)="authorForPreview.set($event)"
-      />
-    } @else {
-      <div class="author-info">
-        <app-author-info
-          [isMyPage]="isMyPage"
-          [currentAuthor]="currentAuthor"
-          [navigationItems]="navigationItems"
-          (navigateToProfile)="navigationService.navigateToProfileByUserId($event)"
-        />
-      </div>
-      <div class="author-actions">
-        <button
-          pButton
-          pRipple
-          [routerLink]="allAuthorPostsLink"
-          type="button"
-          class="post-form-button"
-          icon="pi pi-arrow-right"
-          severity="primary"
-          label="See all posts"
-        ></button>
-        <button
-          pButton
-          pRipple
-          *ngIf="this.isMyPage()"
-          type="button"
-          class="post-form-button"
-          icon="pi pi-plus"
-          severity="primary"
-          label="Create new post"
-          (click)="this.setParamsInModal(); this.modalService.openModal(postForm, 'Create new post')"
-        ></button>
-      </div>
 
-      <app-posts-list
-        [paginatedPostResponse]="this.paginatedPostResponse()"
-        (pageChangeEvent)="this.handlePageChangeEvent($event)"
-      />
-    }
+<div class="page">
+  <div class="author-info">
+    <app-author-info
+      [isMyPage]="false"
+      [currentAuthor]="currentAuthor"
+      (navigateToProfile)="navigationService.navigateToProfileByUsername($event)"
+    />
   </div>
-}
 
-<ng-template #postForm>
-  <app-post-form (createPostEvent)="this.onCreatePost()" />
-</ng-template>
+  <app-posts-list
+    [paginatedPostResponse]="this.paginatedPostResponse()"
+    (pageChangeEvent)="this.handlePageChangeEvent($event)"
+  />
+</div>
