@@ -1,6 +1,8 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-export type CoauthorsFGType = FormGroup<{ coauthor: FormControl<string> }>;
+import { AuthorResponse } from '@/app/api/schemas/authors-response';
+
+export type CoauthorsFGType = FormGroup<{ coauthor: FormControl<AuthorResponse | null> }>;
 
 export interface NewPost {
   coauthorIds: number[];

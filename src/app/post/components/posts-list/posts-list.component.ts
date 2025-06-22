@@ -25,7 +25,7 @@ import { PostComponent } from '@/app/post/components/post/post.component';
 })
 export class PostsListComponent implements OnInit {
   @Output() public pageChangeEvent = new EventEmitter<PaginatorState>();
-  @Output() public postDeleteEvent = new EventEmitter<unknown>();
+  @Output() public postEvent = new EventEmitter();
   public readonly navigationService = inject(NavigationService);
   public first = 0;
 
@@ -39,7 +39,7 @@ export class PostsListComponent implements OnInit {
   public isShowPostActions = input<boolean>(true);
 
   public ngOnInit(): void {
-    this.isPostsLoaded.set(false);
+    this.isPostsLoaded.set(true);
   }
 
   public onPageChange(event: PaginatorState): void {

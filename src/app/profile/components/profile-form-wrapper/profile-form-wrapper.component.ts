@@ -17,5 +17,5 @@ export class ProfileFormWrapperComponent {
   @Output() public updateProfileForPreview = new EventEmitter<null | ProfileResponse>();
 
   public currentProfile = input.required<null | ProfileResponse>();
-  public profileForPreview = input.required<null | ProfileResponse>();
+  public previewProfile = input.required<null | ProfileResponse>();
 }

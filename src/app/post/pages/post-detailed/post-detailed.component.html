@@ -13,6 +13,6 @@
   />
 
   @if (post !== undefined) {
-    <app-post [post]="post" />
+    <app-post [post]="post" (postFormEvent)="this.getCurrentPost()" />
   }
 </div>

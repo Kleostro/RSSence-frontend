@@ -33,7 +33,8 @@
     </div>
 
     <app-posts-list
-      (postDeleteEvent)="this.onPostDelete()"
+      class="posts-list"
+      (postEvent)="this.handlePostEvent()"
       [paginatedPostResponse]="this.paginatedPostResponse()"
       (pageChangeEvent)="this.handlePageChangeEvent($event)"
     />
@@ -41,5 +42,5 @@
 </div>
 
 <ng-template #postForm>
-  <app-post-form (createPostEvent)="this.onCreatePost()" />
+  <app-post-form (formSubmitEvent)="this.onCreatePost()" />
 </ng-template>

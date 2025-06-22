@@ -52,3 +52,7 @@
     <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
   </div>
 }
+
+<ng-template #postForm>
+  <app-post-form [post]="post" (formSubmitEvent)="this.handlePostFormSubmit()" />
+</ng-template>

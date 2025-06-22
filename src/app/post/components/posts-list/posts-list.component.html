@@ -22,7 +22,8 @@
       <app-post
         [post]="post"
         [isShowPostActions]="isShowPostActions()"
-        (postDeleteEvent)="this.postDeleteEvent.emit()"
+        (postDeleteEvent)="this.postEvent.emit()"
+        (postFormEvent)="this.postEvent.emit()"
       />
     </div>
   } @empty {

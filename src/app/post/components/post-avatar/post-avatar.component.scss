@@ -1,5 +1,7 @@
 :host {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  margin-right: auto;
 }
 
 .post-avatar-img {
@@ -20,8 +22,15 @@
   }
 }
 
-.post-createdAt {
-  margin-right: auto;
+.author-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.post-createdAt,
+.post-updatedAt {
+  margin-top: 0.5rem;
   font-size: 0.9rem;
   color: var(--p-text-muted-color);
   letter-spacing: 0.05rem;

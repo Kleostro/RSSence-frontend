@@ -1,15 +1,18 @@
 @let post = this.post();
 @let author = this.author();
 
-<p-avatar
-  shape="circle"
-  class="post-avatar-img"
-  [image]="author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
-  size="normal"
-  [routerLink]="['/author', author?.username]"
-  (click)="$event.stopPropagation()"
-/>
-<a [routerLink]="['/author', author?.username]" class="post-author-link" (click)="$event.stopPropagation()">{{
-  author?.username
-}}</a>
-<span class="post-createdAt">{{ post.createdAt | date: 'medium' }}</span>
+<div class="author-info">
+  <p-avatar
+    shape="circle"
+    class="post-avatar-img"
+    [image]="author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+    size="normal"
+    [routerLink]="['/author', author?.username]"
+    (click)="$event.stopPropagation()"
+  />
+  <a [routerLink]="['/author', author?.username]" class="post-author-link" (click)="$event.stopPropagation()">{{
+    author?.username
+  }}</a>
+</div>
+<span class="post-createdAt">Creation: {{ post.createdAt | date: 'medium' }}</span>
+<span class="post-updatedAt">Last update: {{ post.updatedAt | date: 'medium' }}</span>

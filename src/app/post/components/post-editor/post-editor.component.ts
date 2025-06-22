@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, sig
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import hljs from 'highlight.js';
 import * as marked from 'marked';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,6 +11,7 @@ import { tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { ImageUploadService } from '@/app/shared/services/image-upload/image-upload.service';
+import { configurePostMarked } from '@/app/utils/configure-post-marked';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Component({
@@ -35,7 +35,6 @@ export class PostEditorComponent implements ControlValueAccessor {
   private _onChange!: (_: unknown) => void;
   private _value = '';
   private textarea = viewChild.required<ElementRef<HTMLTextAreaElement>>('textarea');
-
   private uploadedImages = new Set<string>();
 
   public formControlName = signal<string>('');
@@ -51,7 +50,7 @@ export class PostEditorComponent implements ControlValueAccessor {
   public previewHtml = signal<SafeHtml>('');
 
   constructor() {
-    this.configureMarked();
+    configurePostMarked();
   }
 
   private cleanupUnusedImages(): void {
@@ -63,18 +62,6 @@ export class PostEditorComponent implements ControlValueAccessor {
         .deleteImage(url)
         .pipe(tap(() => this.uploadedImages.delete(url)))
         .subscribe();
-    });
-  }
-
-  private configureMarked(): void {
-    marked.use({
-      breaks: true,
-      gfm: true,
-      pedantic: false,
-      renderer: {
-        code: this.renderCodeBlock.bind(this),
-        image: this.renderImage.bind(this),
-      },
     });
   }
 
@@ -111,28 +98,6 @@ export class PostEditorComponent implements ControlValueAccessor {
         )
         .subscribe();
     }
-  }
-
-  private renderCodeBlock(token: marked.Tokens.Code): string {
-    const validLanguage = token.lang && hljs.getLanguage(token.lang) ? token.lang : 'plaintext';
-    return `
-      <pre>
-        <code class="hljs ${token.lang ?? 'text'}">
-          ${hljs.highlight(token.text, { language: validLanguage }).value}
-        </code>
-      </pre>
-    `;
-  }
-
-  private renderImage(token: marked.Tokens.Image): string {
-    return `
-      <img
-        style="max-width: 100%; height: auto;"
-        src="${token.href}"
-        alt="${token.text}"
-        title="${token.title ?? token.text}""
-      />
-    `;
   }
 
   public clearContent(): void {
@@ -209,6 +174,7 @@ export class PostEditorComponent implements ControlValueAccessor {
   public set value(value: string) {
     if (value !== this._value) {
       this._value = value;
+      this.markdownContent.set(value);
       this._onChange(value);
     }
   }
