@@ -1,9 +1,9 @@
 @let currentProfile = this.currentProfile();
-@let profileForPreview = this.profileForPreview();
+@let previewProfile = this.previewProfile();
 
 <div class="profile-form-wrapper">
   <div class="profile-form-preview">
-    <app-profile-preview [profile]="profileForPreview" />
+    <app-profile-preview [profile]="previewProfile" />
   </div>
   <div class="profile-form-form">
     <app-profile-form

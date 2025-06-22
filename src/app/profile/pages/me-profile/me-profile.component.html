@@ -5,7 +5,7 @@
   @if (!currentProfile || isProfileFormStateUpdate) {
     <app-profile-form-wrapper
       [currentProfile]="currentProfile"
-      [profileForPreview]="previewProfile()"
+      [previewProfile]="previewProfile()"
       (backToProfilePage)="profileFormState.set(FORM_STATE.CREATE)"
       (formSubmit)="handleProfileFormSubmit($event)"
       (updateProfileForPreview)="previewProfile.set($event)"

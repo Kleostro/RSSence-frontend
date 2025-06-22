@@ -2,6 +2,7 @@ import { NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   EventEmitter,
   inject,
   input,
@@ -9,10 +10,11 @@ import {
   OnInit,
   Output,
   signal,
+  TemplateRef,
+  viewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import hljs from 'highlight.js';
 import * as marked from 'marked';
 import { MenuItemCommandEvent } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -27,20 +29,34 @@ import { UsersService } from '@/app/api/services/users/users.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
+import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { getPostActions } from '@/app/post/constants/post-actions';
+import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
+import { ModalService } from '@/app/shared/services/modal/modal.service';
+import { configurePostMarked } from '@/app/utils/configure-post-marked';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CoauthorsListComponent, NgIf, ButtonModule, RippleModule, PostAvatarComponent, SpeedDialModule],
+  imports: [
+    CoauthorsListComponent,
+    NgIf,
+    ButtonModule,
+    RippleModule,
+    PostAvatarComponent,
+    SpeedDialModule,
+    PostFormComponent,
+  ],
   selector: 'app-post',
   styleUrl: './post.component.scss',
   templateUrl: './post.component.html',
 })
 export class PostComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
+  private readonly modalService = inject(ModalService);
   private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
   @Output() public postDeleteEvent = new EventEmitter<unknown>();
+  @Output() public postFormEvent = new EventEmitter<unknown>();
   public readonly sanitizer = inject(DomSanitizer);
   public readonly usersService = inject(UsersService);
   public isProcessing = signal<boolean>(false);
@@ -48,10 +64,13 @@ export class PostComponent implements OnDestroy, OnInit {
   public isShowPostActions = input<boolean>(true);
   public mode = signal<'full' | 'preview'>('preview');
   public post = input.required<null | PostResponse>();
+  public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
 
   public postActionsItems = getPostActions(
     (event: MenuItemCommandEvent) => {
       event.originalEvent?.stopPropagation();
+      this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
+      this.modalService.openModal(this.postForm(), `Update post: ${this.post()?.title}`);
     },
     (event: MenuItemCommandEvent) => {
       event.originalEvent?.stopPropagation();
@@ -61,47 +80,21 @@ export class PostComponent implements OnDestroy, OnInit {
   public safeHtml = signal<SafeHtml>('');
 
   constructor() {
-    this.configureMarked();
-  }
-
-  private configureMarked(): void {
-    marked.use({
-      breaks: true,
-      gfm: true,
-      pedantic: false,
-      renderer: {
-        code: this.renderCodeBlock.bind(this),
-        image: this.renderImage.bind(this),
-      },
+    effect(() => {
+      this.parseHtml();
     });
+
+    configurePostMarked();
+
+    if (this.navigationService.isPostDetailedPage()) {
+      this.mode.set('full');
+    }
   }
 
   private async parseHtml(): Promise<string> {
     const parsedHtml = await marked.parse(this.post()?.content ?? '');
     this.safeHtml.set(this.sanitizer.bypassSecurityTrustHtml(parsedHtml));
     return parsedHtml;
-  }
-
-  private renderCodeBlock(token: marked.Tokens.Code): string {
-    const validLanguage = token.lang && hljs.getLanguage(token.lang) ? token.lang : 'plaintext';
-    return `
-          <pre>
-            <code class="hljs ${token.lang ?? 'text'}">
-              ${hljs.highlight(token.text, { language: validLanguage }).value}
-            </code>
-          </pre>
-        `;
-  }
-
-  private renderImage(token: marked.Tokens.Image): string {
-    return `
-          <img
-            style="max-width: 100%; height: auto;"
-            src="${token.href}"
-            alt="${token.text}"
-            title="${token.title ?? token.text}""
-          />
-        `;
   }
 
   public deletePost(): void {
@@ -138,6 +131,11 @@ export class PostComponent implements OnDestroy, OnInit {
         ?.authors.filter((postAuthor) => !postAuthor.isMainAuthor)
         .map((postAuthor) => postAuthor.author) ?? []
     );
+  }
+
+  public handlePostFormSubmit(): void {
+    this.modalService.closeModal();
+    this.postFormEvent.emit();
   }
 
   public ngOnDestroy(): void {

@@ -6,7 +6,11 @@ import { map, Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
-import { AuthorResponse, PaginatedAuthorResponse } from '@/app/api/schemas/authors-response';
+import {
+  AuthorResponse,
+  PaginatedAuthorResponse,
+  PaginatedAuthorResponseSchema,
+} from '@/app/api/schemas/authors-response';
 import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
@@ -58,10 +62,17 @@ export class AuthorsService {
       );
   }
 
-  public getAuthors(query?: PaginationQueryDto): Observable<PaginatedAuthorResponse> {
-    return this.http.get<PaginatedAuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, {
-      params: { ...query },
-    });
+  public getAuthors(query?: PaginationQueryDto): Observable<null | PaginatedAuthorResponse> {
+    return this.http
+      .get<PaginatedAuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, {
+        params: { ...query },
+      })
+      .pipe(
+        map((response: PaginatedAuthorResponse) => {
+          const { data, success } = PaginatedAuthorResponseSchema.safeParse(response);
+          return success ? data : null;
+        }),
+      );
   }
 
   public updateAuthor(username: string, author: FormData): Observable<AuthorResponse> {

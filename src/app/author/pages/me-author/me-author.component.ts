@@ -92,6 +92,7 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     this.currentAuthor.set(newOrUpdatedAuthor);
     this.previewAuthor.set(newOrUpdatedAuthor);
     this.authorFormState.set(FORM_STATE.CREATE);
+    this.loadAuthorPosts(newOrUpdatedAuthor.username).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   public handlePageChangeEvent(event: PaginatorState): void {
@@ -105,6 +106,15 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     this.loadAuthorPosts(username, { limit: rows, page: page + 1 })
       .pipe(takeUntil(this.destroy$))
       .subscribe();
+  }
+
+  public handlePostEvent(): void {
+    const username = this.currentAuthor()?.username;
+    if (!username) {
+      return;
+    }
+
+    this.loadAuthorPosts(username).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   public ngOnDestroy(): void {
@@ -135,15 +145,6 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     this.loadAuthorPosts(username, { sortBy: 'createdAt', sortOrder: 'desc' })
       .pipe(takeUntil(this.destroy$))
       .subscribe();
-  }
-
-  public onPostDelete(): void {
-    const username = this.currentAuthor()?.username;
-    if (!username) {
-      return;
-    }
-
-    this.loadAuthorPosts(username).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   public setParamsInModal(): void {

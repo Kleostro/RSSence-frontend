@@ -52,8 +52,8 @@ export class PostsService {
     return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
   }
 
-  public updatePost(post: FormData): Observable<PostResponse> {
-    return this.http.patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post).pipe(
+  public updatePost(postId: number, post: NewPost): Observable<PostResponse> {
+    return this.http.patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`, post).pipe(
       tap(() => {
         this.message.success(MESSAGE.UPDATE_POST_SUCCESS);
       }),

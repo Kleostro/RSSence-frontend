@@ -3,7 +3,7 @@
   <input class="title-input" pInputText fluid="true" id="title" formControlName="title" autocomplete="off" />
 
   <label for="content">Content</label>
-  <app-post-editor formControlName="content" id="content" />
+  <app-post-editor #postEditor formControlName="content" id="content" />
 
   <div class="multiple-select">
     <ng-container formArrayName="coauthors">
@@ -71,7 +71,7 @@
       pRipple
       type="submit"
       fluid="true"
-      [label]="isProcessing() ? 'Posting...' : 'Post'"
+      [label]="this.getSubmitButtonLabel()"
       [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
       [disabled]="form.invalid || isProcessing()"
       severity="success"

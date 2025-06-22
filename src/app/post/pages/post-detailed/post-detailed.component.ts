@@ -24,12 +24,7 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
   public currentPost = signal<null | PostResponse | undefined>(undefined);
   public postId = input<null | string>(null, { alias: 'id' });
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public ngOnInit(): void {
+  public getCurrentPost(): void {
     const postId = this.postId();
     if (postId) {
       this.postsService
@@ -42,5 +37,14 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
         )
         .subscribe();
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  public ngOnInit(): void {
+    this.getCurrentPost();
   }
 }
