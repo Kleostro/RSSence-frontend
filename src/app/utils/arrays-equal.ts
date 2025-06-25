@@ -1,4 +1,4 @@
-export const arraysEqual = (a: number[], b: number[]): boolean => {
+export const arraysEqual = (a: unknown[], b: unknown[]): boolean => {
   if (a.length !== b.length) {
     return false;
   }

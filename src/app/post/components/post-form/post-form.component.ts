@@ -4,7 +4,7 @@ import {
   Component,
   EventEmitter,
   inject,
-  Input,
+  input,
   OnDestroy,
   OnInit,
   Output,
@@ -58,19 +58,19 @@ export class PostFormComponent implements OnDestroy, OnInit {
   private readonly postsService = inject(PostsService);
   private readonly usersService = inject(UsersService);
   @Output() public formSubmitEvent = new EventEmitter<PostResponse>();
-  @Input() public post: null | PostResponse = null;
   public filteredAuthors = signal<AuthorResponse[]>([]);
   public form!: FormGroup<PostForm>;
   public hasChanges = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
+  public post = input<null | PostResponse>();
   public postEditor = viewChild.required<PostEditorComponent>('postEditor');
 
   private checkPostForChanges(postData: NewPost): void {
-    const coauthorsInPostPreview = this.post?.authors.filter((author) => !author.isMainAuthor) ?? [];
+    const coauthorsInPostPreview = this.post()?.authors.filter((author) => !author.isMainAuthor) ?? [];
     const coauthorIdsInPostPreview = coauthorsInPostPreview.map(({ author }) => author.id);
 
-    const contentUnchanged = this.post?.content === postData.content;
-    const titleUnchanged = this.post?.title === postData.title;
+    const contentUnchanged = this.post()?.content === postData.content;
+    const titleUnchanged = this.post()?.title === postData.title;
     const coauthorsUnchanged = arraysEqual(coauthorIdsInPostPreview, postData.coauthorIds);
 
     if (contentUnchanged && titleUnchanged && coauthorsUnchanged) {
@@ -102,9 +102,8 @@ export class PostFormComponent implements OnDestroy, OnInit {
   }
 
   private handleFormSubmit(postData: NewPost): void {
-    const action$ = this.post
-      ? this.postsService.updatePost(this.post.id, postData)
-      : this.postsService.createPost(postData);
+    const post = this.post();
+    const action$ = post ? this.postsService.updatePost(post.id, postData) : this.postsService.createPost(postData);
     action$
       .pipe(
         take(1),
@@ -156,7 +155,7 @@ export class PostFormComponent implements OnDestroy, OnInit {
   }
 
   public getSubmitButtonLabel(): string {
-    const currentPost = this.post;
+    const currentPost = this.post();
     const isProcessing = this.isProcessing();
 
     if (currentPost) {
@@ -170,13 +169,14 @@ export class PostFormComponent implements OnDestroy, OnInit {
     const MAX_LENGTH = 100;
     this.form = this.fb.group<PostForm>({
       coauthors: this.fb.array<CoauthorsFGType>([]),
-      content: this.fb.control<null | string>(this.post?.content ?? ''),
-      title: this.fb.control<string>(this.post?.title ?? '', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
+      content: this.fb.control<null | string>(this.post()?.content ?? ''),
+      title: this.fb.control<string>(this.post()?.title ?? '', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
     });
+    const post = this.post();
 
-    if (this.post) {
-      this.postEditor().markdownContent.set(this.post.content);
-      this.post.authors.forEach((author) => {
+    if (post) {
+      this.postEditor().markdownContent.set(post.content);
+      post.authors.forEach((author) => {
         if (!author.isMainAuthor) {
           this.addCoauthor(author.author);
         }
@@ -201,7 +201,9 @@ export class PostFormComponent implements OnDestroy, OnInit {
     this.startProcessing();
 
     const postData = this.preparePostData(this.getCoauthorIds());
-    if (this.post) {
+    const post = this.post();
+
+    if (post) {
       this.checkPostForChanges(postData);
     } else {
       this.hasChanges.set(true);
