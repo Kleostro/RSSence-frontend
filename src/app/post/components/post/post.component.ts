@@ -19,9 +19,10 @@ import * as marked from 'marked';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
-import { finalize, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, Subject, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
+import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
@@ -30,6 +31,7 @@ import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coa
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
+import { MessageService } from '@/app/shared/services/message/message.service';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 import { configurePostMarked } from '@/app/utils/configure-post-marked';
 
@@ -51,6 +53,7 @@ import { configurePostMarked } from '@/app/utils/configure-post-marked';
 })
 export class PostComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
+  private readonly message = inject(MessageService);
   private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
   @Output() public postDeleteEvent = new EventEmitter<unknown>();
@@ -103,6 +106,10 @@ export class PostComponent implements OnDestroy, OnInit {
           } else {
             this.postDeleteEvent.emit();
           }
+        }),
+        catchError((error: OverriddenHttpErrorResponse) => {
+          this.message.error(error.error.message);
+          return EMPTY;
         }),
         finalize(() => {
           this.isProcessing.set(false);
