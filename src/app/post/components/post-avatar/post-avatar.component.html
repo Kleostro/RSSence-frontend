@@ -1,4 +1,3 @@
-@let post = this.post();
 @let author = this.author();
 
 <div class="author-info">
@@ -14,5 +13,3 @@
     author?.username
   }}</a>
 </div>
-<span class="post-createdAt">Creation: {{ post.createdAt | date: 'medium' }}</span>
-<span class="post-updatedAt">Last update: {{ post.updatedAt | date: 'medium' }}</span>

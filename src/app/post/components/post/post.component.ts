@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,10 +16,9 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import * as marked from 'marked';
-import { MenuItemCommandEvent } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { Message } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
-import { SpeedDialModule } from 'primeng/speeddial';
 import { finalize, Subject, takeUntil, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
@@ -30,7 +29,6 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
-import { getPostActions } from '@/app/post/constants/post-actions';
 import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 import { configurePostMarked } from '@/app/utils/configure-post-marked';
@@ -40,10 +38,11 @@ import { configurePostMarked } from '@/app/utils/configure-post-marked';
   imports: [
     CoauthorsListComponent,
     NgIf,
+    DatePipe,
     ButtonModule,
+    Message,
     RippleModule,
     PostAvatarComponent,
-    SpeedDialModule,
     PostFormComponent,
   ],
   selector: 'app-post',
@@ -52,13 +51,14 @@ import { configurePostMarked } from '@/app/utils/configure-post-marked';
 })
 export class PostComponent implements OnDestroy, OnInit {
   private readonly destroy$ = new Subject<void>();
-  private readonly modalService = inject(ModalService);
   private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
   @Output() public postDeleteEvent = new EventEmitter<unknown>();
   @Output() public postFormEvent = new EventEmitter<unknown>();
+  public readonly modalService = inject(ModalService);
   public readonly sanitizer = inject(DomSanitizer);
   public readonly usersService = inject(UsersService);
+  public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostActions = input<boolean>(true);
@@ -66,17 +66,6 @@ export class PostComponent implements OnDestroy, OnInit {
   public post = input.required<null | PostResponse>();
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
 
-  public postActionsItems = getPostActions(
-    (event: MenuItemCommandEvent) => {
-      event.originalEvent?.stopPropagation();
-      this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
-      this.modalService.openModal(this.postForm(), `Update post: ${this.post()?.title}`);
-    },
-    (event: MenuItemCommandEvent) => {
-      event.originalEvent?.stopPropagation();
-      this.deletePost();
-    },
-  );
   public safeHtml = signal<SafeHtml>('');
 
   constructor() {
@@ -108,6 +97,7 @@ export class PostComponent implements OnDestroy, OnInit {
       .pipe(
         takeUntil(this.destroy$),
         tap(() => {
+          this.modalService.closeModal();
           if (this.navigationService.isPostDetailedPage()) {
             this.navigationService.goBack();
           } else {
@@ -119,6 +109,11 @@ export class PostComponent implements OnDestroy, OnInit {
         }),
       )
       .subscribe();
+  }
+
+  public editPost(): void {
+    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
+    this.modalService.openModal(this.postForm(), `Update post: ${this.post()?.title}`);
   }
 
   public getAuthor(): AuthorResponse | null {

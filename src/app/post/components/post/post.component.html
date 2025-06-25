@@ -3,28 +3,15 @@
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
-    <header class="post-header">
-      <app-post-avatar [post]="post" [author]="this.getAuthor()" />
-
-      <div *ngIf="this.getCoauthors().length" class="post-coauthors-wrapper">
-        <app-coauthors-list [coauthors]="this.getCoauthors()" />
-      </div>
+    <div class="post-top">
+      <h1 class="post-title">{{ post.title }}</h1>
 
       <div class="post-actions">
-        <p-speeddial
-          *ngIf="isSHhowPostAction"
-          [disabled]="isProcessing()"
-          (onClick)="$event.stopPropagation()"
-          [model]="postActionsItems"
-          direction="left"
-          [buttonProps]="{ severity: 'primary', outlined: true }"
-          [tooltipOptions]="{ tooltipPosition: 'bottom' }"
-        />
-
         <button
           pButton
           pRipple
           type="button"
+          [disabled]="isProcessing()"
           (click)="$event.stopPropagation(); this.mode.set(this.mode() === 'preview' ? 'full' : 'preview')"
           [icon]="
             this.mode() === 'preview'
@@ -34,13 +21,55 @@
           class="switch-mode-button"
           severity="info"
           outlined="true"
-          rounded="true"
         ></button>
+
+        <button
+          pButton
+          pRipple
+          type="button"
+          *ngIf="isSHhowPostAction"
+          [disabled]="isProcessing()"
+          (click)="$event.stopPropagation(); this.editPost()"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
+          class="edit-post-button"
+          severity="primary"
+          outlined="true"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          type="button"
+          *ngIf="isSHhowPostAction"
+          [disabled]="isProcessing()"
+          (click)="$event.stopPropagation(); this.modalService.openModal(this.deletePostConfirm(), `Deleting a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+          class="delete-post-button"
+          severity="danger"
+          outlined="true"
+        ></button>
+      </div>
+    </div>
+
+    <header class="post-header">
+      <div class="post-authors">
+        <app-post-avatar [author]="this.getAuthor()" />
+        <div *ngIf="this.getCoauthors().length" class="post-coauthors-wrapper">
+          <app-coauthors-list [coauthors]="this.getCoauthors()" />
+        </div>
+        <div class="post-times">
+          <span class="post-createdAt">
+            <span class="pi pi-clock"></span>
+            {{ post.createdAt | date: 'medium' }}
+          </span>
+          @if (post.createdAt !== post.updatedAt) {
+            <span class="post-updatedAt"> Edited </span>
+          }
+        </div>
       </div>
     </header>
 
     <body class="post-body">
-      <h1 class="post-title">{{ post.title }}</h1>
       <p class="post-content" *ngIf="this.mode() === 'full'" [innerHTML]="this.safeHtml()"></p>
     </body>
 
@@ -55,4 +84,39 @@
 
 <ng-template #postForm>
   <app-post-form [post]="post" (formSubmitEvent)="this.handlePostFormSubmit()" />
+</ng-template>
+
+<ng-template #deletePostConfirm>
+  <div class="delete-post-confirm">
+    <strong class="delete-post-confirm-title">Are you sure you want to delete this post?</strong>
+    <p-message severity="warn" icon="pi pi-exclamation-circle"
+      >The post is permanently deleted from both the author and the coauthors!</p-message
+    >
+    <div class="delete-post-confirm-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.modalService.closeModal()"
+        label="Cancel"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+        class="cancel-post-confirm-button"
+        severity="primary"
+        outlined="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.deletePost()"
+        label="Delete"
+        [disabled]="isProcessing()"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+        class="delete-post-confirm-button"
+        severity="danger"
+        outlined="true"
+      ></button>
+    </div>
+  </div>
 </ng-template>

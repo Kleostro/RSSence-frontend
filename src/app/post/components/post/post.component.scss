@@ -13,17 +13,21 @@
     opacity: 0.5;
   }
 
+  &-top {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-authors {
+    display: flex;
+    flex-direction: column;
+  }
+
   &-header {
     display: flex;
     gap: 0.5rem;
     align-items: center;
-
     min-height: 4rem;
-    margin-bottom: 0.5rem;
-
-    &:last-of-type {
-      margin-left: auto;
-    }
   }
 
   &-title,
@@ -33,22 +37,52 @@
   }
 
   &-title {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     font-size: 1.5rem;
     font-weight: bold;
     letter-spacing: 0.1rem;
   }
 
+  &-body {
+    margin-top: 2rem;
+    border-top: 0.1rem solid var(--p-surface-400);
+  }
+
   &-content {
-    margin-bottom: 1rem;
+    margin: 1rem 0;
     font-size: 1rem;
   }
 
   &-actions {
     position: relative;
     z-index: 2;
+
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
+    align-self: flex-start;
+  }
+
+  &-createdAt,
+  &-updatedAt {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    font-size: 0.9rem;
+    color: var(--p-text-muted-color);
+    letter-spacing: 0.05rem;
+  }
+
+  &-updatedAt {
+    font-style: italic;
+    color: var(--p-text);
+  }
+
+  &-times {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 1.5rem;
   }
 }
 
@@ -60,5 +94,20 @@
   &-text {
     font-size: 1.5rem;
     color: var(--p-text-muted-color);
+  }
+}
+
+.delete-post-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  &-title {
+    font-size: 1.2rem;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 2rem;
   }
 }
