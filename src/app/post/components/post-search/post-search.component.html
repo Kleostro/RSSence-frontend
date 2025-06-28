@@ -1,0 +1,24 @@
+<form class="search-form" [formGroup]="searchForm">
+  <div class="search-form-checkboxes">
+    @for (searchField of searchFields; track i; let i = $index) {
+      <div class="search-form-checkbox">
+        <p-radiobutton
+          [inputId]="searchField.label"
+          name="searchField"
+          [value]="searchField.value"
+          variant="filled"
+          formControlName="searchField"
+        />
+        <label class="search-form-checkbox-label" [for]="searchField.label">{{ searchField.label }}</label>
+      </div>
+    }
+  </div>
+  <input
+    class="search-form-input"
+    type="search"
+    pInputText
+    formControlName="search"
+    [placeholder]="'Search by ' + searchForm.value.searchField"
+    variant="filled"
+  />
+</form>

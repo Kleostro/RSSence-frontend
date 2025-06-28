@@ -1,0 +1,14 @@
+:host {
+  display: contents;
+}
+
+.posts-search {
+  position: sticky;
+  top: 2rem;
+
+  &-title {
+    display: flex;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+}

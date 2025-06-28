@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
@@ -11,13 +12,24 @@ import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
 import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { PostSearchComponent } from '@/app/post/components/post-search/post-search.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
+import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AuthorInfoComponent, SpeedDialModule, ButtonModule, RippleModule, PostsListComponent],
+  imports: [
+    PostsSettingsComponent,
+    PostSearchComponent,
+    AuthorInfoComponent,
+    SpeedDialModule,
+    ButtonModule,
+    RippleModule,
+    PostsListComponent,
+  ],
   selector: 'app-author',
   styleUrl: './author.component.scss',
   templateUrl: './author.component.html',
@@ -25,9 +37,10 @@ import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.
 export class AuthorComponent implements OnDestroy, OnInit {
   private readonly authorsService = inject(AuthorsService);
   private readonly destroy$ = new Subject<void>();
+  private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
+  private postsQuery$: Observable<PaginationQueryDto> = toObservable(this.postsService.query);
   public readonly navigationService = inject(NavigationService);
-
   public currentAuthor = signal<AuthorResponse | null>(null);
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
@@ -58,12 +71,20 @@ export class AuthorComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
+    this.postsService.resetQuery();
     const { data } = this.route.snapshot;
     if ('author' in data) {
       const result = AuthorSchema.safeParse(data['author']);
       if (result.data) {
         this.currentAuthor.set(result.data);
-        this.loadAuthorPosts(result.data.username).pipe(takeUntil(this.destroy$)).subscribe();
+        this.postsQuery$
+          .pipe(
+            takeUntil(this.destroy$),
+            tap((query) => {
+              this.loadAuthorPosts(result.data.username, query).pipe(takeUntil(this.destroy$)).subscribe();
+            }),
+          )
+          .subscribe();
       }
     }
   }

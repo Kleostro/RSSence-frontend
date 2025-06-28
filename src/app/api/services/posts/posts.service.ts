@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-spread */
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 
 import { map, Observable, tap } from 'rxjs';
 
@@ -18,6 +18,7 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly message = inject(MessageService);
+  public query = signal<PaginationQueryDto>({ limit: 10, page: 1 });
 
   public createPost(post: NewPost): Observable<PostResponse> {
     return this.http.post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post).pipe(
@@ -50,6 +51,10 @@ export class PostsService {
 
   public getPostById(postId: number): Observable<PostResponse> {
     return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
+  }
+
+  public resetQuery(): void {
+    this.query.set({ limit: 10, page: 1 });
   }
 
   public updatePost(postId: number, post: NewPost): Observable<PostResponse> {
