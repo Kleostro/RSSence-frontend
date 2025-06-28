@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
@@ -10,6 +11,7 @@ import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
 import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
+import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
@@ -18,6 +20,7 @@ import { getNavigationAuthorPage } from '@/app/author/constants/navigation-autho
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
+import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
 import { FormState } from '@/app/profile/constants/profile-form';
 import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
@@ -25,6 +28,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    PostsSettingsComponent,
     AuthorFormWrapperComponent,
     AuthorInfoComponent,
     ButtonModule,
@@ -39,8 +43,10 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
 export class MeAuthorComponent implements OnDestroy, OnInit {
   private readonly authorsService = inject(AuthorsService);
   private readonly destroy$ = new Subject<void>();
+  private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
+  private postsQuery$: Observable<PaginationQueryDto> = toObservable(this.postsService.query);
   public readonly FORM_STATE = FORM_STATE;
   public readonly modalService = inject(ModalService);
   public readonly navigationService = inject(NavigationService);
@@ -123,13 +129,21 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
   }
 
   public ngOnInit(): void {
+    this.postsService.resetQuery();
     const { data } = this.route.snapshot;
     if ('author' in data) {
       const result = AuthorSchema.safeParse(data['author']);
       if (result.data) {
         this.currentAuthor.set(result.data);
         this.previewAuthor.set(result.data);
-        this.loadAuthorPosts(result.data.username).pipe(takeUntil(this.destroy$)).subscribe();
+        this.postsQuery$
+          .pipe(
+            takeUntil(this.destroy$),
+            tap((query) => {
+              this.loadAuthorPosts(result.data.username, query).pipe(takeUntil(this.destroy$)).subscribe();
+            }),
+          )
+          .subscribe();
       }
     }
   }

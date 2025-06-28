@@ -2,6 +2,25 @@
   margin-bottom: 1rem;
 }
 
+.posts-wrapper {
+  display: flex;
+  gap: 1%;
+}
+
 .posts-list {
-  max-width: 70%;
+  width: 59%;
+}
+
+.posts-list-settings {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 40%;
+  height: auto;
+}
+
+.posts-count {
+  margin-bottom: 2rem;
 }

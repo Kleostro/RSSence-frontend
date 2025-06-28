@@ -1,0 +1,22 @@
+.posts-wrapper {
+  display: flex;
+  gap: 1%;
+}
+
+.posts-list {
+  width: 59%;
+}
+
+.posts-count {
+  margin-bottom: 2rem;
+}
+
+.posts-list-settings {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 40%;
+  height: auto;
+}

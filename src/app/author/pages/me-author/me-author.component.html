@@ -32,12 +32,19 @@
       ></button>
     </div>
 
-    <app-posts-list
-      class="posts-list"
-      (postEvent)="this.handlePostEvent()"
-      [paginatedPostResponse]="this.paginatedPostResponse()"
-      (pageChangeEvent)="this.handlePageChangeEvent($event)"
-    />
+    <strong class="posts-count">{{ this.paginatedPostResponse()?.total }} posts</strong>
+    <div class="posts-wrapper">
+      <app-posts-list
+        class="posts-list"
+        (postEvent)="this.handlePostEvent()"
+        [paginatedPostResponse]="this.paginatedPostResponse()"
+        (pageChangeEvent)="this.handlePageChangeEvent($event)"
+      />
+
+      <div class="posts-list-settings">
+        <app-posts-settings />
+      </div>
+    </div>
   }
 </div>
 
