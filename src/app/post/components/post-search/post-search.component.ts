@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-spread */
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
