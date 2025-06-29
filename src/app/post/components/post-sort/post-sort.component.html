@@ -1,0 +1,29 @@
+<form class="sorting-form" [formGroup]="sortingForm">
+  <span class="sorting-form-sort-by-title">Sorting:</span>
+  <div class="sorting-form-sort-by">
+    @for (sortBy of sortByOptions; track i; let i = $index) {
+      <div class="sorting-form-checkbox">
+        <p-radiobutton
+          [inputId]="sortBy.label + '-sortBy'"
+          name="sortBy"
+          [value]="sortBy.value"
+          variant="filled"
+          formControlName="sortBy"
+        />
+        <label class="sorting-form-checkbox-label" [for]="sortBy.label + '-sortBy'">{{ sortBy.label }}</label>
+      </div>
+    }
+  </div>
+
+  <span class="sorting-form-sort-order-title">Order:</span>
+  <div class="sorting-form-sort-order">
+    <div class="sorting-form-checkbox">
+      <p-radiobutton [inputId]="'asc'" name="sortOrder" value="asc" variant="filled" formControlName="sortOrder" />
+      <label class="sorting-form-checkbox-label" [for]="'asc'">Ascending</label>
+    </div>
+    <div class="sorting-form-checkbox">
+      <p-radiobutton [inputId]="'desc'" name="sortOrder" value="desc" variant="filled" formControlName="sortOrder" />
+      <label class="sorting-form-checkbox-label" [for]="'desc'">Descending</label>
+    </div>
+  </div>
+</form>

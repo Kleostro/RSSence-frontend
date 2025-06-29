@@ -6,9 +6,7 @@
   position: sticky;
   top: 2rem;
 
-  &-title {
-    display: flex;
-    margin-bottom: 1rem;
-    font-style: italic;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
