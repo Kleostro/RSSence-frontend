@@ -32,7 +32,14 @@
       ></button>
     </div>
 
-    <strong class="posts-count">{{ this.paginatedPostResponse()?.total }} posts</strong>
+    <strong class="posts-count">
+      @if (!this.paginatedPostResponse()) {
+        <p-skeleton width="6rem" height="1.15rem" />
+      } @else {
+        {{ this.paginatedPostResponse()?.total }} posts
+      }
+    </strong>
+
     <div class="posts-wrapper">
       <app-posts-list
         class="posts-list"

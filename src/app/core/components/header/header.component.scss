@@ -6,6 +6,7 @@ header {
 }
 
 .header-wrapper {
+  position: relative;
   margin-bottom: 1rem;
   border-bottom: 0.1rem solid var(--p-surface-600);
   background-color: var(--p-surface-800);

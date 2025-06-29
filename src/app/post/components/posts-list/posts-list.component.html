@@ -1,17 +1,16 @@
 @let posts = paginatedPostResponse()?.items;
 @let limit = paginatedPostResponse()?.limit ?? 10;
 @let total = paginatedPostResponse()?.total ?? 0;
-<p-paginator
-  class="posts-list-paginator"
-  [hidden]="total <= limit"
-  (onPageChange)="onPageChange($event)"
-  [first]="first"
-  [rows]="limit"
-  [totalRecords]="total"
-  [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-/>
-
 @if (this.isPostsLoaded()) {
+  <p-paginator
+    class="posts-list-paginator"
+    [hidden]="total <= limit"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
   @for (post of posts; track post.id; let i = $index) {
     <div
       class="post-container"
@@ -32,20 +31,22 @@
       <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
     </div>
   }
-} @else {
-  <p-skeleton width="100%" height="10.8rem" />
-  <p-skeleton width="100%" height="10.8rem" />
-  <p-skeleton width="100%" height="10.8rem" />
-  <p-skeleton width="100%" height="10.8rem" />
-  <p-skeleton width="100%" height="10.8rem" />
-}
 
-<p-paginator
-  class="posts-list-paginator"
-  [hidden]="total <= limit"
-  (onPageChange)="onPageChange($event)"
-  [first]="first"
-  [rows]="limit"
-  [totalRecords]="total"
-  [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-/>
+  <p-paginator
+    class="posts-list-paginator"
+    [hidden]="total <= limit"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
+} @else {
+  <p-skeleton width="100%" height="3.5rem" />
+  <p-skeleton width="100%" height="12rem" />
+  <p-skeleton width="100%" height="12rem" />
+  <p-skeleton width="100%" height="12rem" />
+  <p-skeleton width="100%" height="12rem" />
+  <p-skeleton width="100%" height="12rem" />
+  <p-skeleton width="100%" height="3.5rem" />
+}

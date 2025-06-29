@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
 import { InputText } from 'primeng/inputtext';
@@ -28,7 +28,6 @@ export class PostSearchComponent implements OnDestroy, OnInit {
     search: [''],
     searchField: [this.searchFields[0].value],
   });
-  public isProcessing = signal<boolean>(false);
 
   public ngOnDestroy(): void {
     this.destroy$.next();

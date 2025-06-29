@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
+import { Skeleton } from 'primeng/skeleton';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { Observable, Subject, takeUntil, tap } from 'rxjs';
 
@@ -15,7 +16,6 @@ import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { PostSearchComponent } from '@/app/post/components/post-search/post-search.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
 
@@ -23,12 +23,12 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PostsSettingsComponent,
-    PostSearchComponent,
     AuthorInfoComponent,
     SpeedDialModule,
     ButtonModule,
     RippleModule,
     PostsListComponent,
+    Skeleton,
   ],
   selector: 'app-author',
   styleUrl: './author.component.scss',
@@ -81,6 +81,7 @@ export class AuthorComponent implements OnDestroy, OnInit {
           .pipe(
             takeUntil(this.destroy$),
             tap((query) => {
+              this.paginatedPostResponse.set(null);
               this.loadAuthorPosts(result.data.username, query).pipe(takeUntil(this.destroy$)).subscribe();
             }),
           )

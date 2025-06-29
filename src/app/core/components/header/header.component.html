@@ -5,6 +5,9 @@
     }
   </header>
   @if (this.loaderService.isProcessing()) {
-    <p-progressbar mode="indeterminate" [style]="{ height: '0.05rem' }" />
+    <p-progressbar
+      mode="indeterminate"
+      [style]="{ height: '0.05rem', position: 'absolute', bottom: '0', width: '100%' }"
+    />
   }
 </div>

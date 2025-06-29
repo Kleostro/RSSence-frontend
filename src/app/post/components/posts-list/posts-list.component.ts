@@ -32,7 +32,7 @@ export class PostsListComponent implements OnInit {
   public paginatedPostResponse = input<null | PaginatedPostResponse>(null);
 
   public isPostsLoaded = linkedSignal({
-    computation: () => true,
+    computation: () => this.paginatedPostResponse() !== null,
     source: this.paginatedPostResponse,
   });
 

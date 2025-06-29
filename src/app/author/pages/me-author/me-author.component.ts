@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
+import { Skeleton } from 'primeng/skeleton';
 import { Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
@@ -35,6 +36,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     RippleModule,
     PostsListComponent,
     PostFormComponent,
+    Skeleton,
   ],
   selector: 'app-me-author',
   styleUrl: './me-author.component.scss',
@@ -140,6 +142,7 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
           .pipe(
             takeUntil(this.destroy$),
             tap((query) => {
+              this.paginatedPostResponse.set(null);
               this.loadAuthorPosts(result.data.username, query).pipe(takeUntil(this.destroy$)).subscribe();
             }),
           )
