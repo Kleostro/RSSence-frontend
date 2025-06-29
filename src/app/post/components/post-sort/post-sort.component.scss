@@ -1,0 +1,45 @@
+.sorting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &-sort-by {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    &-title {
+      font-style: italic;
+    }
+
+    & .sorting-form-checkbox {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      &-label {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &-sort-order {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    &-title {
+      font-style: italic;
+    }
+
+    & .sorting-form-checkbox {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      &-label {
+        cursor: pointer;
+      }
+    }
+  }
+}
