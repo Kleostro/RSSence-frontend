@@ -34,8 +34,8 @@ export class ProfilesService {
     );
   }
 
-  public deleteProfile(): Observable<ProfileResponse> {
-    return this.http.delete<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`).pipe(
+  public deleteProfile(username: string): Observable<ProfileResponse> {
+    return this.http.delete<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${username}`).pipe(
       tap(() => {
         this.message.success(MESSAGE.DELETE_PROFILE_SUCCESS);
       }),

@@ -8,7 +8,9 @@ import { DrawerModule } from 'primeng/drawer';
 import { RippleModule } from 'primeng/ripple';
 import { TieredMenu } from 'primeng/tieredmenu';
 
+import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { ROLE } from '@/app/auth/constants/roles';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
@@ -23,6 +25,7 @@ import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switc
 })
 export class SidebarComponent {
   private readonly authService = inject(AuthService);
+  private readonly rolesService = inject(RolesService);
   private readonly usersService = inject(UsersService);
 
   public readonly APP_ROUTE = APP_ROUTE;
@@ -65,6 +68,21 @@ export class SidebarComponent {
       ],
       label: 'Author',
       visible: !!this.usersService.me()?.profile,
+    },
+    {
+      icon: 'pi pi-crown',
+      items: [
+        {
+          icon: 'pi pi-users',
+          label: 'Users',
+          routerLink: [APP_ROUTE.USERS],
+        },
+      ],
+      label: 'Admin',
+      visible: this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.ADMIN),
+    },
+    {
+      separator: true,
     },
     {
       icon: 'pi pi-cog',

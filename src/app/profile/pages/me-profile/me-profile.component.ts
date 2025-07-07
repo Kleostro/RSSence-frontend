@@ -43,7 +43,7 @@ export class MeProfileComponent implements OnDestroy, OnInit {
 
   public deleteProfile(): void {
     this.profilesService
-      .deleteProfile()
+      .deleteProfile(this.currentProfile()?.username ?? '')
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentProfile.set(null);

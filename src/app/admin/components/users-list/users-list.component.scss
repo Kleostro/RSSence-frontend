@@ -1,0 +1,51 @@
+.clear-filter-button {
+  display: flex;
+  margin-left: auto;
+}
+
+.td-profile,
+.td-author {
+  display: flex;
+}
+
+.td-roles {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem;
+  text-transform: lowercase;
+}
+
+.td-id,
+.td-time {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+}
+
+.td-email {
+  font-size: 0.8rem;
+  color: var(--p-text-color);
+}
+
+.users-list-paginator {
+  ::ng-deep.p-paginator-page.p-paginator-page-selected {
+    pointer-events: none;
+  }
+}
+
+.delete-user-confirm,
+.delete-profile-confirm,
+.delete-author-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  &-title {
+    font-size: 1.2rem;
+  }
+
+  &-actions {
+    display: flex;
+    gap: 2rem;
+  }
+}
