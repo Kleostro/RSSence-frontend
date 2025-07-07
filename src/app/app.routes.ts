@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 
-import { authGuard, loginGuard, meGuard } from '@/app/auth/guards/login.guard';
+import { adminGuard, authGuard, loginGuard, userGuard } from '@/app/auth/guards/login.guard';
 import { authorResolver, meAuthorResolver } from '@/app/author/resolvers/author.resolver';
-import { APP_PATH } from '@/app/core/services/navigation/routes';
+import { ADMIN_PATH, APP_PATH } from '@/app/core/services/navigation/routes';
 import { meProfileResolver, profileResolver } from '@/app/profile/resolvers/profile.resolver';
 
 export const routes: Routes = [
   {
-    canActivate: [meGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./home/pages/home/home.component').then((c) => c.HomeComponent),
     path: APP_PATH.DEFAULT,
     title: 'RSS | Home',
@@ -50,17 +50,36 @@ export const routes: Routes = [
     resolve: { author: authorResolver },
   },
   {
-    canActivate: [meGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
     path: APP_PATH.POSTS.toLowerCase(),
     title: `RSS | ${APP_PATH.POSTS}`,
   },
   {
-    canActivate: [meGuard],
+    canActivate: [userGuard],
     loadComponent: () =>
       import('./post/pages/post-detailed/post-detailed.component').then((c) => c.PostDetailedComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id`,
     title: `RSSence | ${APP_PATH.POSTS.slice(0, -1)}`,
+  },
+  {
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: ADMIN_PATH.USERS.toLowerCase(),
+      },
+      {
+        loadComponent: () => import('./admin/pages/users/users.component').then((c) => c.UsersComponent),
+        path: ADMIN_PATH.USERS.toLowerCase(),
+        title: `Admin | ${ADMIN_PATH.USERS}`,
+      },
+    ],
+    loadComponent: () =>
+      import('./admin/layout/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
+    path: APP_PATH.ADMIN.toLowerCase(),
+    title: `Tu-Tu | ${APP_PATH.ADMIN}`,
   },
   {
     loadComponent: () => import('./core/pages/not-found/not-found.component').then((c) => c.NotFoundComponent),
