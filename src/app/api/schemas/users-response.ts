@@ -6,13 +6,13 @@ import { ProfileSchema } from '@/app/api/schemas/profiles-response';
 
 export const UserSchema = z.object({
   author: AuthorSchema.nullable().optional(),
-  createdAt: z.coerce.date(),
+  createdAt: z.string(),
   email: z.string(),
   id: z.number(),
   profile: ProfileSchema.nullable().optional(),
-  profileUsername: z.string().optional(),
+  profileUsername: z.string().nullable().optional(),
   roles: z.string().array(),
-  updatedAt: z.coerce.date(),
+  updatedAt: z.string(),
 });
 
 export type UserResponse = z.infer<typeof UserSchema>;

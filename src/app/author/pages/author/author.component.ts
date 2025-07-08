@@ -7,7 +7,7 @@ import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { Skeleton } from 'primeng/skeleton';
 import { SpeedDialModule } from 'primeng/speeddial';
-import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
@@ -72,21 +72,36 @@ export class AuthorComponent implements OnDestroy, OnInit {
 
   public ngOnInit(): void {
     this.postsService.resetQuery();
-    const { data } = this.route.snapshot;
-    if ('author' in data) {
-      const result = AuthorSchema.safeParse(data['author']);
-      if (result.data) {
-        this.currentAuthor.set(result.data);
-        this.postsQuery$
-          .pipe(
-            takeUntil(this.destroy$),
-            tap((query) => {
-              this.paginatedPostResponse.set(null);
-              this.loadAuthorPosts(result.data.username, query).pipe(takeUntil(this.destroy$)).subscribe();
-            }),
-          )
-          .subscribe();
-      }
-    }
+
+    this.route.data
+      .pipe(
+        takeUntil(this.destroy$),
+        tap(({ author }) => {
+          const result = AuthorSchema.safeParse(author);
+          if (result.success) {
+            this.currentAuthor.set(result.data);
+            this.paginatedPostResponse.set(null);
+
+            this.loadAuthorPosts(result.data.username, this.postsService.query())
+              .pipe(takeUntil(this.destroy$))
+              .subscribe();
+          }
+        }),
+      )
+      .subscribe();
+
+    this.postsQuery$
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap((query) => {
+          const username = this.currentAuthor()?.username;
+          if (!username) {
+            return [];
+          }
+
+          return this.loadAuthorPosts(username, query);
+        }),
+      )
+      .subscribe();
   }
 }

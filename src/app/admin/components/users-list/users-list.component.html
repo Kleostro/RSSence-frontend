@@ -1,0 +1,296 @@
+@let users = this.paginatedUserResponse()?.items ?? [];
+@let limit = this.paginatedUserResponse()?.limit ?? 10;
+@let total = this.paginatedUserResponse()?.total ?? 0;
+@let me = this.usersService.me();
+@let rolesSeverity = ['success', 'info', 'warn', 'danger'];
+
+@if (this.isUsersLoaded()) {
+  <p-paginator
+    class="users-list-paginator"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
+} @else {
+  <p-skeleton height="3.5rem" />
+}
+<p-table
+  class="users-list-table"
+  #table
+  sortField="id"
+  showGridlines
+  [sortOrder]="1"
+  [loading]="!this.isUsersLoaded() || this.isProcessing()"
+  [value]="users"
+  [resizableColumns]="true"
+  selectionMode="single"
+  [(selection)]="selectedUser"
+  [metaKeySelection]="metaKey"
+  dataKey="id"
+>
+  <ng-template #caption>
+    <button
+      pButton
+      pRipple
+      class="clear-filter-button"
+      label="Clear"
+      [outlined]="true"
+      icon="pi pi-filter-slash"
+      (click)="table.clear()"
+    ></button>
+  </ng-template>
+  <ng-template #header>
+    <tr>
+      <th pResizableColumn pSortableColumn="id">
+        id
+        <p-sortIcon field="id" />
+        <p-columnFilter type="text" field="id" display="menu" />
+      </th>
+      <th pResizableColumn pSortableColumn="email">
+        email
+        <p-sortIcon field="email" />
+        <p-columnFilter type="text" field="email" display="menu" />
+      </th>
+      <th pResizableColumn pSortableColumn="profileUsername">
+        profile
+        <p-sortIcon field="profileUsername" />
+        <p-columnFilter type="text" field="profileUsername" display="menu" />
+      </th>
+      <th pResizableColumn pSortableColumn="profile.authorUsername">
+        author
+        <p-sortIcon field="profile.authorUsername" />
+        <p-columnFilter type="text" field="profile.authorUsername" display="menu" />
+      </th>
+      <th pResizableColumn pSortableColumn="createdAt">
+        creation date
+        <p-sortIcon field="createdAt" />
+        <p-columnFilter type="text" field="createdAt" display="menu" />
+      </th>
+      <th pResizableColumn pSortableColumn="updatedAt">
+        last updating date
+        <p-sortIcon field="updatedAt" />
+        <p-columnFilter type="text" field="updatedAt" display="menu" />
+      </th>
+      <th>roles</th>
+      <th></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-user>
+    <tr [pSelectableRow]="user">
+      <td>
+        <span class="td-id">{{ user.id }}</span>
+      </td>
+      <td>
+        <span class="td-email">{{ user.email ?? '' }}</span>
+      </td>
+      <td>
+        @if (user.profile && user.profile.username) {
+          <div class="td-profile">
+            @if (this.rolesService.isAllowedToBeDeleted(me?.roles ?? [], user.roles) || user.id === me?.id) {
+              <button
+                pButton
+                pRipple
+                size="small"
+                severity="danger"
+                text="true"
+                [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                [disabled]="this.isProcessing()"
+                (click)="this.candidateUser.set(user); this.modalService.openModal(this.deleteProfileConfirm(), `Deleting the ${user.profile.username} profile`); this.modalService.contentWidth.set('50%')"
+              ></button>
+            }
+            <button
+              pButton
+              pRipple
+              [label]="user.profile.username"
+              routerLink="/profile/{{ user.profile.username }}"
+              [text]="true"
+            ></button>
+          </div>
+        }
+      </td>
+      <td>
+        @if (user.profile && user.profile.authorUsername) {
+          <div class="td-author">
+            @if (this.rolesService.isAllowedToBeDeleted(me?.roles ?? [], user.roles) || user.id === me?.id) {
+              <button
+                pButton
+                pRipple
+                size="small"
+                severity="danger"
+                text="true"
+                [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                [disabled]="this.isProcessing()"
+                (click)="this.candidateUser.set(user); this.modalService.openModal(this.deleteAuthorConfirm(), `Deleting the ${user.profile.authorUsername} author`); this.modalService.contentWidth.set('50%')"
+              ></button>
+            }
+            <button
+              pButton
+              pRipple
+              [label]="user.profile.authorUsername"
+              routerLink="/author/{{ user.profile.authorUsername }}"
+              [text]="true"
+            ></button>
+          </div>
+        }
+      </td>
+      <td>
+        <span class="td-time">{{ user.createdAt | date: 'short' }}</span>
+      </td>
+      <td>
+        <span class="td-time">{{ user.updatedAt | date: 'short' }}</span>
+      </td>
+      <td>
+        <div class="td-roles">
+          @for (role of user.roles; track role; let i = $index) {
+            @if (this.rolesService.rolePriority?.get(role); as rolePriority) {
+              <p-tag [value]="role" [severity]="rolesSeverity[rolePriority - 1]" />
+            }
+          }
+        </div>
+      </td>
+
+      <td>
+        @if (this.rolesService.isAllowedToBeDeleted(me?.roles ?? [], user.roles)) {
+          <button
+            pButton
+            pRipple
+            size="small"
+            severity="danger"
+            text="true"
+            [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+            [disabled]="this.isProcessing()"
+            (click)="this.candidateUser.set(user); this.modalService.openModal(this.deleteUserConfirm(), `Deleting the ${user.id} user`); this.modalService.contentWidth.set('50%')"
+          ></button>
+        }
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="8" style="text-align: center">No users found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+@if (this.isUsersLoaded()) {
+  <p-paginator
+    class="users-list-paginator"
+    (onPageChange)="onPageChange($event)"
+    [first]="first"
+    [rows]="limit"
+    [totalRecords]="total"
+    [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+  />
+} @else {
+  <p-skeleton height="3.5rem" />
+}
+
+<ng-template #deleteUserConfirm>
+  <div class="delete-user-confirm">
+    <strong class="delete-user-confirm-title">Are you certain about deleting this user's usership?</strong>
+    <p-message severity="warn" icon="pi pi-exclamation-circle"
+      >All information about the user will be permanently deleted!</p-message
+    >
+    <div class="delete-user-confirm-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.modalService.closeModal()"
+        label="Cancel"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+        class="cancel-post-confirm-button"
+        severity="primary"
+        outlined="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.isProcessing.set(true); this.deleteUserEvent.emit(this.candidateUser()?.id ?? 0)"
+        label="Delete"
+        [disabled]="isProcessing()"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+        class="delete-user-confirm-button"
+        severity="danger"
+        outlined="true"
+      ></button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deleteProfileConfirm>
+  <div class="delete-profile-confirm">
+    <strong class="delete-profile-confirm-title">Are you certain about deleting this user's profileship?</strong>
+    <p-message severity="warn" icon="pi pi-exclamation-circle"
+      >All information about the profile will be permanently deleted!</p-message
+    >
+    <div class="delete-profile-confirm-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.modalService.closeModal()"
+        label="Cancel"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+        class="cancel-post-confirm-button"
+        severity="primary"
+        outlined="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="
+          this.isProcessing.set(true); this.deleteProfileEvent.emit(this.candidateUser()?.profile?.username ?? '')
+        "
+        label="Delete"
+        [disabled]="isProcessing()"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+        class="delete-profile-confirm-button"
+        severity="danger"
+        outlined="true"
+      ></button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deleteAuthorConfirm>
+  <div class="delete-author-confirm">
+    <strong class="delete-author-confirm-title">Are you certain about deleting this user's authorship?</strong>
+    <p-message severity="warn" icon="pi pi-exclamation-circle"
+      >All information about the author will be permanently deleted!</p-message
+    >
+    <div class="delete-author-confirm-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.modalService.closeModal()"
+        label="Cancel"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+        class="cancel-post-confirm-button"
+        severity="primary"
+        outlined="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="
+          this.isProcessing.set(true); this.deleteAuthorEvent.emit(this.candidateUser()?.profile?.authorUsername ?? '')
+        "
+        label="Delete"
+        [disabled]="isProcessing()"
+        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+        class="delete-author-confirm-button"
+        severity="danger"
+        outlined="true"
+      ></button>
+    </div>
+  </div>
+</ng-template>

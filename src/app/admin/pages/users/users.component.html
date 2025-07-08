@@ -1,0 +1,8 @@
+<app-users-list
+  (deleteUserEvent)="handleDeleteUserEvent($event)"
+  (deleteAuthorEvent)="handleDeleteAuthorEvent($event)"
+  (deleteProfileEvent)="handleDeleteProfileEvent($event)"
+  [paginatedUserResponse]="this.paginatedUserResponse()"
+  (pageChangeEvent)="handlePageChangeEvent($event)"
+  #usersListComponent
+/>
