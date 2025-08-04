@@ -1,0 +1,10 @@
+<div class="page">
+  <app-posts-list
+    [paginatedPostResponse]="this.paginatedPostResponse()"
+    (pageChangeEvent)="this.handlePageChangeEvent($event)"
+  >
+    <ng-template let-post>
+      <app-moderation-post [post]="post" [isShowPostModeratorActions]="true" (postEvent)="this.handlePostEvent()" />
+    </ng-template>
+  </app-posts-list>
+</div>

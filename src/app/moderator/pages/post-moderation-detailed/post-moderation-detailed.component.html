@@ -1,0 +1,19 @@
+@let post = this.currentPost();
+
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+
+  @if (post !== undefined) {
+    <app-moderation-post [isShowPostModeratorActions]="true" [post]="post" />
+  }
+</div>

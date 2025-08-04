@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { PaginatorState } from 'primeng/paginator';
-import { catchError, EMPTY, finalize, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, Observable, switchMap, tap } from 'rxjs';
 
 import { UsersListComponent } from '@/app/admin/components/users-list/users-list.component';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
@@ -22,21 +23,21 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   styleUrl: './users.component.scss',
   templateUrl: './users.component.html',
 })
-export class UsersComponent implements OnDestroy, OnInit {
+export class UsersComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly message = inject(MessageService);
   private readonly modalService = inject(ModalService);
   private readonly profilesService = inject(ProfilesService);
   private readonly rolesService = inject(RolesService);
   private readonly usersService = inject(UsersService);
-  private destroy$ = new Subject<void>();
   public paginatedUserResponse = signal<null | PaginatedUserResponse>(null);
   public usersListComponent = viewChild.required(UsersListComponent);
 
   private handleDelete<T>(action: () => Observable<T>, successMessage = '', errorMessage = ''): void {
     action()
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         switchMap(() => this.loadUsers()),
         tap(() => {
           if (successMessage) {
@@ -70,7 +71,7 @@ export class UsersComponent implements OnDestroy, OnInit {
   public handlePageChangeEvent(event: PaginatorState): void {
     const { page = 1, rows } = event;
     this.loadUsers({ limit: rows, page: page + 1 })
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
   }
 
@@ -81,7 +82,7 @@ export class UsersComponent implements OnDestroy, OnInit {
 
     action$
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         switchMap(() => this.loadUsers()),
         tap(() => {
           this.message.info(isAdd ? MESSAGE.REMOVE_ROLE_SUCCESS : MESSAGE.ADD_ROLE_SUCCESS);
@@ -105,12 +106,7 @@ export class UsersComponent implements OnDestroy, OnInit {
     );
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
-    this.loadUsers().pipe(takeUntil(this.destroy$)).subscribe();
+    this.loadUsers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 }

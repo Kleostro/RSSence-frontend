@@ -6,6 +6,7 @@ import { map, Observable, tap } from 'rxjs';
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { PaginatedUserResponse, PaginatedUserResponseSchema, UserResponse } from '@/app/api/schemas/users-response';
+import { ROLE } from '@/app/constants/roles';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -13,6 +14,7 @@ import { ENVIRONMENT } from '@/environment/environment';
 })
 export class UsersService {
   private readonly http = inject(HttpClient);
+  public readonly isModerator = signal<boolean>(false);
   public me = signal<null | UserResponse>(null);
 
   public deleteUser(userId: number): Observable<UserResponse> {
@@ -36,6 +38,7 @@ export class UsersService {
     return this.http.get<null | UserResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.USERS}/${ENDPOINTS.ME}`).pipe(
       tap((me) => {
         this.me.set(me);
+        this.isModerator.set(me?.roles.includes(ROLE.MODERATOR) ?? false);
       }),
     );
   }

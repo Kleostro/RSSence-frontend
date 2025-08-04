@@ -61,6 +61,12 @@ export class AuthorsService {
       );
   }
 
+  public getAuthorPostStatuses(username: string): Observable<{ count: number; name: string }[]> {
+    return this.http.get<{ count: number; name: string }[]>(
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.POSTS.slice(0, -1)}-statuses`,
+    );
+  }
+
   public getAuthors(query?: PaginationQueryDto): Observable<null | PaginatedAuthorResponse> {
     return this.http
       .get<PaginatedAuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, {

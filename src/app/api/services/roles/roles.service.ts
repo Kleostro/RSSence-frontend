@@ -5,7 +5,7 @@ import { Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { UserResponse } from '@/app/api/schemas/users-response';
-import { ROLE } from '@/app/auth/constants/roles';
+import { ROLE } from '@/app/constants/roles';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
