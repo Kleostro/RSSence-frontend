@@ -1,5 +1,6 @@
 export const MESSAGE = {
   ADD_ROLE_SUCCESS: 'Role was added',
+  APPROVE_POST_SUCCESS: 'Post was approved',
   CREATE_AUTHOR_SUCCESS: 'Author was created',
   CREATE_POST_SUCCESS: 'Post was created',
   CREATE_PROFILE_SUCCESS: 'Profile was created',
@@ -13,7 +14,11 @@ export const MESSAGE = {
   LOGOUT_SUCCESS: 'Logout was successful',
   REGISTRATION_ERROR: 'Registration failed',
   REGISTRATION_SUCCESS: 'Registration was successful',
+  REJECT_POST_SUCCESS: 'Post was rejected',
   REMOVE_ROLE_SUCCESS: 'Role was removed',
+  REVISION_POST_SUCCESS: 'Post was revisioned',
+  SAVE_AS_DRAFT_SUCCESS: 'Post was saved as draft',
+  SUBMIT_FOR_MODERATION_SUCCESS: 'Post was submitted for moderation',
   UNKNOWN_ERROR: 'An unknown error occurred',
   UPDATE_AUTHOR_SUCCESS: 'Author was updated',
   UPDATE_POST_SUCCESS: 'Post was updated',

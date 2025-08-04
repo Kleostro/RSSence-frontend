@@ -1,0 +1,93 @@
+<p-timeline class="history-timeline" [value]="this.historyResponse() ?? []">
+  <ng-template #opposite let-event>
+    <small class="text-surface-500 dark:text-surface-400">{{ event.createdAt | date: 'short' }}</small>
+  </ng-template>
+  <ng-template #content let-history>
+    <div class="history-item">
+      <div class="history-item-left">
+        <i class="history-item-action">Action</i>
+        <p-tag
+          class="action-type-tag"
+          [value]="history.actionType"
+          [severity]="this.isAuthorHistoryResponse(history) ? 'info' : 'success'"
+        />
+        @if (this.isModerationHistoryResponse(history)) {
+          <i class="history-item-changes-in-status">Changes in status</i>
+          <div class="tags">
+            <p-tag
+              [value]="history.previousStatus ?? 'N/A'"
+              [severity]="this.getStatusSeverity(history.previousStatus)"
+            />
+            ->
+            <p-tag [value]="history.newStatus" [severity]="this.getStatusSeverity(history.newStatus)" />
+          </div>
+        }
+      </div>
+      <div class="history-item-center">
+        @if (this.isAuthorHistoryResponse(history) && history.description) {
+          <div class="description-wrapper">
+            <h3 class="description-title">Description</h3>
+            @for (change of history.description.split('; '); track change) {
+              <span class="description-text">{{ change }}</span>
+            }
+          </div>
+        }
+
+        @if (this.isModerationHistoryResponse(history)) {
+          @if (history.comment) {
+            <div class="coment-wrapper">
+              <h3 class="comment-title">Comment</h3>
+              <p class="comment-text">{{ history.comment }}</p>
+            </div>
+          }
+
+          @if (history.reasons.length) {
+            <div class="reason-wrapper">
+              <h3 class="reason-title">Reasons</h3>
+              <ul class="reasons-list">
+                @for (reason of history.reasons; track reason) {
+                  <li class="reason-text">{{ reason }}</li>
+                }
+              </ul>
+            </div>
+          }
+        }
+      </div>
+      <div class="history-item-right">
+        @if (this.isModerationHistoryResponse(history)) {
+          @let moderatorProfile = history.moderator.user.profile;
+          <i class="history-item-moderator">Moderator</i>
+          <div class="moderator-info">
+            @if (moderatorProfile) {
+              <p-avatar
+                shape="circle"
+                class="moderator-avatar-img"
+                [image]="moderatorProfile?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+                size="normal"
+                [routerLink]="['/profile', moderatorProfile?.username]"
+              />
+              <a [routerLink]="['/profile', moderatorProfile?.username]" class="moderator-profile-link">{{
+                moderatorProfile?.username
+              }}</a>
+            }
+          </div>
+        }
+
+        @if (this.isAuthorHistoryResponse(history)) {
+          @let author = history.author;
+          <i class="history-item-author">Author</i>
+          <div class="author-info">
+            <p-avatar
+              shape="circle"
+              class="author-avatar-img"
+              [image]="author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+              size="normal"
+              [routerLink]="['/author', author?.username]"
+            />
+            <a [routerLink]="['/author', author?.username]" class="author-link">{{ author?.username }}</a>
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-timeline>

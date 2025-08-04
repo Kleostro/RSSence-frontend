@@ -22,7 +22,7 @@ const renderEm = ({ tokens }: marked.Tokens.Em): string => {
 const renderHeading = ({ depth, tokens }: marked.Tokens.Heading): string => {
   const text = marked.parseInline(tokens.map((t) => t.raw).join(''));
   if (typeof text === 'string') {
-    return `<h${depth} id="heading-${depth}-${tokens[0]?.raw || 'section'}">${text}</h${depth}>`;
+    return `<h${depth} id="heading-${depth}-${tokens[0]?.raw || 'section'}" class="custom-heading">${text}</h${depth}>`;
   }
   return '';
 };
@@ -48,7 +48,7 @@ const renderHtml = (token: marked.Tokens.HTML | marked.Tokens.Tag): string => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = token.raw;
   const textContent = tempDiv.textContent ?? '';
-  return `<p>${escapeHtml(textContent)}</p>`;
+  return escapeHtml(textContent);
 };
 
 const renderImage = (token: marked.Tokens.Image): string => {
@@ -84,6 +84,47 @@ const renderStrong = ({ tokens }: marked.Tokens.Strong): string => {
   return `<b class="custom-strong">${tokens.map((t) => t.raw).join('')}</b>`;
 };
 
+const renderParagraph = (tokens: marked.Tokens.Paragraph): string => {
+  let result = '';
+  tokens.tokens.forEach((token) => {
+    switch (token.type) {
+      case 'codespan':
+        result = result + ` <code>${String(token.text).replace(/`/g, '')}</code> `;
+
+        break;
+      case 'image':
+        result =
+          result +
+          renderImage({
+            href: String(token.href),
+            raw: token.raw,
+            text: String(token.text),
+            title: String(token.title),
+            tokens: token.tokens ?? [],
+            type: 'image',
+          });
+        break;
+      case 'link':
+        result =
+          result +
+          renderLink({
+            href: String(token.href),
+            raw: token.raw,
+            text: String(token.text),
+            title: String(token.title),
+            tokens: token.tokens ?? [],
+            type: 'link',
+          });
+        break;
+      case 'text':
+        result = result + token.raw;
+        break;
+    }
+  });
+
+  return `<p class="custom-paragraph">${result}</p>`;
+};
+
 export const configurePostMarked = (): void => {
   marked.use({
     breaks: true,
@@ -101,6 +142,10 @@ export const configurePostMarked = (): void => {
       link: renderLink,
       list: renderList,
       listitem: renderListitem,
+      paragraph: renderParagraph,
+      space: (token: marked.Tokens.Space) => {
+        return token.raw.replace(/\n/, '<br>');
+      },
       strong: renderStrong,
     },
   });

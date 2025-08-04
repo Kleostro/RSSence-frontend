@@ -4,7 +4,7 @@ import { debounceTime, first, map, of, switchMap } from 'rxjs';
 
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
-import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
+import { FIELD_ERROR_KEY } from '@/app/constants/field-error-key';
 
 export function usernameAvailability(
   service: AuthorsService | ProfilesService,

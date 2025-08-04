@@ -6,7 +6,6 @@
 @if (this.isPostsLoaded()) {
   <p-paginator
     class="posts-list-paginator"
-    [hidden]="total <= limit"
     (onPageChange)="onPageChange($event)"
     [first]="first"
     [rows]="limit"
@@ -14,19 +13,7 @@
     [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
   />
   @for (post of posts; track post.id; let i = $index) {
-    <div
-      class="post-container"
-      tabindex="0"
-      (click)="this.navigationService.navigateToPostById(post.id)"
-      (keyup)="($event.key === 'Enter' || $event.key === ' ') && this.navigationService.navigateToPostById(post.id)"
-    >
-      <app-post
-        [post]="post"
-        [isShowPostActions]="isShowPostActions()"
-        (postDeleteEvent)="this.postEvent.emit()"
-        (postFormEvent)="this.postEvent.emit()"
-      />
-    </div>
+    <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: post, index: i }" />
   } @empty {
     <div class="not-found">
       <p class="not-found-text">Not found any posts</p>
@@ -36,7 +23,6 @@
 
   <p-paginator
     class="posts-list-paginator"
-    [hidden]="total <= limit"
     (onPageChange)="onPageChange($event)"
     [first]="first"
     [rows]="limit"

@@ -11,8 +11,11 @@
   />
 
   <app-posts-list
-    [isShowPostActions]="false"
     [paginatedPostResponse]="this.paginatedPostResponse()"
     (pageChangeEvent)="this.handlePageChangeEvent($event)"
-  />
+  >
+    <ng-template let-post>
+      <app-post [post]="post" [isShowPostUserActions]="post.status !== 'SUBMITTED'" />
+    </ng-template>
+  </app-posts-list>
 </div>

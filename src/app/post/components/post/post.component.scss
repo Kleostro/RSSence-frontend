@@ -24,9 +24,12 @@
   }
 
   &-header {
+    position: relative;
+
     display: flex;
     gap: 0.5rem;
     align-items: center;
+
     min-height: 4rem;
   }
 
@@ -37,10 +40,23 @@
   }
 
   &-title {
+    cursor: pointer;
+
     margin-bottom: 1.5rem;
+
     font-size: 1.5rem;
     font-weight: bold;
     letter-spacing: 0.1rem;
+
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--p-primary-400);
+    }
+
+    &-disabled {
+      pointer-events: none;
+    }
   }
 
   &-body {
@@ -49,6 +65,7 @@
   }
 
   &-content {
+    overflow: hidden;
     margin: 1rem 0;
     font-size: 1rem;
   }
@@ -62,8 +79,7 @@
     align-self: flex-start;
   }
 
-  &-createdAt,
-  &-updatedAt {
+  &-createdAt {
     display: flex;
     gap: 0.25rem;
     align-items: center;
@@ -71,11 +87,6 @@
     font-size: 0.9rem;
     color: var(--p-text-muted-color);
     letter-spacing: 0.05rem;
-  }
-
-  &-updatedAt {
-    font-style: italic;
-    color: var(--p-text);
   }
 
   &-times {
@@ -94,20 +105,5 @@
   &-text {
     font-size: 1.5rem;
     color: var(--p-text-muted-color);
-  }
-}
-
-.delete-post-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  &-title {
-    font-size: 1.2rem;
-  }
-
-  &-actions {
-    display: flex;
-    gap: 2rem;
   }
 }

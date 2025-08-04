@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
@@ -7,15 +7,16 @@ import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { Skeleton } from 'primeng/skeleton';
 import { SpeedDialModule } from 'primeng/speeddial';
-import { Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
 
@@ -24,6 +25,7 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
   imports: [
     PostsSettingsComponent,
     AuthorInfoComponent,
+    PostComponent,
     SpeedDialModule,
     ButtonModule,
     RippleModule,
@@ -34,9 +36,9 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
   styleUrl: './author.component.scss',
   templateUrl: './author.component.html',
 })
-export class AuthorComponent implements OnDestroy, OnInit {
+export class AuthorComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
   private postsQuery$: Observable<PaginationQueryDto> = toObservable(this.postsService.query);
@@ -61,29 +63,24 @@ export class AuthorComponent implements OnDestroy, OnInit {
     const { page = 1, rows } = event;
 
     this.loadAuthorPosts(username, { limit: rows, page: page + 1 })
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   public ngOnInit(): void {
     this.postsService.resetQuery();
+    this.postsService.query.set({ filter: POST_STATUS.APPROVED, filterField: 'status' });
 
     this.route.data
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap(({ author }) => {
           const result = AuthorSchema.safeParse(author);
           if (result.success) {
             this.currentAuthor.set(result.data);
             this.paginatedPostResponse.set(null);
-
             this.loadAuthorPosts(result.data.username, this.postsService.query())
-              .pipe(takeUntil(this.destroy$))
+              .pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe();
           }
         }),
@@ -92,7 +89,7 @@ export class AuthorComponent implements OnDestroy, OnInit {
 
     this.postsQuery$
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         switchMap((query) => {
           const username = this.currentAuthor()?.username;
           if (!username) {

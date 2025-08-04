@@ -6,12 +6,12 @@ export type CoauthorsFGType = FormGroup<{ coauthor: FormControl<AuthorResponse |
 
 export interface NewPost {
   coauthorIds: number[];
-  content: null | string;
+  content: string;
   title: string;
 }
 
 export interface PostForm {
   coauthors: FormArray<CoauthorsFGType>;
-  content: FormControl<null | string>;
+  content: FormControl<string>;
   title: FormControl<string>;
 }

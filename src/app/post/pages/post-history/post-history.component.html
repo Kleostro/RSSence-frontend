@@ -1,5 +1,3 @@
-@let post = this.currentPost();
-
 <div class="page">
   <button
     pButton
@@ -12,8 +10,7 @@
     severity="info"
     outlined="true"
   ></button>
-
-  @if (post !== undefined) {
-    <app-post [isShowPostUserActions]="true" [post]="post" (postFormEvent)="this.getCurrentPost()" />
-  }
+  <div class="history-wrapper">
+    <app-post-history-timeline [historyResponse]="this.currentHistory()" />
+  </div>
 </div>

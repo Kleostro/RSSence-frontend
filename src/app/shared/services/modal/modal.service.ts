@@ -1,7 +1,7 @@
 import { Injectable, signal, TemplateRef } from '@angular/core';
 
-import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
-import ModalPositionType from '@/app/shared/models/modal-position';
+import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
+import ModalPositionType from '@/app/interfaces/modal-position';
 
 @Injectable({
   providedIn: 'root',

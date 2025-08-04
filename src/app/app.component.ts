@@ -9,6 +9,7 @@ import { HeaderComponent } from '@/app/core/components/header/header.component';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { ModalComponent } from '@/app/shared/components/modal/modal.component';
 import { PageLoaderComponent } from '@/app/shared/components/page-loader/page-loader.component';
+import { configurePostMarked } from '@/app/utils/configure-post-marked';
 
 @Component({
   imports: [RouterOutlet, HeaderComponent, ToastModule, ModalComponent, PageLoaderComponent],
@@ -24,5 +25,6 @@ export class AppComponent implements OnInit {
   public ngOnInit(): void {
     this.primeng.ripple.set(true);
     this.authService.checkAuth();
+    configurePostMarked();
   }
 }

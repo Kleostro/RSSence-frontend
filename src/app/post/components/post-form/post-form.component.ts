@@ -2,15 +2,16 @@ import { NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   input,
-  OnDestroy,
   OnInit,
   Output,
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
@@ -21,20 +22,23 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, Subject, take, takeUntil, tap } from 'rxjs';
+import { finalize, map, switchMap, take, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { PostResponse } from '@/app/api/schemas/posts-response';
+import { POST_STATUS, PostResponse, PostStatusType } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { POST_FORM_FIELD_CONFIG } from '@/app/constants/post-form';
+import { CoauthorsFGType, NewPost, PostForm } from '@/app/interfaces/post-form';
 import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
-import { CoauthorsFGType, NewPost, PostForm } from '@/app/post/interfaces/post-form';
+import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { arraysEqual } from '@/app/utils/arrays-equal';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FormFieldErrorComponent,
     ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
@@ -51,18 +55,19 @@ import { arraysEqual } from '@/app/utils/arrays-equal';
   styleUrl: './post-form.component.scss',
   templateUrl: './post-form.component.html',
 })
-export class PostFormComponent implements OnDestroy, OnInit {
+export class PostFormComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postsService = inject(PostsService);
   private readonly usersService = inject(UsersService);
-  @Output() public formSubmitEvent = new EventEmitter<PostResponse>();
+  @Output() public formSubmitEvent = new EventEmitter<PostStatusType>();
   public filteredAuthors = signal<AuthorResponse[]>([]);
   public form!: FormGroup<PostForm>;
   public hasChanges = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
   public post = input<null | PostResponse>();
+  public POST_FORM_FIELD_CONFIG = POST_FORM_FIELD_CONFIG;
   public postEditor = viewChild.required<PostEditorComponent>('postEditor');
 
   private checkPostForChanges(postData: NewPost): void {
@@ -101,17 +106,23 @@ export class PostFormComponent implements OnDestroy, OnInit {
     return coauthorsArray.map((coauthor: AuthorResponse) => coauthor.id);
   }
 
-  private handleFormSubmit(postData: NewPost): void {
+  private handleFormSubmit(postData: NewPost, isDraftPost: boolean): void {
     const post = this.post();
     const action$ = post ? this.postsService.updatePost(post.id, postData) : this.postsService.createPost(postData);
     action$
       .pipe(
         take(1),
-        map((newPost: PostResponse) => {
+        switchMap((newPost) => {
+          if (isDraftPost) {
+            return this.postsService.saveAsDraft(newPost.id);
+          }
+
+          return this.postsService.submitForModeration(newPost.id);
+        }),
+        map(() => {
           this.form.reset();
           this.form.controls.coauthors.clear();
-
-          this.formSubmitEvent.emit(newPost);
+          this.formSubmitEvent.emit(isDraftPost ? POST_STATUS.DRAFT : POST_STATUS.SUBMITTED);
         }),
         finalize(() => {
           this.completeProcessing();
@@ -146,7 +157,7 @@ export class PostFormComponent implements OnDestroy, OnInit {
     this.authorsService
       .getAuthors({ search: query, searchField: 'username' })
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap((data) => {
           this.filteredAuthors.set(data?.items.filter((author) => author.id !== authorMeId) ?? []);
         }),
@@ -159,18 +170,25 @@ export class PostFormComponent implements OnDestroy, OnInit {
     const isProcessing = this.isProcessing();
 
     if (currentPost) {
-      return isProcessing ? 'Saving...' : 'Save';
+      return isProcessing ? 'Updating...' : 'Update';
     } else {
-      return isProcessing ? 'Posting...' : 'Post';
+      return isProcessing ? 'Submiting...' : 'Submit';
     }
   }
 
   public initForm(): void {
-    const MAX_LENGTH = 100;
     this.form = this.fb.group<PostForm>({
       coauthors: this.fb.array<CoauthorsFGType>([]),
-      content: this.fb.control<null | string>(this.post()?.content ?? ''),
-      title: this.fb.control<string>(this.post()?.title ?? '', [Validators.required, Validators.maxLength(MAX_LENGTH)]),
+      content: this.fb.control<string>(this.post()?.content ?? '', [
+        Validators.required,
+        Validators.minLength(this.POST_FORM_FIELD_CONFIG.content.min),
+        Validators.maxLength(this.POST_FORM_FIELD_CONFIG.content.max),
+      ]),
+      title: this.fb.control<string>(this.post()?.title ?? '', [
+        Validators.required,
+        Validators.minLength(this.POST_FORM_FIELD_CONFIG.title.min),
+        Validators.maxLength(this.POST_FORM_FIELD_CONFIG.title.max),
+      ]),
     });
     const post = this.post();
 
@@ -184,16 +202,11 @@ export class PostFormComponent implements OnDestroy, OnInit {
     }
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
     this.initForm();
   }
 
-  public submit(): void {
+  public submit(isDraftPost: boolean): void {
     if (this.form.invalid) {
       return;
     }
@@ -210,7 +223,7 @@ export class PostFormComponent implements OnDestroy, OnInit {
     }
 
     if (this.hasChanges()) {
-      this.handleFormSubmit(postData);
+      this.handleFormSubmit(postData, isDraftPost);
     }
   }
 }

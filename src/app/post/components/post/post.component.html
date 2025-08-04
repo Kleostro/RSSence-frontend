@@ -1,18 +1,63 @@
 @let post = this.post();
-@let isSHhowPostAction = this.isShowPostActions() && this.usersService.me()?.author?.id === this.getAuthor()?.id;
+@let isShowPostUserActions =
+  this.isShowPostUserActions() && this.usersService.me()?.author?.id === this.getAuthor()?.id;
+@let canSubmitPost = post?.status === 'DRAFT';
+@let canEditPost = post?.status !== 'REJECTED';
+@let canMoveToDetailsPage = post?.status === 'APPROVED' && !this.navigationService.isPostDetailedPage();
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
     <div class="post-top">
-      <h1 class="post-title">{{ post.title }}</h1>
-
+      <h1
+        class="post-title"
+        aria-disabled="true"
+        [class.post-title-disabled]="!canMoveToDetailsPage"
+        (click)="this.navigationService.navigateToPostById(post.id)"
+        (keyup)="this.navigationService.navigateToPostById(post.id)"
+        (keydown)="this.navigationService.navigateToPostById(post.id)"
+      >
+        {{ post.title }}
+      </h1>
       <div class="post-actions">
+        @if (canMoveToDetailsPage) {
+          <button
+            pButton
+            pRipple
+            pTooltip="Details"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)="this.navigationService.navigateToPostById(post.id)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+            class="post-moderation-details-button"
+            severity="success"
+            outlined="true"
+          ></button>
+        }
+        @if (this.canViewPostHistory()) {
+          <button
+            pButton
+            pRipple
+            pTooltip="History"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)="this.navigationService.navigateToPostHistory(post.id)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
+            class="post-moderation-history-button"
+            severity="primary"
+            outlined="true"
+          ></button>
+        }
+
         <button
           pButton
           pRipple
+          [pTooltip]="this.mode() === 'preview' ? 'Unwrap' : 'Roll up'"
+          tooltipPosition="bottom"
           type="button"
           [disabled]="isProcessing()"
-          (click)="$event.stopPropagation(); this.mode.set(this.mode() === 'preview' ? 'full' : 'preview')"
+          (click)="this.mode.set(this.mode() === 'preview' ? 'full' : 'preview')"
           [icon]="
             this.mode() === 'preview'
               ? 'pi pi-arrow-up-right-and-arrow-down-left-from-center'
@@ -23,54 +68,76 @@
           outlined="true"
         ></button>
 
-        <button
-          pButton
-          pRipple
-          type="button"
-          *ngIf="isSHhowPostAction"
-          [disabled]="isProcessing()"
-          (click)="$event.stopPropagation(); this.editPost()"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
-          class="edit-post-button"
-          severity="primary"
-          outlined="true"
-        ></button>
-
-        <button
-          pButton
-          pRipple
-          type="button"
-          *ngIf="isSHhowPostAction"
-          [disabled]="isProcessing()"
-          (click)="$event.stopPropagation(); this.modalService.openModal(this.deletePostConfirm(), `Deleting a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
-          class="delete-post-button"
-          severity="danger"
-          outlined="true"
-        ></button>
+        @if (isShowPostUserActions) {
+          @if (canSubmitPost) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Submit"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.submitPost()"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
+              class="submit-post-button"
+              severity="success"
+              outlined="true"
+            ></button>
+          }
+          @if (canEditPost) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Edit"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.editPost()"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
+              class="edit-post-button"
+              severity="primary"
+              outlined="true"
+            ></button>
+          }
+          <button
+            pButton
+            pRipple
+            pTooltip="Delete"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)=" this.modalService.openModal(this.deletePostConfirm(), `Deleting a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+            class="delete-post-button"
+            severity="danger"
+            outlined="true"
+          ></button>
+        }
       </div>
     </div>
 
     <header class="post-header">
       <div class="post-authors">
         <app-post-avatar [author]="this.getAuthor()" />
-        <div *ngIf="this.getCoauthors().length" class="post-coauthors-wrapper">
-          <app-coauthors-list [coauthors]="this.getCoauthors()" />
-        </div>
+        @if (this.getCoauthors().length) {
+          <div class="post-coauthors-wrapper">
+            <app-coauthors-list [coauthors]="this.getCoauthors()" />
+          </div>
+        }
         <div class="post-times">
           <span class="post-createdAt">
             <span class="pi pi-clock"></span>
-            {{ post.createdAt | date: 'medium' }}
+            {{ post.createdAt | date: 'mediumDate' }}
+            at {{ post.createdAt | date: 'shortTime' }}
           </span>
-          @if (post.createdAt !== post.updatedAt) {
-            <span class="post-updatedAt"> Edited </span>
-          }
         </div>
       </div>
     </header>
 
     <body class="post-body">
-      <p class="post-content" *ngIf="this.mode() === 'full'" [innerHTML]="this.safeHtml()"></p>
+      @if (this.mode() === 'full') {
+        <div class="post-content" [@postBody] [innerHTML]="this.safeHtml()"></div>
+      }
     </body>
 
     <footer class="post-footer"></footer>
@@ -87,36 +154,13 @@
 </ng-template>
 
 <ng-template #deletePostConfirm>
-  <div class="delete-post-confirm">
-    <strong class="delete-post-confirm-title">Are you sure you want to delete this post?</strong>
-    <p-message severity="warn" icon="pi pi-exclamation-circle"
-      >The post is permanently deleted from both the author and the coauthors!</p-message
-    >
-    <div class="delete-post-confirm-actions">
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.modalService.closeModal()"
-        label="Cancel"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
-        class="cancel-post-confirm-button"
-        severity="primary"
-        outlined="true"
-      ></button>
-
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.deletePost()"
-        label="Delete"
-        [disabled]="isProcessing()"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
-        class="delete-post-confirm-button"
-        severity="danger"
-        outlined="true"
-      ></button>
-    </div>
-  </div>
+  <app-confirm
+    infoMessage="Are you sure you want to delete this post?"
+    warningMessage="The post is permanently deleted from both the author and the coauthors!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="this.deletePost()"
+    [isProcessing]="this.isProcessing()"
+  />
 </ng-template>

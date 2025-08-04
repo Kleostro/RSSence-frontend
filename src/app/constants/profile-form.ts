@@ -1,6 +1,6 @@
-import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
+import { FIELD_ERROR_KEY } from '@/app/constants/field-error-key';
 
-export const AUTHOR_FORM_FIELD_CONFIG = {
+export const PROFILE_FORM_FIELD_CONFIG = {
   bio: {
     max: 500,
     messages: {
@@ -39,6 +39,7 @@ export const AUTHOR_FORM_FIELD_CONFIG = {
 
 export const FORM_CONTROL_NAME = {
   AVATAR: 'avatar',
+  BIRTHDATE: 'birthdate',
 } as const;
 
 export const FORM_STATE = {
