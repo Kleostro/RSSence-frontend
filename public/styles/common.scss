@@ -21,3 +21,76 @@
   width: 40rem;
   height: 40rem;
 }
+
+.custom-heading {
+  margin-top: 2rem;
+}
+
+.custom-paragraph {
+  margin-top: 1rem;
+  line-height: 190%;
+
+  code {
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.4rem;
+
+    color: var(--p-text-color);
+    overflow-wrap: break-word;
+    white-space: break-spaces;
+
+    background-color: var(--p-surface-900);
+  }
+}
+
+.custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  margin-top: 2rem;
+  padding-inline-start: 2rem;
+
+  line-height: 190%;
+  list-style-type: disc;
+
+  code {
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.4rem;
+
+    color: var(--p-text-color);
+    overflow-wrap: break-word;
+    white-space: break-spaces;
+
+    background-color: var(--p-surface-900);
+  }
+}
+
+code {
+  &.hljs {
+    padding: 0 !important;
+    border-radius: 0.5rem;
+    color: var(--p-text-color);
+    background-color: var(--p-surface-700);
+  }
+
+  & .hljs-attr {
+    color: var(--p-blue-300);
+  }
+
+  & .hljs-string {
+    color: var(--p-orange-400);
+  }
+
+  & .hljs-variable {
+    color: var(--p-primary-300);
+  }
+
+  & .hljs-title,
+  .hljs-title.class_ {
+    color: var(--p-fuchsia-300);
+  }
+
+  & .hljs-keyword {
+    color: var(--p-cyan-400);
+  }
+}
