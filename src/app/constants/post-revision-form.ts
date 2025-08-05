@@ -1,0 +1,10 @@
+import { FIELD_ERROR_KEY } from '@/app/constants/field-error-key';
+
+export const POST_REVISION_FORM_FIELD_CONFIG = {
+  comment: {
+    max: 256,
+    messages: {
+      [FIELD_ERROR_KEY.REQUIRED]: 'Please input your comment!',
+    },
+  },
+} as const;

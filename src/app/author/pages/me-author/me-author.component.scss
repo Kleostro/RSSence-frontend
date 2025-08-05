@@ -11,6 +11,13 @@
   width: 59%;
 }
 
+.post-form-button {
+  display: flex;
+  width: 50%;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+}
+
 .posts-list-settings {
   position: relative;
 
@@ -21,6 +28,17 @@
   height: auto;
 }
 
-.posts-count {
-  margin-bottom: 2rem;
+.tab-content {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tab-label {
+  font-size: 1rem;
+  letter-spacing: 0.05rem;
+}
+
+.tab-count {
+  font-size: 0.8rem;
 }

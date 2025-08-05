@@ -1,4 +1,6 @@
 export interface PaginationQueryDto {
+  filter?: string;
+  filterField?: string;
   limit?: number;
   page?: number;
   search?: string;

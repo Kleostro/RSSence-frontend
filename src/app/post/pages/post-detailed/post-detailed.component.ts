@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
@@ -16,8 +17,8 @@ import { PostComponent } from '@/app/post/components/post/post.component';
   styleUrl: './post-detailed.component.scss',
   templateUrl: './post-detailed.component.html',
 })
-export class PostDetailedComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class PostDetailedComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly postsService = inject(PostsService);
   public readonly navigationService = inject(NavigationService);
 
@@ -30,18 +31,13 @@ export class PostDetailedComponent implements OnDestroy, OnInit {
       this.postsService
         .getPostById(+postId)
         .pipe(
-          takeUntil(this.destroy$),
+          takeUntilDestroyed(this.destroyRef),
           tap((post: PostResponse) => {
             this.currentPost.set(post);
           }),
         )
         .subscribe();
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   public ngOnInit(): void {

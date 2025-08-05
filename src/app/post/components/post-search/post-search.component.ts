@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
 import { InputText } from 'primeng/inputtext';
 import { RadioButton } from 'primeng/radiobutton';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 
 import { PostsService } from '@/app/api/services/posts/posts.service';
 
@@ -16,8 +17,8 @@ const DEBOUNCE_TIME = 400;
   styleUrl: './post-search.component.scss',
   templateUrl: './post-search.component.html',
 })
-export class PostSearchComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class PostSearchComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postsService = inject(PostsService);
   public readonly searchFields = [
@@ -29,15 +30,10 @@ export class PostSearchComponent implements OnDestroy, OnInit {
     searchField: [this.searchFields[0].value],
   });
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
     this.searchForm.valueChanges
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         debounceTime(DEBOUNCE_TIME),
         distinctUntilChanged(),
         tap((formFalue) => {

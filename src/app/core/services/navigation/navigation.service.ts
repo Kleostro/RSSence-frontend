@@ -15,7 +15,9 @@ export class NavigationService {
   private readonly router = inject(Router);
 
   public isLoginPage = signal<boolean>(false);
+  public isPostDetailedModerationPage = signal<boolean>(false);
   public isPostDetailedPage = signal<boolean>(false);
+  public isPostModerationPage = signal<boolean>(false);
   public queryParams = signal<Record<string, string>>({});
 
   constructor() {
@@ -24,6 +26,8 @@ export class NavigationService {
 
       this.isPostDetailedPage.set(url.startsWith(APP_ROUTE.POSTS + '/'));
       this.isLoginPage.set(url.startsWith(APP_ROUTE.LOGIN));
+      this.isPostModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION));
+      this.isPostDetailedModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION + '/'));
     });
   }
 
@@ -53,6 +57,19 @@ export class NavigationService {
 
   public navigateToPostById(postId: number): void {
     this.router.navigate([APP_ROUTE.POSTS, postId]);
+  }
+
+  public navigateToPostHistory(postId: number): void {
+    const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.HISTORY}`;
+    this.router.navigate([url]);
+  }
+
+  public navigateToPostModeration(): void {
+    this.router.navigate([APP_ROUTE.POST_MODERATION]);
+  }
+
+  public navigateToPostModerationById(postId: number): void {
+    this.router.navigate([APP_ROUTE.POST_MODERATION, postId]);
   }
 
   public navigateToProfile(): void {

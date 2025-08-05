@@ -11,7 +11,6 @@ import { tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { ImageUploadService } from '@/app/shared/services/image-upload/image-upload.service';
-import { configurePostMarked } from '@/app/utils/configure-post-marked';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Component({
@@ -48,10 +47,6 @@ export class PostEditorComponent implements ControlValueAccessor {
 
   public onTouched!: () => void;
   public previewHtml = signal<SafeHtml>('');
-
-  constructor() {
-    configurePostMarked();
-  }
 
   private cleanupUnusedImages(): void {
     const usedImages = this.extractUsedImages();

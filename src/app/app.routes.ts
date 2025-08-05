@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, loginGuard, userGuard } from '@/app/auth/guards/login.guard';
+import { adminGuard, loginGuard, moderatorGuard, userGuard } from '@/app/auth/guards/login.guard';
 import { authorResolver, meAuthorResolver } from '@/app/author/resolvers/author.resolver';
-import { ADMIN_PATH, APP_PATH } from '@/app/core/services/navigation/routes';
+import { ADMIN_PATH, APP_PATH, MODERATOR_PATH } from '@/app/core/services/navigation/routes';
 import { meProfileResolver, profileResolver } from '@/app/profile/resolvers/profile.resolver';
 
 export const routes: Routes = [
@@ -26,25 +26,25 @@ export const routes: Routes = [
     title: `RSS | ${APP_PATH.SIGN_UP}`,
   },
   {
-    canActivate: [authGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./profile/pages/me-profile/me-profile.component').then((c) => c.MeProfileComponent),
     path: APP_PATH.PROFILE.toLowerCase(),
     resolve: { profile: meProfileResolver },
   },
   {
-    canActivate: [authGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
     path: `${APP_PATH.PROFILE.toLowerCase()}/:id`,
     resolve: { profile: profileResolver },
   },
   {
-    canActivate: [authGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./author/pages/me-author/me-author.component').then((c) => c.MeAuthorComponent),
     path: APP_PATH.AUTHOR.toLowerCase(),
     resolve: { author: meAuthorResolver },
   },
   {
-    canActivate: [authGuard],
+    canActivate: [userGuard],
     loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
     path: `${APP_PATH.AUTHOR.toLowerCase()}/:id`,
     resolve: { author: authorResolver },
@@ -61,6 +61,12 @@ export const routes: Routes = [
       import('./post/pages/post-detailed/post-detailed.component').then((c) => c.PostDetailedComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id`,
     title: `RSSence | ${APP_PATH.POSTS.slice(0, -1)}`,
+  },
+  {
+    canActivate: [userGuard],
+    loadComponent: () => import('./post/pages/post-history/post-history.component').then((c) => c.PostHistoryComponent),
+    path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.HISTORY.toLowerCase()}`,
+    title: `Post | ${APP_PATH.HISTORY}`,
   },
   {
     canActivate: [adminGuard],
@@ -82,9 +88,44 @@ export const routes: Routes = [
     title: `Tu-Tu | ${APP_PATH.ADMIN}`,
   },
   {
+    canActivate: [moderatorGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: MODERATOR_PATH.POSTS.toLowerCase(),
+      },
+      {
+        loadComponent: () =>
+          import('./moderator/pages/posts-moderation/posts-moderation.component').then(
+            (c) => c.PostsModerationComponent,
+          ),
+        path: MODERATOR_PATH.POSTS.toLowerCase(),
+        title: `Moderator | ${MODERATOR_PATH.POSTS}`,
+      },
+      {
+        loadComponent: () =>
+          import('./moderator/pages/post-moderation-detailed/post-moderation-detailed.component').then(
+            (c) => c.PostModerationDetailedComponent,
+          ),
+        path: `${MODERATOR_PATH.POSTS.toLowerCase()}/:id`,
+        title: `Moderator | ${MODERATOR_PATH.POSTS.slice(0, -1)}`,
+      },
+    ],
+    loadComponent: () =>
+      import('./moderator/layout/moderator-layout/moderator-layout.component').then((c) => c.ModeratorLayoutComponent),
+    path: APP_PATH.MODERATOR.toLowerCase(),
+    title: `Tu-Tu | ${APP_PATH.MODERATOR}`,
+  },
+  {
     loadComponent: () => import('./core/pages/not-found/not-found.component').then((c) => c.NotFoundComponent),
     path: APP_PATH.NOT_FOUND,
     title: `RSS | ${APP_PATH.NOT_FOUND}`,
+  },
+  {
+    loadComponent: () => import('./core/pages/forbidden/forbidden.component').then((c) => c.ForbiddenComponent),
+    path: APP_PATH.FORBIDDEN,
+    title: `RSS | ${APP_PATH.FORBIDDEN}`,
   },
   {
     path: APP_PATH.NO_MATCH,

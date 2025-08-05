@@ -2,15 +2,16 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
-  OnDestroy,
   OnInit,
   Output,
   signal,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -20,14 +21,14 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, EMPTY, tap } from 'rxjs';
 
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { hasKeyInProfileResponse, ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
+import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/constants/profile-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/profile/constants/profile-form';
-import { ProfileForm } from '@/app/profile/interfaces/profile-form';
+import { ProfileForm } from '@/app/interfaces/profile-form';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
@@ -52,10 +53,10 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
   styleUrl: './profile-form.component.scss',
   templateUrl: './profile-form.component.html',
 })
-export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
+export class ProfileFormComponent implements AfterViewInit, OnInit {
   private readonly avatarFile = signal<File | null>(null);
   private readonly birthdate = signal<null | string>(null);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly message = inject(MessageService);
@@ -129,7 +130,7 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
 
     action$
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap((newOrUpdatedProfile) => {
           this.formSubmitEvent.emit(newOrUpdatedProfile);
         }),
@@ -208,11 +209,6 @@ export class ProfileFormComponent implements AfterViewInit, OnDestroy, OnInit {
     if (this.profile?.birthdate) {
       this.birthdatePicker.writeValue(new Date(this.profile.birthdate));
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   public ngOnInit(): void {

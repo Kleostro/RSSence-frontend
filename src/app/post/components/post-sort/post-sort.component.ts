@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { RadioButton } from 'primeng/radiobutton';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 
 import { PostsService } from '@/app/api/services/posts/posts.service';
 
@@ -20,8 +21,8 @@ interface SortingForm {
   styleUrl: './post-sort.component.scss',
   templateUrl: './post-sort.component.html',
 })
-export class PostSortComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class PostSortComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postsService = inject(PostsService);
   public readonly sortByOptions = [
@@ -35,15 +36,10 @@ export class PostSortComponent implements OnDestroy, OnInit {
     sortOrder: this.fb.control('asc'),
   });
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
     this.sortingForm.valueChanges
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         debounceTime(DEBOUNCE_TIME),
         distinctUntilChanged(),
         tap((formFalue) => {

@@ -1,7 +1,8 @@
 @let post = this.currentPost();
 
 <div class="page">
-  <p-button
+  <button
+    pButton
     pRipple
     class="back-button"
     type="button"
@@ -10,9 +11,9 @@
     icon="pi pi-arrow-left"
     severity="info"
     outlined="true"
-  />
+  ></button>
 
   @if (post !== undefined) {
-    <app-post [post]="post" (postFormEvent)="this.getCurrentPost()" />
+    <app-post [isShowPostUserActions]="true" [post]="post" (postFormEvent)="this.getCurrentPost()" />
   }
 </div>

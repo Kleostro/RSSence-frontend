@@ -1,0 +1,39 @@
+<div class="confirm">
+  @if (this.infoMessage()) {
+    <p-message severity="info" icon="pi pi-info-circle" [text]="this.infoMessage()" />
+  }
+  @if (this.warningMessage()) {
+    <p-message severity="warn" icon="pi pi-exclamation-circle" [text]="this.warningMessage()" />
+  }
+
+  <div class="body">
+    <ng-content />
+  </div>
+
+  <div class="confirm-actions">
+    <button
+      pButton
+      pRipple
+      type="button"
+      (click)="this.modalService.closeModal()"
+      [label]="this.cancelButtonText()"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : this.cancelButtonIcon()"
+      class="confirm-button-cancel"
+      [severity]="this.cancelButtonSeverity()"
+      outlined="true"
+    ></button>
+
+    <button
+      pButton
+      pRipple
+      type="button"
+      (click)="this.confirmEvent.emit()"
+      [label]="this.confirmButtonText()"
+      [disabled]="this.isProcessing() || this.confirmButtonDisabled()"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : this.confirmButtonIcon()"
+      class="confirm-button-confirm"
+      [severity]="this.confirmButtonSeverity()"
+      outlined="true"
+    ></button>
+  </div>
+</div>

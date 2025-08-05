@@ -1,72 +1,94 @@
-import { DatePipe, NgIf } from '@angular/common';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  DestroyRef,
   effect,
   EventEmitter,
   inject,
   input,
-  OnDestroy,
   OnInit,
   Output,
   signal,
   TemplateRef,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import * as marked from 'marked';
 import { ButtonModule } from 'primeng/button';
-import { Message } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
-import { catchError, EMPTY, finalize, Subject, takeUntil, tap } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
+import { catchError, EMPTY, finalize, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
-import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
+import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
-import { configurePostMarked } from '@/app/utils/configure-post-marked';
 
 @Component({
+  animations: [
+    trigger('postBody', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scaleY(0)', transformOrigin: 'top' }),
+        animate('300ms ease-in', style({ opacity: 1, transform: 'scaleY(1)' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'scaleY(1)', transformOrigin: 'top' }),
+        animate('300ms ease-out', style({ opacity: 0, transform: 'scaleY(0)' })),
+      ]),
+    ]),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CoauthorsListComponent,
-    NgIf,
     DatePipe,
     ButtonModule,
-    Message,
     RippleModule,
     PostAvatarComponent,
     PostFormComponent,
+    TooltipModule,
+    ConfirmComponent,
   ],
   selector: 'app-post',
   styleUrl: './post.component.scss',
   templateUrl: './post.component.html',
 })
-export class PostComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class PostComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly message = inject(MessageService);
-  private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
-  @Output() public postDeleteEvent = new EventEmitter<unknown>();
+  @Output() public postEvent = new EventEmitter<unknown>();
   @Output() public postFormEvent = new EventEmitter<unknown>();
   public readonly modalService = inject(ModalService);
+  public readonly navigationService = inject(NavigationService);
   public readonly sanitizer = inject(DomSanitizer);
   public readonly usersService = inject(UsersService);
+  public post = input.required<null | PostResponse>();
+  public canViewPostHistory = computed(() => {
+    const post = this.post();
+    return (
+      (post?.authors.some(({ author }) => author.id === this.usersService.me()?.author?.id) ?? false) ||
+      this.usersService.isModerator()
+    );
+  });
   public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
-  public isShowPostActions = input<boolean>(true);
+  public isShowPostUserActions = input<boolean>(false);
   public mode = signal<'full' | 'preview'>('preview');
-  public post = input.required<null | PostResponse>();
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
 
   public safeHtml = signal<SafeHtml>('');
@@ -75,8 +97,6 @@ export class PostComponent implements OnDestroy, OnInit {
     effect(() => {
       this.parseHtml();
     });
-
-    configurePostMarked();
 
     if (this.navigationService.isPostDetailedPage()) {
       this.mode.set('full');
@@ -89,6 +109,30 @@ export class PostComponent implements OnDestroy, OnInit {
     return parsedHtml;
   }
 
+  public approvePost(): void {
+    const post = this.post();
+    if (!post) {
+      return;
+    }
+    this.isProcessing.set(true);
+    this.postsService
+      .approvePost(post.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => {
+          this.postEvent.emit();
+        }),
+        catchError((error: OverriddenHttpErrorResponse) => {
+          this.message.error(error.error.message);
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.isProcessing.set(false);
+        }),
+      )
+      .subscribe();
+  }
+
   public deletePost(): void {
     const post = this.post();
     if (!post) {
@@ -98,13 +142,13 @@ export class PostComponent implements OnDestroy, OnInit {
     this.postsService
       .deletePost(post.id)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap(() => {
           this.modalService.closeModal();
           if (this.navigationService.isPostDetailedPage()) {
             this.navigationService.goBack();
           } else {
-            this.postDeleteEvent.emit();
+            this.postEvent.emit();
           }
         }),
         catchError((error: OverriddenHttpErrorResponse) => {
@@ -140,12 +184,32 @@ export class PostComponent implements OnDestroy, OnInit {
     this.postFormEvent.emit();
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
     this.parseHtml();
+  }
+
+  public submitPost(): void {
+    const post = this.post();
+    if (!post) {
+      return;
+    }
+    this.isProcessing.set(true);
+    this.postsService
+      .submitForModeration(post.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(() => {
+          this.modalService.closeModal();
+          this.postEvent.emit();
+        }),
+        catchError((error: OverriddenHttpErrorResponse) => {
+          this.message.error(error.error.message);
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.isProcessing.set(false);
+        }),
+      )
+      .subscribe();
   }
 }

@@ -10,8 +10,8 @@ import { TieredMenu } from 'primeng/tieredmenu';
 
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
-import { ROLE } from '@/app/auth/constants/roles';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
+import { ROLE } from '@/app/constants/roles';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 import { ThemeSwitchService } from '@/app/core/services/theme-switch/theme-switch.service';
@@ -77,12 +77,28 @@ export class SidebarComponent {
           label: 'Users',
           routerLink: [APP_ROUTE.USERS],
         },
+        {
+          separator: true,
+        },
       ],
       label: 'Admin',
       visible: this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.ADMIN),
     },
+
     {
-      separator: true,
+      icon: 'pi pi-shield',
+      items: [
+        {
+          icon: 'pi pi-list-check',
+          label: 'Post moderation',
+          routerLink: [APP_ROUTE.POST_MODERATION],
+        },
+        {
+          separator: true,
+        },
+      ],
+      label: 'Moderator',
+      visible: this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR),
     },
     {
       icon: 'pi pi-cog',

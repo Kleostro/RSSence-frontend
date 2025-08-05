@@ -14,7 +14,12 @@
   &-footer {
     position: sticky;
     bottom: 0;
+
+    display: flex;
+    gap: 1rem;
+
     padding: 1rem 0;
+
     background-color: var(--p-surface-800);
   }
 }

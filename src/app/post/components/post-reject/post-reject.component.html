@@ -1,0 +1,55 @@
+@let commentControl = this.rejectForm.controls.comment;
+@let reasonsControl = this.rejectForm.controls.reasons;
+
+<app-confirm
+  infoMessage="It is necessary to describe all the comments in detail."
+  warningMessage="Are you sure you want to reject this post?"
+  confirmButtonText="Reject"
+  confirmButtonSeverity="danger"
+  [confirmButtonDisabled]="this.rejectForm.invalid"
+  (confirmEvent)="this.rejectPost()"
+  [isProcessing]="this.isProcessing()"
+>
+  <form class="rejectForm" [formGroup]="this.rejectForm">
+    <p-floatlabel>
+      <textarea
+        pTextarea
+        class="form-textarea"
+        rows="10"
+        id="comment"
+        name="comment"
+        formControlName="comment"
+      ></textarea>
+      <label for="comment">Comment <span style="color: red">*</span></label>
+    </p-floatlabel>
+
+    <div class="control-errors">
+      <app-form-field-error
+        [control]="commentControl"
+        field="comment"
+        [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.comment"
+        [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.comment.messages"
+      />
+    </div>
+
+    <label for="reasons">Reason <span style="color: red">*</span></label>
+    <p-listbox
+      id="reasons"
+      name="reasons"
+      formControlName="reasons"
+      [options]="this.reasons"
+      [multiple]="true"
+      [checkbox]="true"
+      optionLabel="label"
+    />
+
+    <div class="control-errors">
+      <app-form-field-error
+        [control]="reasonsControl"
+        field="reasons"
+        [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.reasons"
+        [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.reasons.messages"
+      />
+    </div>
+  </form>
+</app-confirm>

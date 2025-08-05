@@ -1,25 +1,27 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PostsListComponent, ButtonModule, RippleModule],
+  imports: [PostsListComponent, ButtonModule, RippleModule, PostComponent],
   selector: 'app-posts',
   styleUrl: './posts.component.scss',
   templateUrl: './posts.component.html',
 })
-export class PostsComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class PostsComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly postsService = inject(PostsService);
   public readonly navigationService = inject(NavigationService);
 
@@ -35,17 +37,18 @@ export class PostsComponent implements OnDestroy, OnInit {
 
   public handlePageChangeEvent(event: PaginatorState): void {
     const { page = 1, rows } = event;
-    const query: PaginationQueryDto = { limit: rows, page: page + 1 };
+    const query: PaginationQueryDto = {
+      filter: POST_STATUS.APPROVED,
+      filterField: 'status',
+      limit: rows,
+      page: page + 1,
+    };
 
-    this.loadAllPosts(query).pipe(takeUntil(this.destroy$)).subscribe();
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.loadAllPosts(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   public ngOnInit(): void {
-    this.loadAllPosts().pipe(takeUntil(this.destroy$)).subscribe();
+    const query: PaginationQueryDto = { filter: POST_STATUS.APPROVED, filterField: 'status' };
+    this.loadAllPosts(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 }

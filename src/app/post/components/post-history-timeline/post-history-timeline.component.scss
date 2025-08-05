@@ -1,0 +1,130 @@
+.history-timeline {
+  ::ng-deep.p-timeline-event-opposite {
+    flex: none;
+  }
+}
+
+.action-type-tag,
+.status-tag {
+  width: max-content;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+}
+
+.history-item {
+  display: grid;
+  grid-template-columns: 2fr 4.5fr 0.5fr;
+  gap: 1rem;
+
+  margin: 1rem 0;
+  padding: 1rem 2rem;
+  border: 0.1rem solid var(--p-surface-600);
+  border-radius: 0.5rem;
+
+  background-color: var(--p-surface-800);
+
+  &-action,
+  &-changes-in-status {
+    padding-top: 0.5rem;
+    font-weight: bold;
+    font-style: italic;
+    color: var(--p-text-muted-color);
+  }
+
+  &-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-right: 0.1rem dotted var(--p-surface-600);
+  }
+
+  &-center {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-right: 0.1rem dotted var(--p-surface-600);
+  }
+
+  &-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+}
+
+.description-wrapper,
+.coment-wrapper,
+.reason-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.reasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  padding-left: 1rem;
+
+  list-style: auto;
+}
+
+.description-title,
+.comment-title,
+.reason-title,
+.history-item-author,
+.history-item-moderator {
+  font-weight: bold;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+}
+
+.history-item-author,
+.history-item-moderator {
+  text-align: right;
+}
+
+.description-text,
+.comment-text,
+.reason-text {
+  font-size: 1rem;
+}
+
+.moderator-avatar-img,
+.author-avatar-img {
+  cursor: pointer;
+  transition: filter 0.3s;
+
+  &:hover {
+    filter: brightness(1.5);
+  }
+}
+
+.moderator-profile-link,
+.author-link {
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: var(--p-primary-color);
+  }
+}
+
+.moderator-info,
+.author-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

@@ -1,29 +1,31 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { Skeleton } from 'primeng/skeleton';
-import { Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { TabsModule } from 'primeng/tabs';
+import { Observable, switchMap, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, POST_STATUS, PostStatusType } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
-import { FORM_STATE } from '@/app/author/constants/author-form';
-import { getNavigationAuthorPage } from '@/app/author/constants/navigation-author-page';
+import { FORM_STATE } from '@/app/constants/author-form';
+import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
+import { getNavigationAuthorPage } from '@/app/constants/navigation-author-page';
+import { FormState } from '@/app/constants/profile-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
+import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
-import { FormState } from '@/app/profile/constants/profile-form';
-import MODAL_POSITION_DIRECTION from '@/app/shared/constants/modal-position';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
@@ -33,18 +35,20 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     AuthorFormWrapperComponent,
     AuthorInfoComponent,
     ButtonModule,
+    PostComponent,
     RippleModule,
     PostsListComponent,
     PostFormComponent,
-    Skeleton,
+    BadgeModule,
+    TabsModule,
   ],
   selector: 'app-me-author',
   styleUrl: './me-author.component.scss',
   templateUrl: './me-author.component.html',
 })
-export class MeAuthorComponent implements OnDestroy, OnInit {
+export class MeAuthorComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
@@ -66,13 +70,25 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     },
   );
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
+  public paginatedPostResponseOnTab = signal<null | PaginatedPostResponse>(null);
+  public postStatuses = signal<{ count: number; name: string }[]>([]);
   public previewAuthor = signal<AuthorResponse | null>(null);
+  public selectedTab = signal<string>('');
 
   private loadAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
     return this.authorsService.getAuthorPosts(username, query).pipe(
-      takeUntil(this.destroy$),
+      takeUntilDestroyed(this.destroyRef),
       tap((data) => {
         this.paginatedPostResponse.set(data);
+      }),
+    );
+  }
+
+  private loadAuthorPostStatuses(username: string): Observable<{ count: number; name: string }[]> {
+    return this.authorsService.getAuthorPostStatuses(username).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      tap((data) => {
+        this.postStatuses.set(data);
       }),
     );
   }
@@ -86,7 +102,7 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     this.authorsService
       .deleteAuthor(username)
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         switchMap(() => this.usersService.getMe()),
       )
       .subscribe(() => {
@@ -100,7 +116,7 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     this.currentAuthor.set(newOrUpdatedAuthor);
     this.previewAuthor.set(newOrUpdatedAuthor);
     this.authorFormState.set(FORM_STATE.CREATE);
-    this.loadAuthorPosts(newOrUpdatedAuthor.username).pipe(takeUntil(this.destroy$)).subscribe();
+    this.loadAuthorPosts(newOrUpdatedAuthor.username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   public handlePageChangeEvent(event: PaginatorState): void {
@@ -110,10 +126,9 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
     }
 
     const { page = 1, rows } = event;
+    this.postsService.query.set({ ...this.postsService.query(), limit: rows, page: page + 1 });
 
-    this.loadAuthorPosts(username, { limit: rows, page: page + 1 })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
+    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   public handlePostEvent(): void {
@@ -122,20 +137,23 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
       return;
     }
 
-    this.loadAuthorPosts(username).pipe(takeUntil(this.destroy$)).subscribe();
+    this.loadAuthorPostStatuses(username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  public handleTabChange(status: string): void {
+    this.selectedTab.set(status);
+    this.postsService.query.set({ ...this.postsService.query(), filter: status, filterField: 'status' });
+    this.handlePostEvent();
   }
 
   public ngOnInit(): void {
     this.postsService.resetQuery();
+    this.postsService.query.set({ filter: POST_STATUS.APPROVED, filterField: 'status' });
 
     this.route.data
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap(({ author }) => {
           const result = AuthorSchema.safeParse(author);
           if (result.success) {
@@ -143,8 +161,15 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
             this.previewAuthor.set(result.data);
             this.paginatedPostResponse.set(null);
 
-            this.loadAuthorPosts(result.data.username, this.postsService.query())
-              .pipe(takeUntil(this.destroy$))
+            this.loadAuthorPostStatuses(result.data.username)
+              .pipe(
+                tap((data) => {
+                  this.selectedTab.set(data[0]?.name ?? '');
+                  this.postsService.query.set({ filter: this.selectedTab(), filterField: 'status' });
+                }),
+                takeUntilDestroyed(this.destroyRef),
+                switchMap(() => this.loadAuthorPosts(result.data.username, this.postsService.query())),
+              )
               .subscribe();
           }
         }),
@@ -153,7 +178,7 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
 
     this.postsQuery$
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         switchMap((query) => {
           const username = this.currentAuthor()?.username;
           if (!username) {
@@ -166,20 +191,28 @@ export class MeAuthorComponent implements OnDestroy, OnInit {
       .subscribe();
   }
 
-  public onCreatePost(): void {
+  public onCreatePost(postStatus: PostStatusType): void {
     const username = this.currentAuthor()?.username;
     if (!username) {
       return;
     }
 
     this.modalService.closeModal();
+    this.selectedTab.set(postStatus);
 
-    this.loadAuthorPosts(username, { sortBy: 'createdAt', sortOrder: 'desc' })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
+    this.postsService.query.set({
+      ...this.postsService.query(),
+      filter: postStatus,
+      filterField: 'status',
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+
+    this.loadAuthorPostStatuses(username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   public setParamsInModal(): void {
-    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
+    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER);
   }
 }

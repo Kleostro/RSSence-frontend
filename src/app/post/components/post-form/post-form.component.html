@@ -1,16 +1,35 @@
-<form class="form" [formGroup]="form" (submit)="submit()">
+@let titleControl = this.form.controls.title;
+@let contentControl = this.form.controls.content;
+
+<form class="form" [formGroup]="this.form">
   <label for="title">Title</label>
   <input class="title-input" pInputText fluid="true" id="title" formControlName="title" autocomplete="off" />
+  <div class="control-errors">
+    <app-form-field-error
+      [control]="titleControl"
+      field="title"
+      [fieldBoundaries]="POST_FORM_FIELD_CONFIG.title"
+      [errorMessages]="POST_FORM_FIELD_CONFIG.title.messages"
+    />
+  </div>
 
   <label for="content">Content</label>
   <app-post-editor #postEditor formControlName="content" id="content" />
+  <div class="control-errors">
+    <app-form-field-error
+      [control]="contentControl"
+      field="content"
+      [fieldBoundaries]="POST_FORM_FIELD_CONFIG.content"
+      [errorMessages]="POST_FORM_FIELD_CONFIG.content.messages"
+    />
+  </div>
 
   <div class="multiple-select">
     <ng-container formArrayName="coauthors">
       <div class="coauthors">
         <span>Add up to 5 coauthors</span>
         <div class="coauthor-wrapper">
-          @for (coauthorFG of form.controls.coauthors.controls; track coauthorFG; let i = $index) {
+          @for (coauthorFG of this.form.controls.coauthors.controls; track coauthorFG; let i = $index) {
             <div [formGroup]="coauthorFG">
               <div class="coauthor-fg-wrapper">
                 <div class="coauthor-control">
@@ -36,11 +55,11 @@
                   class="remove-coauthor-btn"
                   pRipple
                   type="button"
-                  [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                  [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
                   severity="danger"
                   outlined="true"
-                  (click)="form.controls.coauthors.removeAt(i)"
-                  [disabled]="isProcessing()"
+                  (click)="this.form.controls.coauthors.removeAt(i)"
+                  [disabled]="this.isProcessing()"
                 />
               </div>
             </div>
@@ -52,12 +71,12 @@
             type="button"
             label="Add"
             fluid="true"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
+            [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
             severity="success"
             outlined="true"
             *ngIf="form.controls.coauthors.controls.length < 5"
-            (click)="addCoauthor()"
-            [disabled]="isProcessing()"
+            (click)="this.addCoauthor()"
+            [disabled]="this.isProcessing()"
           />
         </div>
       </div>
@@ -68,12 +87,25 @@
     <button
       pButton
       pRipple
-      type="submit"
+      type="button"
       fluid="true"
       [label]="this.getSubmitButtonLabel()"
-      [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-      [disabled]="form.invalid || isProcessing()"
+      (click)="this.submit(false)"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+      [disabled]="form.invalid || this.isProcessing()"
       severity="success"
+      outlined="true"
+    ></button>
+    <button
+      pButton
+      pRipple
+      type="button"
+      fluid="true"
+      (click)="this.submit(true)"
+      [label]="this.isProcessing() ? 'Saving...' : 'Save as draft'"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
+      [disabled]="form.invalid || this.isProcessing()"
+      severity="info"
       outlined="true"
     ></button>
   </div>

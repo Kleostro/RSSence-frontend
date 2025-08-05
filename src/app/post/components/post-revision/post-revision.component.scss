@@ -1,0 +1,10 @@
+.revisionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-textarea {
+  resize: none;
+  width: 100%;
+}

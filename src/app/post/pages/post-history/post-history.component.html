@@ -1,0 +1,16 @@
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+  <div class="history-wrapper">
+    <app-post-history-timeline [historyResponse]="this.currentHistory()" />
+  </div>
+</div>

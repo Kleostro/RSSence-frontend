@@ -1,14 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
-  OnDestroy,
   OnInit,
   Output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -17,15 +18,15 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, EMPTY, switchMap, tap } from 'rxjs';
 
 import { AuthorResponse, hasKeyInAuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { UsersService } from '@/app/api/services/users/users.service';
-import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/author/constants/author-form';
-import { AuthorForm } from '@/app/author/interfaces/author-form';
+import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/constants/author-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+import { AuthorForm } from '@/app/interfaces/author-form';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
@@ -49,10 +50,10 @@ import { usernameAvailability } from '@/app/shared/validators/username-availabil
   styleUrl: './author-form.component.scss',
   templateUrl: './author-form.component.html',
 })
-export class AuthorFormComponent implements OnDestroy, OnInit {
+export class AuthorFormComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
   private readonly avatarFile = signal<File | null>(null);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly fileHandlingService = inject(FileHandlingService);
   private readonly message = inject(MessageService);
@@ -119,7 +120,7 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
 
     action$
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
         tap((newOrUpdatedAuthor) => {
           this.formSubmitEvent.emit(newOrUpdatedAuthor);
         }),
@@ -190,11 +191,6 @@ export class AuthorFormComponent implements OnDestroy, OnInit {
       username,
     });
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   public ngOnInit(): void {

@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl } from '@angular/forms';
 
-import { Subject, takeUntil } from 'rxjs';
-
-import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
+import { FIELD_ERROR_KEY } from '@/app/constants/field-error-key';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -12,8 +11,8 @@ import { FIELD_ERROR_KEY } from '@/app/shared/constants/field-error-key';
   styleUrl: './form-field-error.component.scss',
   templateUrl: './form-field-error.component.html',
 })
-export class FormFieldErrorComponent implements OnDestroy, OnInit {
-  private readonly destroy$ = new Subject<void>();
+export class FormFieldErrorComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
 
   public readonly control = input.required<AbstractControl>();
   public readonly errorMessage = signal<null | string>(null);
@@ -57,14 +56,9 @@ export class FormFieldErrorComponent implements OnDestroy, OnInit {
     });
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   public ngOnInit(): void {
     this.control()
-      .statusChanges.pipe(takeUntil(this.destroy$))
+      .statusChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.errorMessage.set(this.getError());
       });
