@@ -1,0 +1,117 @@
+.back-button {
+  width: max-content;
+  margin-bottom: 1rem;
+}
+
+.diff-container {
+  border: 0.2rem solid var(--p-surface-600);
+  border-radius: 0.2rem;
+  background-color: var(--p-surface-900);
+}
+
+.diff-header {
+  display: flex;
+}
+
+.title-label {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--p-text-color);
+  text-align: center;
+
+  background-color: var(--p-surface-800);
+}
+
+.version-label {
+  flex: 1;
+
+  padding: 0.5rem;
+
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--p-text-color);
+  text-align: center;
+}
+
+.diff-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1rem;
+}
+
+.diff-left {
+  grid-column: 1;
+}
+
+.diff-right {
+  grid-column: 2;
+}
+
+.diff-line {
+  display: flex;
+  align-items: flex-start;
+
+  padding: 0.25rem 0.5rem;
+
+  color: var(--p-text-color);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+
+  &.add {
+    background-color: color-mix(in srgb, var(--p-green-900) 40%, var(--p-surface-800) 60%);
+
+    .line-index,
+    .line-marker {
+      color: var(--p-green-500);
+    }
+  }
+
+  &.remove {
+    background-color: color-mix(in srgb, var(--p-red-800) 30%, var(--p-surface-800) 70%);
+
+    .line-index,
+    .line-marker {
+      color: var(--p-red-500);
+    }
+  }
+}
+
+.line-index {
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.line-marker {
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.line-content {
+  flex: 1;
+
+  font-family: monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: break-all;
+  white-space: break-spaces;
+
+  .common {
+    color: var(--p-text-color);
+  }
+
+  .add {
+    text-decoration: none;
+    background-color: color-mix(in srgb, var(--p-green-700) 60%, var(--p-surface-800) 40%);
+  }
+
+  .remove {
+    color: var(--p-red-100);
+    text-decoration: line-through;
+    background-color: color-mix(in srgb, var(--p-red-700) 60%, var(--p-surface-800) 40%);
+  }
+}

@@ -1,0 +1,34 @@
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+
+import { forkJoin, of, switchMap } from 'rxjs';
+
+import { PostsService } from '@/app/api/services/posts/posts.service';
+import { RolesService } from '@/app/api/services/roles/roles.service';
+import { UsersService } from '@/app/api/services/users/users.service';
+import { ROLE } from '@/app/constants/roles';
+import { APP_ROUTE } from '@/app/core/services/navigation/routes';
+
+export const postAuthorGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const usersService = inject(UsersService);
+  const postService = inject(PostsService);
+  const rolesService = inject(RolesService);
+  const router = inject(Router);
+  const postId = Number(route.paramMap.get('id'));
+
+  if (postId) {
+    return forkJoin([usersService.getMe(), postService.getPostById(postId)]).pipe(
+      switchMap(([me, post]) => {
+        if (
+          rolesService.hasAccess(me?.roles ?? [], ROLE.MODERATOR) ||
+          post.authors.some(({ author }) => author.id === me?.author?.id)
+        ) {
+          return of(true);
+        }
+        return of(router.createUrlTree([APP_ROUTE.FORBIDDEN]));
+      }),
+    );
+  }
+
+  return of(false);
+};

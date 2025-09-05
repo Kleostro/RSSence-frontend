@@ -1,0 +1,76 @@
+@let pageTitle = this.pageTitle();
+
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+
+  <h1 class="title">{{ pageTitle }}</h1>
+  <div class="versions-wrapper">
+    @let versions = this.paginatedPostVersionResponse()?.items ?? [];
+    @let limit = this.paginatedPostVersionResponse()?.limit ?? 10;
+    @let total = this.paginatedPostVersionResponse()?.total ?? 0;
+
+    <div class="actions-wrapper">
+      <button
+        pButton
+        pRipple
+        class="reset-button"
+        type="button"
+        (click)="this.selectedVersions.set([])"
+        [disabled]="this.isProcessing() || !this.selectedVersions().length"
+        [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
+        label="Reset"
+        [fluid]="true"
+        severity="info"
+        outlined="true"
+      ></button>
+      <button
+        pButton
+        pRipple
+        [disabled]="this.selectedVersions().length !== 2 || this.isProcessing()"
+        (click)="this.compareVersions()"
+        [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right-arrow-left'"
+        label="Compare"
+        severity="success"
+        class="compare-button"
+        type="button"
+        [fluid]="true"
+        outlined="true"
+      ></button>
+    </div>
+
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="first"
+      [rows]="limit"
+      [totalRecords]="total"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+    />
+
+    <app-post-version-timeline
+      [versions]="versions"
+      [isProcessing]="this.isProcessing()"
+      [selectedVersions]="this.selectedVersions()"
+      (deleteVersion)="this.deleteVersion($event)"
+      (revertVersion)="this.revertVersion($event)"
+      (selectVersion)="this.onVersionSelected($event)"
+    />
+
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="first"
+      [rows]="limit"
+      [totalRecords]="total"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+    />
+  </div>
+</div>
