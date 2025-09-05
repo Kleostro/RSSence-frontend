@@ -186,8 +186,8 @@ export class AuthorFormComponent implements OnInit {
       firstname,
       id: this.author?.id ?? 0,
       lastname,
-      profileUsername: this.author?.profileUsername ?? null,
       updatedAt: this.author?.updatedAt ?? '',
+      userId: this.author?.userId ?? 0,
       username,
     });
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());

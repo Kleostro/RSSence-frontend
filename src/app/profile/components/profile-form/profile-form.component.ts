@@ -193,13 +193,15 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
   private updateProfileForPreview(): void {
     const { bio, firstname, lastname, username } = this.form.getRawValue();
     this.updatedProfile.set({
-      authorUsername: this.profile?.authorUsername ?? null,
       avatarUrl: this.avatarUrl() ?? this.profile?.avatarUrl ?? null,
       bio,
       birthdate: this.birthdate() ?? this.profile?.birthdate ?? null,
+      createdAt: this.profile?.createdAt ?? '',
       firstname,
       id: this.profile?.id ?? 0,
       lastname,
+      updatedAt: this.profile?.updatedAt ?? '',
+      userId: this.profile?.userId ?? 0,
       username,
     });
     this.updateProfileForPreviewEvent.emit(this.updatedProfile());

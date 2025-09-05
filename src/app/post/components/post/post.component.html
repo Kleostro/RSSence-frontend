@@ -4,6 +4,8 @@
 @let canSubmitPost = post?.status === 'DRAFT';
 @let canEditPost = post?.status !== 'REJECTED';
 @let canMoveToDetailsPage = post?.status === 'APPROVED' && !this.navigationService.isPostDetailedPage();
+@let canViewPostHistory = this.canViewPostHistory();
+@let canViewPostVersions = this.canViewPostVersions();
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
@@ -23,29 +25,44 @@
           <button
             pButton
             pRipple
-            pTooltip="Details"
+            pTooltip="Read"
             tooltipPosition="bottom"
             type="button"
             [disabled]="isProcessing()"
             (click)="this.navigationService.navigateToPostById(post.id)"
             [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
-            class="post-moderation-details-button"
+            class="post-read-button"
             severity="success"
             outlined="true"
           ></button>
         }
-        @if (this.canViewPostHistory()) {
+        @if (canViewPostHistory) {
           <button
             pButton
             pRipple
-            pTooltip="History"
+            pTooltip="Logs"
             tooltipPosition="bottom"
             type="button"
             [disabled]="isProcessing()"
             (click)="this.navigationService.navigateToPostHistory(post.id)"
             [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
-            class="post-moderation-history-button"
+            class="post-history-button"
             severity="primary"
+            outlined="true"
+          ></button>
+        }
+        @if (canViewPostVersions) {
+          <button
+            pButton
+            pRipple
+            pTooltip="Versions"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)="this.navigationService.navigateToPostVersions(post.id)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-history'"
+            class="post-versions-button"
+            severity="info"
             outlined="true"
           ></button>
         }

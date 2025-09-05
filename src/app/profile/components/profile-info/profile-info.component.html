@@ -1,4 +1,5 @@
 @let currentProfile = this.currentProfile();
+@let authorUsername = this.currentAuthorUsername();
 @let isMyPage = this.isMyPage();
 @let navigationItems = this.navigationItems();
 
@@ -16,7 +17,7 @@
       pRipple
       type="button"
       class="move-to-author-button"
-      (click)="navigateToAuthor.emit(currentProfile?.authorUsername)"
+      (click)="navigateToAuthor.emit(authorUsername)"
       label="Author"
       icon="pi pi-user"
       severity="info"

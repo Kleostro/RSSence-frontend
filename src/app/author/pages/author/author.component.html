@@ -1,31 +1,44 @@
-@let currentAuthor = this.currentAuthor();
+@let currentAuthor = this.currentUser()?.author ?? null;
+@let contributionStats = this.contributionStats();
 
 <div class="page">
   <div class="author-info">
     <app-author-info
       [isMyPage]="false"
       [currentAuthor]="currentAuthor"
+      [currentProfileUsername]="this.currentUser()?.profile?.username ?? null"
       (navigateToProfile)="navigationService.navigateToProfileByUsername($event)"
     />
   </div>
 
-  <strong class="posts-count">
-    @if (!this.paginatedPostResponse()) {
-      <p-skeleton width="6rem" height="1.15rem" />
-    } @else {
-      {{ this.paginatedPostResponse()?.total }} posts
-    }
-  </strong>
   <div class="posts-wrapper">
-    <app-posts-list
+    <p-tabs
       class="posts-list"
-      [paginatedPostResponse]="this.paginatedPostResponse()"
-      (pageChangeEvent)="this.handlePageChangeEvent($event)"
+      [scrollable]="true"
+      (valueChange)="this.handleTabChange($event.toString())"
+      [value]="this.selectedTab()"
     >
-      <ng-template let-post>
-        <app-post [post]="post" [isShowPostUserActions]="post.status !== 'SUBMITTED'" />
-      </ng-template>
-    </app-posts-list>
+      <p-tablist>
+        @for (tab of contributionStats; track tab) {
+          <p-tab [value]="tab.value">
+            <div class="tab-content">
+              <p-badge class="tab-count" [value]="tab.count" />
+              <span class="tab-label"> {{ tab.label }} </span>
+            </div>
+          </p-tab>
+        }
+      </p-tablist>
+      @for (tab of contributionStats; track tab) {
+        <p-tabpanel [value]="tab.value">
+          <app-posts-list
+            [paginatedPostResponse]="this.paginatedPostResponse()"
+            (pageChangeEvent)="this.handlePageChangeEvent($event)"
+          >
+            <ng-template let-post> <app-post [post]="post" /> </ng-template
+          ></app-posts-list>
+        </p-tabpanel>
+      }
+    </p-tabs>
 
     <div class="posts-list-settings">
       <app-posts-settings />
