@@ -10,7 +10,6 @@ export const UserSchema = z.object({
   email: z.string(),
   id: z.number(),
   profile: ProfileSchema.nullable().optional(),
-  profileUsername: z.string().nullable().optional(),
   roles: z.string().array(),
   updatedAt: z.string(),
 });

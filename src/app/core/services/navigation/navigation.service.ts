@@ -28,6 +28,10 @@ export class NavigationService {
       this.isLoginPage.set(url.startsWith(APP_ROUTE.LOGIN));
       this.isPostModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION));
       this.isPostDetailedModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION + '/'));
+
+      this.activatedRoute.queryParams.subscribe((params) => {
+        this.queryParams.set(params);
+      });
     });
   }
 
@@ -70,6 +74,16 @@ export class NavigationService {
 
   public navigateToPostModerationById(postId: number): void {
     this.router.navigate([APP_ROUTE.POST_MODERATION, postId]);
+  }
+
+  public navigateToPostVersionDiff(postId: number, from: number, to: number): void {
+    const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.VERSION_DIFF}`;
+    this.router.navigate([url], { queryParams: { from, to } });
+  }
+
+  public navigateToPostVersions(postId: number): void {
+    const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.VERSIONS}`;
+    this.router.navigate([url]);
   }
 
   public navigateToProfile(): void {

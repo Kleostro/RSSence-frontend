@@ -1,3 +1,7 @@
+:host {
+  display: contents;
+}
+
 .sorting-form {
   display: flex;
   flex-direction: column;
@@ -5,8 +9,8 @@
 
   &-sort-by {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
+    flex-direction: column;
+    gap: 1rem;
 
     &-title {
       font-style: italic;
@@ -25,8 +29,8 @@
 
   &-sort-order {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
+    flex-direction: column;
+    gap: 1rem;
 
     &-title {
       font-style: italic;

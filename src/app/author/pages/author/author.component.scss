@@ -4,11 +4,7 @@
 }
 
 .posts-list {
-  width: 59%;
-}
-
-.posts-count {
-  margin-bottom: 2rem;
+  width: 69%;
 }
 
 .posts-list-settings {
@@ -17,6 +13,21 @@
   display: flex;
   flex-direction: column;
 
-  width: 40%;
+  width: 30%;
   height: auto;
+}
+
+.tab-content {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tab-label {
+  font-size: 1rem;
+  letter-spacing: 0.05rem;
+}
+
+.tab-count {
+  font-size: 0.8rem;
 }

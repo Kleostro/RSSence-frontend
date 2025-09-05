@@ -281,9 +281,7 @@
         pButton
         pRipple
         type="button"
-        (click)="
-          this.isProcessing.set(true); this.deleteAuthorEvent.emit(this.candidateUser()?.profile?.authorUsername ?? '')
-        "
+        (click)="this.isProcessing.set(true); this.deleteAuthorEvent.emit(this.candidateUser()?.author?.username ?? '')"
         label="Delete"
         [disabled]="isProcessing()"
         [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"

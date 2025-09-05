@@ -48,6 +48,12 @@ export class AuthorsService {
     return this.http.get<AuthorResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`);
   }
 
+  public getAuthorContributionStats(username: string): Observable<{ count: number; label: string; value: string }[]> {
+    return this.http.get<{ count: number; label: string; value: string }[]>(
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.CONTRIBUTION_STATS}`,
+    );
+  }
+
   public getAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
     return this.http
       .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.POSTS}`, {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -16,8 +16,9 @@ import { AuthorPreviewComponent } from '@/app/author/components/author-preview/a
   templateUrl: './author-info.component.html',
 })
 export class AuthorInfoComponent {
-  @Output() public navigateToProfile = new EventEmitter<null | string>();
   public currentAuthor = input.required<AuthorResponse | null>();
+  public currentProfileUsername = input<null | string>(null);
   public isMyPage = input<boolean>(true);
+  public navigateToProfile = output<null | string>();
   public navigationItems = input<MenuItem[]>([]);
 }

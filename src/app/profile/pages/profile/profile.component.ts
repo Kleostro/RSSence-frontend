@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
-import { ProfileResponse, ProfileSchema } from '@/app/api/schemas/profiles-response';
+import { tap } from 'rxjs';
+
+import { UserResponse, UserSchema } from '@/app/api/schemas/users-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ProfileInfoComponent } from '@/app/profile/components/profile-info/profile-info.component';
 
@@ -13,16 +16,22 @@ import { ProfileInfoComponent } from '@/app/profile/components/profile-info/prof
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   public readonly navigationService = inject(NavigationService);
-
-  public currentProfile = signal<null | ProfileResponse>(null);
+  public currentUser = signal<null | UserResponse>(null);
 
   public ngOnInit(): void {
-    const { data } = this.route.snapshot;
-    if ('profile' in data) {
-      const result = ProfileSchema.safeParse(data['profile']);
-      this.currentProfile.set(result.data ?? null);
-    }
+    this.route.data
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap(({ user }) => {
+          const result = UserSchema.safeParse(user);
+          if (result.success) {
+            this.currentUser.set(result.data);
+          }
+        }),
+      )
+      .subscribe();
   }
 }

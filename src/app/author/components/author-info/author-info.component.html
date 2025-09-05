@@ -1,4 +1,5 @@
 @let currentAuthor = this.currentAuthor();
+@let profileUsername = this.currentProfileUsername();
 @let isMyPage = this.isMyPage();
 @let navigationItems = this.navigationItems();
 
@@ -20,7 +21,7 @@
       icon="pi pi-user"
       severity="info"
       outlined="true"
-      (click)="navigateToProfile.emit(currentAuthor?.profileUsername)"
+      (click)="this.navigateToProfile.emit(profileUsername ?? '')"
     />
   }
   <app-author-preview [author]="currentAuthor" />

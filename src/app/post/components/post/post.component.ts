@@ -28,8 +28,10 @@ import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
+import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
+import { ROLE } from '@/app/constants/roles';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
@@ -70,6 +72,7 @@ export class PostComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly message = inject(MessageService);
   private readonly postsService = inject(PostsService);
+  private readonly rolesService = inject(RolesService);
   @Output() public postEvent = new EventEmitter<unknown>();
   @Output() public postFormEvent = new EventEmitter<unknown>();
   public readonly modalService = inject(ModalService);
@@ -81,7 +84,18 @@ export class PostComponent implements OnInit {
     const post = this.post();
     return (
       (post?.authors.some(({ author }) => author.id === this.usersService.me()?.author?.id) ?? false) ||
-      this.usersService.isModerator()
+      this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)
+    );
+  });
+  public canViewPostVersions = computed(() => {
+    const post = this.post();
+    return (
+      ((post?.authors.some(
+        (postAuthor) => postAuthor.authorId === this.usersService.me()?.author?.id && postAuthor.isMainAuthor,
+      ) ??
+        false) ||
+        this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)) &&
+      post?.status === 'APPROVED'
     );
   });
   public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');

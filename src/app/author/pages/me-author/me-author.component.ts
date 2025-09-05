@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { BadgeModule } from 'primeng/badge';
@@ -11,7 +11,7 @@ import { Observable, switchMap, tap } from 'rxjs';
 
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse, POST_STATUS, PostStatusType } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, PostStatusType } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
@@ -52,7 +52,6 @@ export class MeAuthorComponent implements OnInit {
   private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
-  private postsQuery$: Observable<PaginationQueryDto> = toObservable(this.postsService.query);
   public readonly FORM_STATE = FORM_STATE;
   public readonly modalService = inject(ModalService);
   public readonly navigationService = inject(NavigationService);
@@ -128,7 +127,12 @@ export class MeAuthorComponent implements OnInit {
     const { page = 1, rows } = event;
     this.postsService.query.set({ ...this.postsService.query(), limit: rows, page: page + 1 });
 
-    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadAuthorPostStatuses(username)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
+      )
+      .subscribe();
   }
 
   public handlePostEvent(): void {
@@ -137,19 +141,40 @@ export class MeAuthorComponent implements OnInit {
       return;
     }
 
-    this.loadAuthorPostStatuses(username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadAuthorPostStatuses(username)
+      .pipe(
+        tap((data) => {
+          const firstTab = data[0]?.name ?? null;
+          this.selectedTab.set(firstTab);
+          this.postsService.query.set({
+            filter: this.selectedTab(),
+            filterField: firstTab ? 'status' : undefined,
+          });
+        }),
+        takeUntilDestroyed(this.destroyRef),
+        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
+      )
+      .subscribe();
   }
 
   public handleTabChange(status: string): void {
     this.selectedTab.set(status);
     this.postsService.query.set({ ...this.postsService.query(), filter: status, filterField: 'status' });
-    this.handlePostEvent();
+    const username = this.currentAuthor()?.username;
+    if (!username) {
+      return;
+    }
+
+    this.loadAuthorPostStatuses(username)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
+      )
+      .subscribe();
   }
 
   public ngOnInit(): void {
     this.postsService.resetQuery();
-    this.postsService.query.set({ filter: POST_STATUS.APPROVED, filterField: 'status' });
 
     this.route.data
       .pipe(
@@ -164,28 +189,18 @@ export class MeAuthorComponent implements OnInit {
             this.loadAuthorPostStatuses(result.data.username)
               .pipe(
                 tap((data) => {
-                  this.selectedTab.set(data[0]?.name ?? '');
-                  this.postsService.query.set({ filter: this.selectedTab(), filterField: 'status' });
+                  const firstTab = data[0]?.name ?? null;
+                  this.selectedTab.set(firstTab);
+                  this.postsService.query.set({
+                    filter: this.selectedTab(),
+                    filterField: firstTab ? 'status' : undefined,
+                  });
                 }),
                 takeUntilDestroyed(this.destroyRef),
                 switchMap(() => this.loadAuthorPosts(result.data.username, this.postsService.query())),
               )
               .subscribe();
           }
-        }),
-      )
-      .subscribe();
-
-    this.postsQuery$
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        switchMap((query) => {
-          const username = this.currentAuthor()?.username;
-          if (!username) {
-            return [];
-          }
-
-          return this.loadAuthorPosts(username, query);
         }),
       )
       .subscribe();

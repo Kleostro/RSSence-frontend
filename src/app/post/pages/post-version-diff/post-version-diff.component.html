@@ -1,0 +1,142 @@
+@let diff = this.currentPostVersionDiff();
+@let diffTitle = diff?.title;
+@let diffContent = diff?.content;
+@let diffCoauthors = diff?.coauthors;
+
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+
+  <div class="version-diff-wrapper">
+    <div class="diff-container">
+      <div class="diff-header">
+        <div class="version-label">Version {{ diff?.versionFrom }}</div>
+        <div class="version-label">Version {{ diff?.versionTo }}</div>
+      </div>
+
+      <div class="title-label">Title</div>
+      <div class="diff-view">
+        @for (line of diffTitle?.diff?.left; track $index) {
+          <div class="diff-line diff-left" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-marker">
+              @if (line.type === 'remove') {
+                -
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @for (line of diffTitle?.diff?.right; track $index) {
+          <div class="diff-line" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-marker">
+              @if (line.type === 'add') {
+                +
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="title-label">Content</div>
+      <div class="diff-view">
+        @for (line of diffContent?.diff?.left; track $index) {
+          <div class="diff-line diff-left" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-index" [class]="line.type">{{ $index + 1 }}</div>
+            <div class="line-marker">
+              @if (line.type === 'remove') {
+                -
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @for (line of diffContent?.diff?.right; track $index) {
+          <div class="diff-line diff-right" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-index" [class]="line.type">{{ $index + 1 }}</div>
+            <div class="line-marker">
+              @if (line.type === 'add') {
+                +
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="title-label">Coauthors</div>
+      <div class="diff-view">
+        @for (line of diffCoauthors?.diff?.left; track $index) {
+          <div class="diff-line diff-left" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-index" [class]="line.type">{{ $index + 1 }}</div>
+            <div class="line-marker">
+              @if (line.type === 'remove') {
+                -
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @for (line of diffCoauthors?.diff?.right; track $index) {
+          <div class="diff-line diff-right" [class]="line.type" [style.gridRow]="$index + 1">
+            <div class="line-index" [class]="line.type">{{ $index + 1 }}</div>
+            <div class="line-marker">
+              @if (line.type === 'remove') {
+                -
+              } @else {
+                &nbsp;
+              }
+            </div>
+            <div class="line-content">
+              @for (part of line.parts; track $index) {
+                <span [class]="part.type">{{ part.value }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

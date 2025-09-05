@@ -5,7 +5,7 @@ import { AuthorSchema } from '@/app/api/schemas/authors-response';
 export const PostHistorySchema = z.object({
   actionType: z.string(),
   author: AuthorSchema,
-  authorUsername: z.string(),
+  authorId: z.number(),
   createdAt: z.string(),
   description: z.string().nullable(),
   id: z.number(),

@@ -12,6 +12,8 @@ export const APP_PATH = {
   PROFILE: 'Profile',
   SETTINGS: 'Settings',
   SIGN_UP: 'Sign-up',
+  VERSION_DIFF: 'Version-diff',
+  VERSIONS: 'Versions',
 } as const;
 
 export const ADMIN_PATH = {
@@ -36,4 +38,6 @@ export const APP_ROUTE = {
   PROFILE: `/${APP_PATH.PROFILE.toLowerCase()}`,
   SIGN_UP: `/${APP_PATH.SIGN_UP.toLowerCase()}`,
   USERS: `/${APP_PATH.ADMIN.toLowerCase()}/${ADMIN_PATH.USERS.toLowerCase()}`,
+  VERSION_DIFF: `/${APP_PATH.VERSION_DIFF.toLowerCase()}`,
+  VERSIONS: `/${APP_PATH.VERSIONS.toLowerCase()}`,
 } as const;

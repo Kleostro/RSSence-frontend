@@ -1,0 +1,74 @@
+@let versions = this.versions();
+
+<p-timeline class="version-timeline" [value]="versions">
+  <ng-template #opposite let-event>
+    <small
+      >{{ event.createdAt | date: 'mediumDate' }} <br />
+      as {{ event.createdAt | date: 'shortTime' }}</small
+    >
+  </ng-template>
+  <ng-template #content let-version>
+    <div
+      class="version-item"
+      [class.version-item-disabled]="
+        this.selectedVersions().length === 2 && !this.selectedVersions().includes(version.version)
+      "
+      [class.version-item-select]="this.selectedVersions().includes(version.version)"
+      (click)="
+        this.selectVersion.emit({
+          version: version.version,
+          isSelected: !this.selectedVersions().includes(version.version),
+        })
+      "
+      (keyup)="
+        this.selectVersion.emit({
+          version: version.version,
+          isSelected: !this.selectedVersions().includes(version.version),
+        })
+      "
+      (keydown)="
+        this.selectVersion.emit({
+          version: version.version,
+          isSelected: !this.selectedVersions().includes(version.version),
+        })
+      "
+      tabindex="0"
+    >
+      <span class="version-number">Version {{ version.version }}</span>
+
+      <div class="version-status" [class]="version.isCurrent ? 'current' : 'archived'">
+        {{ version.isCurrent ? 'Current' : 'Archived' }}
+      </div>
+
+      @if (!version.isCurrent) {
+        <button
+          pButton
+          pRipple
+          class="version-revert-button"
+          type="button"
+          (click)="this.revertVersion.emit(version)"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
+          [disabled]="isProcessing()"
+          pTooltip="Revert"
+          tooltipPosition="bottom"
+          severity="success"
+          outlined="true"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          class="version-delete-button"
+          type="button"
+          (click)="this.deleteVersion.emit(version)"
+          [disabled]="isProcessing()"
+          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+          pTooltip="Delete"
+          tooltipPosition="bottom"
+          severity="danger"
+          outlined="true"
+        ></button>
+      }
+    </div>
+  </ng-template>
+</p-timeline>

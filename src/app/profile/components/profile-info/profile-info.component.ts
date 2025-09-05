@@ -17,7 +17,7 @@ import { ProfilePreviewComponent } from '@/app/profile/components/profile-previe
 })
 export class ProfileInfoComponent {
   @Output() public navigateToAuthor = new EventEmitter<null | string>();
-
+  public currentAuthorUsername = input<null | string>(null);
   public currentProfile = input.required<null | ProfileResponse>();
   public isMyPage = input<boolean>(true);
   public navigationItems = input<MenuItem[]>([]);

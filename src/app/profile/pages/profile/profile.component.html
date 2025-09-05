@@ -1,10 +1,11 @@
-@let currentProfile = this.currentProfile();
+@let currentProfile = this.currentUser()?.profile ?? null;
 
 <div class="page">
   @if (currentProfile) {
     <div class="profile-info">
       <app-profile-info
         [isMyPage]="false"
+        [currentAuthorUsername]="this.currentUser()?.author?.username ?? null"
         [currentProfile]="currentProfile"
         (navigateToAuthor)="navigationService.navigateToAuthorByUsername($event)"
       />

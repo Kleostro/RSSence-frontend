@@ -1,4 +1,5 @@
-import { HttpClient } from '@angular/common/http';
+/* eslint-disable max-len */
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 
 import { map, Observable, tap } from 'rxjs';
@@ -6,6 +7,12 @@ import { map, Observable, tap } from 'rxjs';
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { ModerationHistoryResponse } from '@/app/api/schemas/moderation-history-response';
+import { PostVersionDiffResponse } from '@/app/api/schemas/post-version-diff-response';
+import {
+  PaginatedPostVersionResponse,
+  PaginatedPostVersionResponseSchema,
+  PostVersionResponse,
+} from '@/app/api/schemas/post-version-response';
 import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
 import { NewPost } from '@/app/interfaces/post-form';
 import { MESSAGE } from '@/app/shared/services/constants/message';
@@ -18,7 +25,7 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly message = inject(MessageService);
-  public query = signal<PaginationQueryDto>({});
+  public query = signal<PaginationQueryDto>({ limit: 10, page: 1 });
 
   public approvePost(postId: number): Observable<PostResponse> {
     return this.http
@@ -46,6 +53,18 @@ export class PostsService {
     );
   }
 
+  public deletePostVersion(postId: number, version: number): Observable<PostVersionResponse> {
+    return this.http
+      .delete<PostVersionResponse>(
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSIONS}/${version.toString()}`,
+      )
+      .pipe(
+        tap(() => {
+          this.message.success(MESSAGE.DELETE_POST_VERSION_SUCCESS);
+        }),
+      );
+  }
+
   public getAllPosts(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
     return this.http
       .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, {
@@ -67,6 +86,32 @@ export class PostsService {
     return this.http.get<ModerationHistoryResponse[]>(
       `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.HISTORY}`,
     );
+  }
+
+  public getPostVersionDiff(
+    postId: number,
+    fromVersion: number,
+    toVersion: number,
+  ): Observable<PostVersionDiffResponse> {
+    const params = new HttpParams().set('from', fromVersion.toString()).set('to', toVersion.toString());
+    return this.http.get<PostVersionDiffResponse>(
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSION_DIFF}/`,
+      { params },
+    );
+  }
+
+  public getPostVersions(postId: number, query?: PaginationQueryDto): Observable<null | PaginatedPostVersionResponse> {
+    return this.http
+      .get<PaginatedPostVersionResponse>(
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSIONS}`,
+        { params: { ...query } },
+      )
+      .pipe(
+        map((response: PaginatedPostVersionResponse) => {
+          const { data, success } = PaginatedPostVersionResponseSchema.safeParse(response);
+          return success ? data : null;
+        }),
+      );
   }
 
   public getSubmittedForModeration(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
@@ -97,6 +142,18 @@ export class PostsService {
 
   public resetQuery(): void {
     this.query.set({ limit: 10, page: 1 });
+  }
+
+  public revertToVersion(postId: number, version: number): Observable<PostResponse> {
+    return this.http
+      .post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.REVERT}`, {
+        version,
+      })
+      .pipe(
+        tap(() => {
+          this.message.info(MESSAGE.REVERT_POST_SUCCESS);
+        }),
+      );
   }
 
   public revisionPost(postId: number, comment: string): Observable<PostResponse> {
