@@ -3,13 +3,15 @@ import { z } from 'zod';
 import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
 
 export const ProfileSchema = z.object({
-  authorUsername: z.string().nullable(),
   avatarUrl: z.string().nullable(),
   bio: z.string().nullable(),
   birthdate: z.string().nullable(),
+  createdAt: z.string(),
   firstname: z.string(),
   id: z.number(),
   lastname: z.string(),
+  updatedAt: z.string(),
+  userId: z.number(),
   username: z.string(),
 });
 

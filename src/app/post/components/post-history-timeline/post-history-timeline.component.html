@@ -1,6 +1,9 @@
 <p-timeline class="history-timeline" [value]="this.historyResponse() ?? []">
   <ng-template #opposite let-event>
-    <small class="text-surface-500 dark:text-surface-400">{{ event.createdAt | date: 'short' }}</small>
+    <small
+      >{{ event.createdAt | date: 'mediumDate' }} <br />
+      as {{ event.createdAt | date: 'shortTime' }}</small
+    >
   </ng-template>
   <ng-template #content let-history>
     <div class="history-item">

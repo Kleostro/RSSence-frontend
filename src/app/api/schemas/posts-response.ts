@@ -17,7 +17,7 @@ export const PostSchema = z.object({
   authors: z.array(
     z.object({
       author: AuthorSchema,
-      authorUsername: z.string(),
+      authorId: z.number(),
       isMainAuthor: z.boolean(),
       postId: z.number(),
     }),
