@@ -1,6 +1,7 @@
 export const FIELD_ERROR_KEY = {
   MAX_LENGTH: 'maxlength',
   MIN_LENGTH: 'minlength',
+  PATTERN: 'pattern',
   REQUIRED: 'required',
   USERNAME_EXISTS: 'usernameExists',
 } as const;
