@@ -1,6 +1,5 @@
 @let currentAuthor = this.currentAuthor();
 @let isAuthorFormStateUpdate = this.authorFormState() === FORM_STATE.UPDATE;
-@let modalTitle = 'Create new post';
 
 <div class="page">
   @if (!currentAuthor || isAuthorFormStateUpdate) {
@@ -19,76 +18,30 @@
         (navigateToProfile)="navigationService.navigateToProfileByUsername($event)"
       />
     </div>
-    <div class="author-actions">
-      <button
-        pButton
-        pRipple
-        type="button"
-        class="post-form-button"
-        icon="pi pi-pencil"
-        severity="success"
-        outlined="true"
-        [label]="modalTitle"
-        (click)="this.setParamsInModal(); this.modalService.openModal(postForm, modalTitle)"
-      ></button>
-    </div>
 
     <div class="posts-wrapper">
-      <p-tabs
-        class="posts-list"
-        [scrollable]="true"
-        (valueChange)="this.handleTabChange($event.toString())"
-        [value]="this.selectedTab()"
-      >
-        <p-tablist>
-          @for (status of this.postStatuses(); track status.name; let i = $index) {
-            <p-tab [value]="status.name">
-              <div class="tab-content">
-                <span class="tab-label"> {{ status.name }}</span>
-                <p-badge
-                  class="tab-count"
-                  [value]="status.count"
-                  [severity]="
-                    status.name === 'APPROVED'
-                      ? 'success'
-                      : status.name === 'SUBMITTED'
-                        ? 'info'
-                        : status.name === 'REVISION_REQUIRED'
-                          ? 'warn'
-                          : status.name === 'REJECTED'
-                            ? 'danger'
-                            : 'secondary'
-                  "
-                />
-              </div>
-            </p-tab>
-          }
-        </p-tablist>
-        @for (status of this.postStatuses(); track status.name) {
-          <p-tabpanel [value]="status.name">
-            <app-posts-list
-              [paginatedPostResponse]="this.paginatedPostResponse()"
-              (pageChangeEvent)="this.handlePageChangeEvent($event)"
-            >
-              <ng-template let-post>
-                <app-post
-                  [post]="post"
-                  [isShowPostUserActions]="post.status !== 'SUBMITTED'"
-                  (postEvent)="this.handlePostEvent()"
-                  (postFormEvent)="this.handlePostEvent()"
-                /> </ng-template
-            ></app-posts-list>
-          </p-tabpanel>
-        }
-      </p-tabs>
-
       <div class="posts-list-settings">
-        <app-posts-settings />
+        <app-posts-settings
+          [canCreatePost]="true"
+          [statusOptions]="this.postStatuses()"
+          [contributionStats]="this.contributionStats()"
+        />
+      </div>
+
+      <div class="posts-list">
+        <app-posts-list
+          [paginatedPostResponse]="this.paginatedPostResponse()"
+          (pageChange)="this.handlePageChange($event)"
+        >
+          <ng-template let-post>
+            <app-post
+              [post]="post"
+              [isShowPostUserActions]="post.status !== 'SUBMITTED'"
+              (postEvent)="this.handlePostEvent()"
+              (postFormEvent)="this.handlePostEvent()"
+            /> </ng-template
+        ></app-posts-list>
       </div>
     </div>
   }
 </div>
-
-<ng-template #postForm>
-  <app-post-form (formSubmitEvent)="this.onCreatePost($event)" />
-</ng-template>

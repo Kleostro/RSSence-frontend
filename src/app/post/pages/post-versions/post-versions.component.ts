@@ -7,7 +7,7 @@ import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
 import { finalize, map, tap } from 'rxjs';
 
-import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { PostQuery } from '@/app/api/interfaces/post-query';
 import { PaginatedPostVersionResponse, PostVersionResponse } from '@/app/api/schemas/post-version-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
@@ -65,11 +65,11 @@ export class PostVersionsComponent implements OnInit {
     }
   }
 
-  public getCurrentPostVersions(query?: PaginationQueryDto): void {
+  public getCurrentPostVersions(query?: PostQuery): void {
     const postId = this.postId();
     if (postId) {
       this.postsService
-        .getPostVersions(+postId, query)
+        .getVersionsByPost(+postId, query)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           tap((response: null | PaginatedPostVersionResponse) => {

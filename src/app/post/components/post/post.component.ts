@@ -26,11 +26,12 @@ import { catchError, EMPTY, finalize, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
-import { PostResponse } from '@/app/api/schemas/posts-response';
+import { POST_STATUS, PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
+import { POST_ACTION } from '@/app/constants/post-action';
 import { ROLE } from '@/app/constants/roles';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
@@ -79,7 +80,8 @@ export class PostComponent implements OnInit {
   public readonly navigationService = inject(NavigationService);
   public readonly sanitizer = inject(DomSanitizer);
   public readonly usersService = inject(UsersService);
-  public post = input.required<null | PostResponse>();
+  public post = input<null | PostResponse>(null);
+
   public canViewPostHistory = computed(() => {
     const post = this.post();
     return (
@@ -95,25 +97,22 @@ export class PostComponent implements OnInit {
       ) ??
         false) ||
         this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)) &&
-      post?.status === 'APPROVED'
+      post?.status === POST_STATUS.APPROVED
     );
   });
   public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostUserActions = input<boolean>(false);
-  public mode = signal<'full' | 'preview'>('preview');
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
 
   public safeHtml = signal<SafeHtml>('');
 
   constructor() {
-    effect(() => {
-      this.parseHtml();
-    });
-
     if (this.navigationService.isPostDetailedPage()) {
-      this.mode.set('full');
+      effect(() => {
+        this.parseHtml();
+      });
     }
   }
 
@@ -121,30 +120,6 @@ export class PostComponent implements OnInit {
     const parsedHtml = await marked.parse(this.post()?.content ?? '');
     this.safeHtml.set(this.sanitizer.bypassSecurityTrustHtml(parsedHtml));
     return parsedHtml;
-  }
-
-  public approvePost(): void {
-    const post = this.post();
-    if (!post) {
-      return;
-    }
-    this.isProcessing.set(true);
-    this.postsService
-      .approvePost(post.id)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap(() => {
-          this.postEvent.emit();
-        }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
-          return EMPTY;
-        }),
-        finalize(() => {
-          this.isProcessing.set(false);
-        }),
-      )
-      .subscribe();
   }
 
   public deletePost(): void {
@@ -209,7 +184,7 @@ export class PostComponent implements OnInit {
     }
     this.isProcessing.set(true);
     this.postsService
-      .submitForModeration(post.id)
+      .performPostAuthorAction(post.id, POST_ACTION.SUBMIT)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap(() => {

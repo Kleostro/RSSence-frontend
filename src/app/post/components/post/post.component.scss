@@ -42,11 +42,15 @@
   &-title {
     cursor: pointer;
 
+    overflow: hidden;
+
     margin-bottom: 1.5rem;
 
     font-size: 1.5rem;
     font-weight: bold;
+    text-overflow: ellipsis;
     letter-spacing: 0.1rem;
+    white-space: nowrap;
 
     transition: color 0.3s;
 
@@ -61,7 +65,27 @@
 
   &-body {
     margin-top: 2rem;
-    border-top: 0.1rem solid var(--p-surface-400);
+    border-top: 0.1rem solid transparent;
+
+    &-approved {
+      border-color: var(--p-green-400);
+    }
+
+    &-draft {
+      border-color: var(--p-surface-400);
+    }
+
+    &-submitted {
+      border-color: var(--p-primary-400);
+    }
+
+    &-rejected {
+      border-color: var(--p-red-400);
+    }
+
+    &-revision_required {
+      border-color: var(--p-orange-400);
+    }
   }
 
   &-content {
@@ -71,12 +95,10 @@
   }
 
   &-actions {
-    position: relative;
-    z-index: 2;
-
     display: flex;
     gap: 0.5rem;
     align-self: flex-start;
+    margin-left: 2rem;
   }
 
   &-createdAt {

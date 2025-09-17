@@ -27,6 +27,7 @@ import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-er
 import { PostResponse } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { POST_ACTION } from '@/app/constants/post-action';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
@@ -75,7 +76,6 @@ export class ModerationPostComponent {
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostModeratorActions = input<boolean>(false);
-  public mode = signal<'full' | 'preview'>('preview');
   public post = input.required<null | PostResponse>();
   public rejectPostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('rejectPostConfirm');
 
@@ -84,12 +84,10 @@ export class ModerationPostComponent {
   public safeHtml = signal<SafeHtml>('');
 
   constructor() {
-    effect(() => {
-      this.parseHtml();
-    });
-
     if (this.navigationService.isPostDetailedModerationPage()) {
-      this.mode.set('full');
+      effect(() => {
+        this.parseHtml();
+      });
     }
   }
 
@@ -106,7 +104,7 @@ export class ModerationPostComponent {
     }
     this.isProcessing.set(true);
     this.postsService
-      .approvePost(post.id)
+      .performPostModeratorAction(post.id, POST_ACTION.APPROVE)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap(() => {

@@ -2,31 +2,29 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
-import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { TabsModule } from 'primeng/tabs';
-import { Observable, switchMap, tap } from 'rxjs';
+import { forkJoin, map, Observable, switchMap, tap } from 'rxjs';
 
+import { AuthorContributions } from '@/app/api/interfaces/author/author-contributions';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { PostQuery } from '@/app/api/interfaces/post-query';
+import { PostStatuses } from '@/app/api/interfaces/post/post-statuses';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse, PostStatusType } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
 import { FORM_STATE } from '@/app/constants/author-form';
-import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
 import { getNavigationAuthorPage } from '@/app/constants/navigation-author-page';
 import { FormState } from '@/app/constants/profile-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
-import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
-import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,9 +36,6 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     PostComponent,
     RippleModule,
     PostsListComponent,
-    PostFormComponent,
-    BadgeModule,
-    TabsModule,
   ],
   selector: 'app-me-author',
   styleUrl: './me-author.component.scss',
@@ -53,9 +48,9 @@ export class MeAuthorComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
   public readonly FORM_STATE = FORM_STATE;
-  public readonly modalService = inject(ModalService);
   public readonly navigationService = inject(NavigationService);
   public authorFormState = signal<FormState>(FORM_STATE.CREATE);
+  public contributionStats = signal<AuthorContributions[]>([]);
   public currentAuthor = signal<AuthorResponse | null>(null);
   public navigationItems = getNavigationAuthorPage(
     () => {
@@ -70,12 +65,20 @@ export class MeAuthorComponent implements OnInit {
   );
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
   public paginatedPostResponseOnTab = signal<null | PaginatedPostResponse>(null);
-  public postStatuses = signal<{ count: number; name: string }[]>([]);
+  public postStatuses = signal<PostStatuses[]>([]);
   public previewAuthor = signal<AuthorResponse | null>(null);
-  public selectedTab = signal<string>('');
+
+  private loadAuthorContributionStats(username: string, query?: PaginationQueryDto): Observable<AuthorContributions[]> {
+    return this.authorsService.getAuthorContributionStats(username, query).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      tap((data) => {
+        this.contributionStats.set(data);
+      }),
+    );
+  }
 
   private loadAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.authorsService.getAuthorPosts(username, query).pipe(
+    return this.postsService.getPostsByAuthor(username, query).pipe(
       takeUntilDestroyed(this.destroyRef),
       tap((data) => {
         this.paginatedPostResponse.set(data);
@@ -83,11 +86,35 @@ export class MeAuthorComponent implements OnInit {
     );
   }
 
-  private loadAuthorPostStatuses(username: string): Observable<{ count: number; name: string }[]> {
-    return this.authorsService.getAuthorPostStatuses(username).pipe(
+  private loadAuthorPostStatuses(username: string, query?: PostQuery): Observable<PostStatuses[]> {
+    return this.authorsService.getAuthorPostStatuses(username, query).pipe(
       takeUntilDestroyed(this.destroyRef),
       tap((data) => {
         this.postStatuses.set(data);
+      }),
+    );
+  }
+
+  private loadPostsInfoAndAuthor(
+    username: string,
+    query: Record<string, string>,
+  ): Observable<{
+    posts: null | PaginatedPostResponse;
+    postStatuses: PostStatuses[];
+    stats: AuthorContributions[];
+  }> {
+    return forkJoin({
+      postStatuses: this.loadAuthorPostStatuses(username, query),
+      stats: this.loadAuthorContributionStats(username, query),
+    }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      switchMap(({ postStatuses, stats }) => {
+        return this.loadAuthorPosts(username, this.navigationService.queryParams()).pipe(
+          map((posts) => ({ posts, postStatuses, stats })),
+        );
+      }),
+      tap(({ posts }) => {
+        this.paginatedPostResponse.set(posts);
       }),
     );
   }
@@ -115,24 +142,19 @@ export class MeAuthorComponent implements OnInit {
     this.currentAuthor.set(newOrUpdatedAuthor);
     this.previewAuthor.set(newOrUpdatedAuthor);
     this.authorFormState.set(FORM_STATE.CREATE);
-    this.loadAuthorPosts(newOrUpdatedAuthor.username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadAuthorPosts(newOrUpdatedAuthor.username, this.navigationService.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
-  public handlePageChangeEvent(event: PaginatorState): void {
+  public handlePageChange(event: PaginatorState): void {
     const username = this.currentAuthor()?.username;
     if (!username) {
       return;
     }
 
-    const { page = 1, rows } = event;
-    this.postsService.query.set({ ...this.postsService.query(), limit: rows, page: page + 1 });
-
-    this.loadAuthorPostStatuses(username)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
-      )
-      .subscribe();
+    const { page = 0, rows } = event;
+    this.navigationService.updateQueryParams({ limit: rows, page: page + 1 });
   }
 
   public handlePostEvent(): void {
@@ -141,40 +163,26 @@ export class MeAuthorComponent implements OnInit {
       return;
     }
 
-    this.loadAuthorPostStatuses(username)
-      .pipe(
-        tap((data) => {
-          const firstTab = data[0]?.name ?? null;
-          this.selectedTab.set(firstTab);
-          this.postsService.query.set({
-            filter: this.selectedTab(),
-            filterField: firstTab ? 'status' : undefined,
-          });
-        }),
-        takeUntilDestroyed(this.destroyRef),
-        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
-      )
-      .subscribe();
-  }
+    this.navigationService.updateQueryParams({ status: [this.postStatuses()[0].name] });
 
-  public handleTabChange(status: string): void {
-    this.selectedTab.set(status);
-    this.postsService.query.set({ ...this.postsService.query(), filter: status, filterField: 'status' });
-    const username = this.currentAuthor()?.username;
-    if (!username) {
-      return;
-    }
-
-    this.loadAuthorPostStatuses(username)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        switchMap(() => this.loadAuthorPosts(username, this.postsService.query())),
-      )
+    this.loadPostsInfoAndAuthor(username, this.navigationService.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
   }
 
   public ngOnInit(): void {
-    this.postsService.resetQuery();
+    this.navigationService.queryParams$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap((query) => {
+          const username = this.currentAuthor()?.username;
+          if (!username) {
+            return [];
+          }
+          return this.loadPostsInfoAndAuthor(username, query);
+        }),
+      )
+      .subscribe();
 
     this.route.data
       .pipe(
@@ -186,48 +194,12 @@ export class MeAuthorComponent implements OnInit {
             this.previewAuthor.set(result.data);
             this.paginatedPostResponse.set(null);
 
-            this.loadAuthorPostStatuses(result.data.username)
-              .pipe(
-                tap((data) => {
-                  const firstTab = data[0]?.name ?? null;
-                  this.selectedTab.set(firstTab);
-                  this.postsService.query.set({
-                    filter: this.selectedTab(),
-                    filterField: firstTab ? 'status' : undefined,
-                  });
-                }),
-                takeUntilDestroyed(this.destroyRef),
-                switchMap(() => this.loadAuthorPosts(result.data.username, this.postsService.query())),
-              )
+            this.loadPostsInfoAndAuthor(result.data.username, this.navigationService.queryParams())
+              .pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe();
           }
         }),
       )
       .subscribe();
-  }
-
-  public onCreatePost(postStatus: PostStatusType): void {
-    const username = this.currentAuthor()?.username;
-    if (!username) {
-      return;
-    }
-
-    this.modalService.closeModal();
-    this.selectedTab.set(postStatus);
-
-    this.postsService.query.set({
-      ...this.postsService.query(),
-      filter: postStatus,
-      filterField: 'status',
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
-    });
-
-    this.loadAuthorPostStatuses(username).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-    this.loadAuthorPosts(username, this.postsService.query()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-  }
-
-  public setParamsInModal(): void {
-    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER);
   }
 }

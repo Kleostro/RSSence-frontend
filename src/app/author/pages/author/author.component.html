@@ -1,5 +1,4 @@
 @let currentAuthor = this.currentUser()?.author ?? null;
-@let contributionStats = this.contributionStats();
 
 <div class="page">
   <div class="author-info">
@@ -12,36 +11,17 @@
   </div>
 
   <div class="posts-wrapper">
-    <p-tabs
-      class="posts-list"
-      [scrollable]="true"
-      (valueChange)="this.handleTabChange($event.toString())"
-      [value]="this.selectedTab()"
-    >
-      <p-tablist>
-        @for (tab of contributionStats; track tab) {
-          <p-tab [value]="tab.value">
-            <div class="tab-content">
-              <p-badge class="tab-count" [value]="tab.count" />
-              <span class="tab-label"> {{ tab.label }} </span>
-            </div>
-          </p-tab>
-        }
-      </p-tablist>
-      @for (tab of contributionStats; track tab) {
-        <p-tabpanel [value]="tab.value">
-          <app-posts-list
-            [paginatedPostResponse]="this.paginatedPostResponse()"
-            (pageChangeEvent)="this.handlePageChangeEvent($event)"
-          >
-            <ng-template let-post> <app-post [post]="post" /> </ng-template
-          ></app-posts-list>
-        </p-tabpanel>
-      }
-    </p-tabs>
-
     <div class="posts-list-settings">
-      <app-posts-settings />
+      <app-posts-settings [contributionStats]="this.contributionStats()" />
+    </div>
+
+    <div class="posts-list">
+      <app-posts-list
+        [paginatedPostResponse]="this.paginatedPostResponse()"
+        (pageChange)="this.handlePageChange($event)"
+      >
+        <ng-template let-post> <app-post [post]="post" /> </ng-template
+      ></app-posts-list>
     </div>
   </div>
 </div>
