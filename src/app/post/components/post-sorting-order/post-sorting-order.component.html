@@ -1,0 +1,21 @@
+<form class="sorting-order-form" [formGroup]="sortingOrderForm">
+  <div class="order-wrapper">
+    <span class="sorting-order-form-sort-order-title">Order:</span>
+    <div class="sorting-order-form-sort-order">
+      @for (sortingOrder of sortingOrderOptions; track i; let i = $index) {
+        <div class="sorting-order-form-checkbox">
+          <p-radiobutton
+            [inputId]="sortingOrder.label + '-sortingOrder'"
+            name="sortingOrder"
+            [value]="sortingOrder.value"
+            variant="filled"
+            formControlName="sortingOrder"
+          />
+          <label class="sorting-order-form-checkbox-label" [for]="sortingOrder.label + '-sortingOrder'">{{
+            sortingOrder.label
+          }}</label>
+        </div>
+      }
+    </div>
+  </div>
+</form>

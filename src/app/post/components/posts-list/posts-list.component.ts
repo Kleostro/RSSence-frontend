@@ -3,12 +3,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
-  EventEmitter,
   inject,
   input,
   linkedSignal,
-  OnInit,
-  Output,
+  output,
   TemplateRef,
 } from '@angular/core';
 
@@ -25,11 +23,9 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
   styleUrl: './posts-list.component.scss',
   templateUrl: './posts-list.component.html',
 })
-export class PostsListComponent implements OnInit {
+export class PostsListComponent {
   @ContentChild(TemplateRef) public itemTemplate!: TemplateRef<unknown>;
-  @Output() public pageChangeEvent = new EventEmitter<PaginatorState>();
   public readonly navigationService = inject(NavigationService);
-  public first = 0;
 
   public paginatedPostResponse = input<null | PaginatedPostResponse>(null);
 
@@ -38,21 +34,10 @@ export class PostsListComponent implements OnInit {
     source: this.paginatedPostResponse,
   });
 
-  public handleMoveToPost(postId: number): void {
-    if (this.navigationService.isPostModerationPage()) {
-      this.navigationService.navigateToPostModerationById(postId);
-    } else {
-      this.navigationService.navigateToPostById(postId);
-    }
-  }
-
-  public ngOnInit(): void {
-    this.isPostsLoaded.set(true);
-  }
+  public pageChange = output<PaginatorState>();
 
   public onPageChange(event: PaginatorState): void {
-    this.first = event.first ?? 0;
     this.isPostsLoaded.set(false);
-    this.pageChangeEvent.emit(event);
+    this.pageChange.emit(event);
   }
 }

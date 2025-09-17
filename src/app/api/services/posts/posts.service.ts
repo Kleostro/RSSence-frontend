@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { map, Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
-import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { POST_QUERY_KEYS, PostQuery } from '@/app/api/interfaces/post-query';
 import { ModerationHistoryResponse } from '@/app/api/schemas/moderation-history-response';
 import { PostVersionDiffResponse } from '@/app/api/schemas/post-version-diff-response';
 import {
@@ -17,6 +17,7 @@ import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from
 import { NewPost } from '@/app/interfaces/post-form';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
+import { buildHttpParams } from '@/app/utils/http-params';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -25,17 +26,6 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly message = inject(MessageService);
-  public query = signal<PaginationQueryDto>({ limit: 10, page: 1 });
-
-  public approvePost(postId: number): Observable<PostResponse> {
-    return this.http
-      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.APPROVE}`, {})
-      .pipe(
-        tap(() => {
-          this.message.info(MESSAGE.APPROVE_POST_SUCCESS);
-        }),
-      );
-  }
 
   public createPost(post: NewPost): Observable<PostResponse> {
     return this.http.post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, post).pipe(
@@ -56,7 +46,7 @@ export class PostsService {
   public deletePostVersion(postId: number, version: number): Observable<PostVersionResponse> {
     return this.http
       .delete<PostVersionResponse>(
-        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSIONS}/${version.toString()}`,
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.VERSIONS}/${version.toString()}`,
       )
       .pipe(
         tap(() => {
@@ -65,7 +55,7 @@ export class PostsService {
       );
   }
 
-  public getAllPosts(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
+  public getAllPosts(query?: PostQuery): Observable<null | PaginatedPostResponse> {
     return this.http
       .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}`, {
         params: { ...query },
@@ -79,13 +69,31 @@ export class PostsService {
   }
 
   public getPostById(postId: number): Observable<PostResponse> {
-    return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}`);
+    return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/id/${postId.toString()}`);
+  }
+
+  public getPostBySlug(slug: string): Observable<PostResponse> {
+    return this.http.get<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${slug}`);
   }
 
   public getPostModerationHistory(postId: number): Observable<ModerationHistoryResponse[]> {
     return this.http.get<ModerationHistoryResponse[]>(
-      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.HISTORY}`,
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.AUDIT}/${ENDPOINTS.FULL_HISTORY}`,
     );
+  }
+
+  public getPostsByAuthor(username: string, query?: PostQuery): Observable<null | PaginatedPostResponse> {
+    const params = query ? buildHttpParams(query, POST_QUERY_KEYS) : new HttpParams();
+    return this.http
+      .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${username}/${ENDPOINTS.POSTS}`, {
+        params,
+      })
+      .pipe(
+        map((response: PaginatedPostResponse) => {
+          const { data, success } = PaginatedPostResponseSchema.safeParse(response);
+          return success ? data : null;
+        }),
+      );
   }
 
   public getPostVersionDiff(
@@ -95,15 +103,15 @@ export class PostsService {
   ): Observable<PostVersionDiffResponse> {
     const params = new HttpParams().set('from', fromVersion.toString()).set('to', toVersion.toString());
     return this.http.get<PostVersionDiffResponse>(
-      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSION_DIFF}/`,
+      `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.VERSIONS}/${ENDPOINTS.VERSION_DIFF}/`,
       { params },
     );
   }
 
-  public getPostVersions(postId: number, query?: PaginationQueryDto): Observable<null | PaginatedPostVersionResponse> {
+  public getVersionsByPost(postId: number, query?: PostQuery): Observable<null | PaginatedPostVersionResponse> {
     return this.http
       .get<PaginatedPostVersionResponse>(
-        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.POST_VERSIONS}`,
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.VERSIONS}`,
         { params: { ...query } },
       )
       .pipe(
@@ -114,76 +122,45 @@ export class PostsService {
       );
   }
 
-  public getSubmittedForModeration(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
+  public performPostAuthorAction(postId: number, action: string): Observable<PostResponse> {
     return this.http
-      .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${ENDPOINTS.MODERATION}`, {
-        params: { ...query },
-      })
-      .pipe(
-        map((response: PaginatedPostResponse) => {
-          const { data, success } = PaginatedPostResponseSchema.safeParse(response);
-          return success ? data : null;
-        }),
-      );
-  }
-
-  public rejectPost(postId: number, comment: string, reasons: string[]): Observable<PostResponse> {
-    return this.http
-      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.REJECT}`, {
-        comment,
-        reasons,
+      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.MODERATION}`, {
+        action,
       })
       .pipe(
         tap(() => {
-          this.message.info(MESSAGE.REJECT_POST_SUCCESS);
+          this.message.info(MESSAGE.APPROVE_POST_SUCCESS);
         }),
       );
   }
 
-  public resetQuery(): void {
-    this.query.set({ limit: 10, page: 1 });
+  public performPostModeratorAction(
+    postId: number,
+    action: string,
+    comment?: string,
+    reasons?: string[],
+  ): Observable<PostResponse> {
+    return this.http
+      .patch<PostResponse>(
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.MODERATION}/${ENDPOINTS.MODERATOR}`,
+        { action, comment, reasons },
+      )
+      .pipe(
+        tap(() => {
+          this.message.info(MESSAGE.APPROVE_POST_SUCCESS);
+        }),
+      );
   }
 
   public revertToVersion(postId: number, version: number): Observable<PostResponse> {
     return this.http
-      .post<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.REVERT}`, {
-        version,
-      })
+      .post<PostResponse>(
+        `${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.VERSIONS}/${version.toString()}/${ENDPOINTS.REVERT}`,
+        {},
+      )
       .pipe(
         tap(() => {
           this.message.info(MESSAGE.REVERT_POST_SUCCESS);
-        }),
-      );
-  }
-
-  public revisionPost(postId: number, comment: string): Observable<PostResponse> {
-    return this.http
-      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.REVISION}`, {
-        comment,
-      })
-      .pipe(
-        tap(() => {
-          this.message.info(MESSAGE.REVISION_POST_SUCCESS);
-        }),
-      );
-  }
-
-  public saveAsDraft(postId: number): Observable<PostResponse> {
-    return this.http
-      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.DRAFT}`, {})
-      .pipe(
-        tap(() => {
-          this.message.info(MESSAGE.SAVE_AS_DRAFT_SUCCESS);
-        }),
-      );
-  }
-
-  public submitForModeration(postId: number): Observable<PostResponse> {
-    return this.http
-      .patch<PostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.POSTS}/${postId.toString()}/${ENDPOINTS.SUBMIT}`, {})
-      .pipe(
-        tap(() => {
-          this.message.info(MESSAGE.SUBMIT_FOR_MODERATION_SUCCESS);
         }),
       );
   }

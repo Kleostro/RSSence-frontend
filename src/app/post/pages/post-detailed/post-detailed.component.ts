@@ -23,13 +23,13 @@ export class PostDetailedComponent implements OnInit {
   public readonly navigationService = inject(NavigationService);
 
   public currentPost = signal<null | PostResponse | undefined>(undefined);
-  public postId = input<null | string>(null, { alias: 'id' });
+  public postSlug = input<null | string>(null, { alias: 'id' });
 
   public getCurrentPost(): void {
-    const postId = this.postId();
-    if (postId) {
+    const postSlug = this.postSlug();
+    if (postSlug) {
       this.postsService
-        .getPostById(+postId)
+        .getPostBySlug(postSlug)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           tap((post: PostResponse) => {

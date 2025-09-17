@@ -4,9 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PaginatorState } from 'primeng/paginator';
 import { Observable, tap } from 'rxjs';
 
-import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PostQuery } from '@/app/api/interfaces/post-query';
+import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ModerationPostComponent } from '@/app/moderator/components/moderation-post/moderation-post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 
@@ -19,29 +20,38 @@ import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.
 })
 export class PostsModerationComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly navigationService = inject(NavigationService);
   private readonly postsService = inject(PostsService);
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
-  private loadPostsForModeration(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.postsService.getSubmittedForModeration(query).pipe(
+  private loadPostsForModeration(query?: PostQuery): Observable<null | PaginatedPostResponse> {
+    return this.postsService.getAllPosts(query).pipe(
       tap((data) => {
         this.paginatedPostResponse.set(data);
       }),
     );
   }
 
-  public handlePageChangeEvent(event: PaginatorState): void {
+  public handlePageChange(event: PaginatorState): void {
     const { page = 1, rows } = event;
-    const query: PaginationQueryDto = { limit: rows, page: page + 1 };
 
-    this.loadPostsForModeration(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.navigationService.updateQueryParams({ limit: rows, page: page + 1 });
+
+    this.loadPostsForModeration(this.navigationService.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   public handlePostEvent(): void {
-    this.loadPostsForModeration().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadPostsForModeration(this.navigationService.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   public ngOnInit(): void {
-    this.loadPostsForModeration().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.navigationService.updateQueryParams({ status: [POST_STATUS.SUBMITTED] });
+    this.loadPostsForModeration(this.navigationService.queryParams())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 }

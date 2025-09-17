@@ -1,4 +1,31 @@
-<div class="posts-search">
-  <app-post-search />
-  <app-post-sort />
+@let modalTitle = 'New post';
+
+<div class="settings-wrapper">
+  @if (this.canCreatePost()) {
+    <button
+      pButton
+      pRipple
+      type="button"
+      class="post-form-button"
+      icon="pi pi-pencil"
+      severity="success"
+      outlined="true"
+      (click)="this.setParamsInModal(); this.modalService.openModal(postForm, modalTitle)"
+    >
+      {{ modalTitle }}
+    </button>
+  }
+
+  <app-post-search (searchEvent)="this.settingsHandler($event)" />
+  <app-post-sorting (sortEvent)="this.settingsHandler($event)" />
+  <app-post-filter
+    [statusOptions]="this.statusOptions()"
+    [contributionStats]="this.contributionStats()"
+    (filterEvent)="this.settingsHandler($event)"
+  />
+  <app-post-sorting-order (sortOrderEvent)="this.settingsHandler($event)" />
 </div>
+
+<ng-template #postForm>
+  <app-post-form (formSubmitEvent)="this.onCreatePost($event)" />
+</ng-template>

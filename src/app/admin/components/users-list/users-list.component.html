@@ -53,15 +53,15 @@
         <p-sortIcon field="email" />
         <p-columnFilter type="text" field="email" display="menu" />
       </th>
-      <th pResizableColumn pSortableColumn="profileUsername">
+      <th pResizableColumn pSortableColumn="profile.username">
         profile
-        <p-sortIcon field="profileUsername" />
-        <p-columnFilter type="text" field="profileUsername" display="menu" />
+        <p-sortIcon field="profile" />
+        <p-columnFilter type="text" field="profile.username" display="menu" />
       </th>
-      <th pResizableColumn pSortableColumn="profile.authorUsername">
+      <th pResizableColumn pSortableColumn="author.username">
         author
-        <p-sortIcon field="profile.authorUsername" />
-        <p-columnFilter type="text" field="profile.authorUsername" display="menu" />
+        <p-sortIcon field="author" />
+        <p-columnFilter type="text" field="author.username" display="menu" />
       </th>
       <th pResizableColumn pSortableColumn="createdAt">
         creation date
@@ -111,7 +111,7 @@
         }
       </td>
       <td>
-        @if (user.profile && user.profile.authorUsername) {
+        @if (user.author && user.author.username) {
           <div class="td-author">
             @if (this.rolesService.isAllowedToBeDeleted(me?.roles ?? [], user.roles) || user.id === me?.id) {
               <button
@@ -122,14 +122,14 @@
                 text="true"
                 [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
                 [disabled]="this.isProcessing()"
-                (click)="this.candidateUser.set(user); this.modalService.openModal(this.deleteAuthorConfirm(), `Deleting the ${user.profile.authorUsername} author`); this.modalService.contentWidth.set('50%')"
+                (click)="this.candidateUser.set(user); this.modalService.openModal(this.deleteAuthorConfirm(), `Deleting the ${user.author.username} author`); this.modalService.contentWidth.set('50%')"
               ></button>
             }
             <button
               pButton
               pRipple
-              [label]="user.profile.authorUsername"
-              routerLink="/author/{{ user.profile.authorUsername }}"
+              [label]="user.author.username"
+              routerLink="/author/{{ user.author.username }}"
               [text]="true"
             ></button>
           </div>

@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { inject, Injectable, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 
 import { filter } from 'rxjs';
@@ -19,6 +20,7 @@ export class NavigationService {
   public isPostDetailedPage = signal<boolean>(false);
   public isPostModerationPage = signal<boolean>(false);
   public queryParams = signal<Record<string, string>>({});
+  public queryParams$ = toObservable(this.queryParams);
 
   constructor() {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
@@ -59,12 +61,13 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.NOT_FOUND]);
   }
 
-  public navigateToPostById(postId: number): void {
-    this.router.navigate([APP_ROUTE.POSTS, postId]);
+  public navigateToPostBySlug(slug?: string): void {
+    this.router.navigate([APP_ROUTE.POSTS, slug]);
   }
 
-  public navigateToPostHistory(postId: number): void {
+  public navigateToPostHistory(postId: null | number): void {
     const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.HISTORY}`;
+
     this.router.navigate([url]);
   }
 
@@ -72,8 +75,8 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.POST_MODERATION]);
   }
 
-  public navigateToPostModerationById(postId: number): void {
-    this.router.navigate([APP_ROUTE.POST_MODERATION, postId]);
+  public navigateToPostModerationBySlug(slug?: string): void {
+    this.router.navigate([APP_ROUTE.POST_MODERATION, slug]);
   }
 
   public navigateToPostVersionDiff(postId: number, from: number, to: number): void {
@@ -81,7 +84,7 @@ export class NavigationService {
     this.router.navigate([url], { queryParams: { from, to } });
   }
 
-  public navigateToPostVersions(postId: number): void {
+  public navigateToPostVersions(postId: null | number): void {
     const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.VERSIONS}`;
     this.router.navigate([url]);
   }
@@ -99,6 +102,7 @@ export class NavigationService {
       queryParams: params,
       queryParamsHandling: 'merge',
       relativeTo: this.activatedRoute,
+      replaceUrl: true,
     });
   }
 }

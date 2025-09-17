@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-top: 0.5rem;
 
   &-checkboxes {
     display: flex;
@@ -21,11 +22,17 @@
 
   &-input {
     width: 100%;
+    margin-top: 0.5rem;
   }
 }
 
 .posts-search-title {
   display: flex;
+
   margin-bottom: 0.5rem;
-  font-style: italic;
+
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--p-surface-400);
+  letter-spacing: 0.05rem;
 }

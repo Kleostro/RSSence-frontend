@@ -3,11 +3,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
   input,
   OnInit,
-  Output,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -25,10 +24,11 @@ import { TextareaModule } from 'primeng/textarea';
 import { finalize, map, switchMap, take, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { POST_STATUS, PostResponse, PostStatusType } from '@/app/api/schemas/posts-response';
+import { POST_STATUS, PostResponse } from '@/app/api/schemas/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { POST_ACTION } from '@/app/constants/post-action';
 import { POST_FORM_FIELD_CONFIG } from '@/app/constants/post-form';
 import { CoauthorsFGType, NewPost, PostForm } from '@/app/interfaces/post-form';
 import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
@@ -61,16 +61,16 @@ export class PostFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postsService = inject(PostsService);
   private readonly usersService = inject(UsersService);
-  @Output() public formSubmitEvent = new EventEmitter<PostStatusType>();
   public filteredAuthors = signal<AuthorResponse[]>([]);
   public form!: FormGroup<PostForm>;
+  public formSubmitEvent = output<string>();
   public hasChanges = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
   public post = input<null | PostResponse>();
   public POST_FORM_FIELD_CONFIG = POST_FORM_FIELD_CONFIG;
   public postEditor = viewChild.required<PostEditorComponent>('postEditor');
 
-  private checkPostForChanges(postData: NewPost): void {
+  private checkPostForChanges(postData: NewPost, status: string): void {
     const coauthorsInPostPreview = this.post()?.authors.filter((author) => !author.isMainAuthor) ?? [];
     const coauthorIdsInPostPreview = coauthorsInPostPreview.map(({ author }) => author.id);
 
@@ -80,7 +80,7 @@ export class PostFormComponent implements OnInit {
 
     if (contentUnchanged && titleUnchanged && coauthorsUnchanged) {
       this.hasChanges.set(false);
-      this.formSubmitEvent.emit();
+      this.formSubmitEvent.emit(status);
       this.completeProcessing();
     } else {
       this.hasChanges.set(true);
@@ -114,10 +114,10 @@ export class PostFormComponent implements OnInit {
         take(1),
         switchMap((newPost) => {
           if (isDraftPost) {
-            return this.postsService.saveAsDraft(newPost.id);
+            return this.postsService.performPostAuthorAction(newPost.id, POST_ACTION.SAVE_AS_DRAFT);
           }
 
-          return this.postsService.submitForModeration(newPost.id);
+          return this.postsService.performPostAuthorAction(newPost.id, POST_ACTION.SUBMIT);
         }),
         map(() => {
           this.form.reset();
@@ -188,6 +188,7 @@ export class PostFormComponent implements OnInit {
         Validators.required,
         Validators.minLength(this.POST_FORM_FIELD_CONFIG.title.min),
         Validators.maxLength(this.POST_FORM_FIELD_CONFIG.title.max),
+        Validators.pattern(this.POST_FORM_FIELD_CONFIG.title.pattern),
       ]),
     });
     const post = this.post();
@@ -217,7 +218,7 @@ export class PostFormComponent implements OnInit {
     const post = this.post();
 
     if (post) {
-      this.checkPostForChanges(postData);
+      this.checkPostForChanges(postData, post.status);
     } else {
       this.hasChanges.set(true);
     }

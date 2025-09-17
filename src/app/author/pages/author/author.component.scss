@@ -4,7 +4,7 @@
 }
 
 .posts-list {
-  width: 69%;
+  width: 79%;
 }
 
 .posts-list-settings {
@@ -13,21 +13,9 @@
   display: flex;
   flex-direction: column;
 
-  width: 30%;
+  width: 20%;
   height: auto;
-}
+  border-radius: var(--p-content-border-radius);
 
-.tab-content {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.tab-label {
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
-}
-
-.tab-count {
-  font-size: 0.8rem;
+  background-color: var(--p-content-background);
 }

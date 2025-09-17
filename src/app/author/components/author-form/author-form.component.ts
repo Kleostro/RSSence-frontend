@@ -113,9 +113,8 @@ export class AuthorFormComponent implements OnInit {
   }
 
   private handleFormSubmit(formData: FormData): void {
-    const username = this.author?.username ?? '';
     const action$ = this.author
-      ? this.authorsService.updateAuthor(username, formData)
+      ? this.authorsService.updateAuthor(formData)
       : this.authorsService.createAuthor(formData);
 
     action$

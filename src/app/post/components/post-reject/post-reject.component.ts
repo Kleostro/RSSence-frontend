@@ -10,6 +10,7 @@ import { catchError, EMPTY, finalize, tap } from 'rxjs';
 
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
+import { POST_ACTION } from '@/app/constants/post-action';
 import { POST_REJECT_FORM_FIELD_CONFIG } from '@/app/constants/post-reject-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
@@ -73,8 +74,9 @@ export class PostRejectComponent {
 
     this.isProcessing.set(true);
     this.postsService
-      .rejectPost(
+      .performPostModeratorAction(
         postId,
+        POST_ACTION.REJECT,
         comment,
         reasons.map((reason) => reason.value),
       )

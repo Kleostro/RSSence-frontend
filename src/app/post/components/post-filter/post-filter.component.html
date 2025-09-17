@@ -1,0 +1,69 @@
+<form class="filter-form" [formGroup]="this.filterForm">
+  @if (this.statusOptions().length) {
+    <div class="status-wrapper">
+      <span class="filter-form-filter-by-title">Status:</span>
+      <div class="filter-form-filter-by">
+        @for (status of this.statusOptions(); track status.name) {
+          @let statsBadgeSeverity =
+            status.name === 'APPROVED'
+              ? 'success'
+              : status.name === 'REVISION_REQUIRED'
+                ? 'warn'
+                : status.name === 'DRAFT'
+                  ? 'secondary'
+                  : status.name === 'REJECTED'
+                    ? 'danger'
+                    : 'info';
+
+          <div class="filter-form-checkbox">
+            <p-checkbox
+              [inputId]="status.name + '-status'"
+              name="status"
+              [value]="status.name"
+              variant="filled"
+              [formControl]="this.filterForm.controls.status"
+            />
+            <label class="filter-form-checkbox-label" [for]="status.name + '-status'">
+              {{ status.label }}
+              <p-badge class="ml-1" [severity]="statsBadgeSeverity" [value]="status.count" />
+            </label>
+          </div>
+        }
+      </div>
+      <button
+        outlined="true"
+        severity="danger"
+        pButton
+        pRipple
+        icon="pi pi-eraser"
+        class="filter-form-status-reset"
+        type="button"
+        [disabled]="!this.filterForm.value.status?.length"
+        (click)="this.resetStatusFilter()"
+      >
+        Reset
+      </button>
+    </div>
+  }
+  @if (this.contributionStats().length) {
+    <div class="authorship-wrapper">
+      <span class="filter-form-filter-by-title">Authorship:</span>
+      <div class="filter-form-filter-by">
+        @for (stats of this.contributionStats(); track stats.value) {
+          <div class="filter-form-checkbox">
+            <p-radiobutton
+              [inputId]="stats.value + '-authorship'"
+              name="authorShip"
+              [value]="stats.value"
+              variant="filled"
+              [formControl]="this.filterForm.controls.isMainAuthor"
+            />
+            <label class="filter-form-checkbox-label" [for]="stats.value + '-authorship'">
+              {{ stats.label }} <p-badge [value]="stats.count" />
+            </label>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</form>

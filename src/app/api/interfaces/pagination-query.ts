@@ -1,6 +1,4 @@
 export interface PaginationQueryDto {
-  filter?: string;
-  filterField?: string;
   limit?: number;
   page?: number;
   search?: string;
@@ -8,3 +6,12 @@ export interface PaginationQueryDto {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
+
+export const PAGINATION_QUERY_KEYS = [
+  'page',
+  'limit',
+  'search',
+  'searchField',
+  'sortBy',
+  'sortOrder',
+] as const satisfies readonly (keyof PaginationQueryDto)[];

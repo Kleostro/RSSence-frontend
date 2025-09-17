@@ -6,7 +6,7 @@ import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { Observable, tap } from 'rxjs';
 
-import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { PostQuery } from '@/app/api/interfaces/post-query';
 import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
@@ -27,7 +27,7 @@ export class PostsComponent implements OnInit {
 
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
 
-  private loadAllPosts(query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
+  private loadAllPosts(query?: PostQuery): Observable<null | PaginatedPostResponse> {
     return this.postsService.getAllPosts(query).pipe(
       tap((data) => {
         this.paginatedPostResponse.set(data);
@@ -35,20 +35,19 @@ export class PostsComponent implements OnInit {
     );
   }
 
-  public handlePageChangeEvent(event: PaginatorState): void {
+  public handlePageChange(event: PaginatorState): void {
     const { page = 1, rows } = event;
-    const query: PaginationQueryDto = {
-      filter: POST_STATUS.APPROVED,
-      filterField: 'status',
+    const query: PostQuery = {
       limit: rows,
       page: page + 1,
+      status: [POST_STATUS.APPROVED],
     };
 
     this.loadAllPosts(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   public ngOnInit(): void {
-    const query: PaginationQueryDto = { filter: POST_STATUS.APPROVED, filterField: 'status' };
+    const query: PostQuery = { status: [POST_STATUS.APPROVED] };
     this.loadAllPosts(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 }

@@ -2,11 +2,21 @@
   display: contents;
 }
 
-.posts-search {
-  position: sticky;
-  top: 2rem;
+.post-form-button {
+  display: flex;
+  padding: 0.5rem;
+}
 
+.settings-wrapper {
+  position: sticky;
+  top: 0;
+
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  max-height: calc(100vh - 0.5rem);
+  padding: 1.5rem;
+  padding-top: 0.5rem;
 }

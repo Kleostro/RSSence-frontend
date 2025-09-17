@@ -55,7 +55,7 @@ export class PostRevisionComponent {
     }
     this.isProcessing.set(true);
     this.postsService
-      .revisionPost(postId, comment)
+      .performPostModeratorAction(postId, 'REVISION_REQUEST', comment)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap(() => {

@@ -6,13 +6,20 @@ import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Rout
 })
 export class LoaderService {
   private readonly router = inject(Router);
+  private lastRoutePath = '';
   public isPageLoading = signal(false);
+
   public isProcessing = signal(false);
 
   constructor() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.isPageLoading.set(true);
+        const nextRoutePath = event.url.split('?')[0];
+
+        if (nextRoutePath !== this.lastRoutePath) {
+          this.isPageLoading.set(true);
+          this.lastRoutePath = nextRoutePath;
+        }
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||

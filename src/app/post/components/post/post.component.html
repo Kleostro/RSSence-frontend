@@ -10,16 +10,16 @@
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
     <div class="post-top">
-      <h1
-        class="post-title"
+      <a
         aria-disabled="true"
+        class="post-title"
         [class.post-title-disabled]="!canMoveToDetailsPage"
-        (click)="this.navigationService.navigateToPostById(post.id)"
-        (keyup)="this.navigationService.navigateToPostById(post.id)"
-        (keydown)="this.navigationService.navigateToPostById(post.id)"
+        (click)="this.navigationService.navigateToPostBySlug(post.slug)"
+        (keyup)="this.navigationService.navigateToPostBySlug(post.slug)"
+        (keydown)="this.navigationService.navigateToPostBySlug(post.slug)"
+        >{{ post.title }}</a
       >
-        {{ post.title }}
-      </h1>
+
       <div class="post-actions">
         @if (canMoveToDetailsPage) {
           <button
@@ -29,7 +29,7 @@
             tooltipPosition="bottom"
             type="button"
             [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostById(post.id)"
+            (click)="this.navigationService.navigateToPostBySlug(post.slug)"
             [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
             class="post-read-button"
             severity="success"
@@ -66,24 +66,6 @@
             outlined="true"
           ></button>
         }
-
-        <button
-          pButton
-          pRipple
-          [pTooltip]="this.mode() === 'preview' ? 'Unwrap' : 'Roll up'"
-          tooltipPosition="bottom"
-          type="button"
-          [disabled]="isProcessing()"
-          (click)="this.mode.set(this.mode() === 'preview' ? 'full' : 'preview')"
-          [icon]="
-            this.mode() === 'preview'
-              ? 'pi pi-arrow-up-right-and-arrow-down-left-from-center'
-              : 'pi pi-arrow-down-left-and-arrow-up-right-to-center'
-          "
-          class="switch-mode-button"
-          severity="info"
-          outlined="true"
-        ></button>
 
         @if (isShowPostUserActions) {
           @if (canSubmitPost) {
@@ -151,8 +133,8 @@
       </div>
     </header>
 
-    <body class="post-body">
-      @if (this.mode() === 'full') {
+    <body class="post-body" [class]="'post-body-' + post.status.toLowerCase()">
+      @if (this.navigationService.isPostDetailedPage()) {
         <div class="post-content" [@postBody] [innerHTML]="this.safeHtml()"></div>
       }
     </body>
