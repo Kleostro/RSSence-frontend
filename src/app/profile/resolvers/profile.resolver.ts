@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ResolveFn } from '@angular/router';
 
-import { map, of, switchMap, tap } from 'rxjs';
+import { of, switchMap, tap } from 'rxjs';
 
 import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { UserResponse } from '@/app/api/schemas/users-response';
@@ -13,12 +13,10 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
 export const meProfileResolver: ResolveFn<null | ProfileResponse> = () => {
   const usersService = inject(UsersService);
   const title = inject(Title);
-  return usersService.getMe().pipe(
-    map((me) => me?.profile ?? null),
-    tap((profile) => {
-      title.setTitle('RSS | ' + (profile?.username ?? 'Profile'));
-    }),
-  );
+
+  const meProfile = usersService.me()?.profile ?? null;
+  title.setTitle('Profile | ' + (meProfile?.username ?? ''));
+  return meProfile ?? null;
 };
 
 export const profileResolver: ResolveFn<null | UserResponse> = (route) => {
@@ -43,7 +41,7 @@ export const profileResolver: ResolveFn<null | UserResponse> = (route) => {
               navigationService.navigateToAuthor();
               return of(usersService.me());
             } else {
-              title.setTitle('RSS | ' + (profile?.username ?? ''));
+              title.setTitle('Profile | ' + (profile?.username ?? ''));
               return of(user);
             }
           }),

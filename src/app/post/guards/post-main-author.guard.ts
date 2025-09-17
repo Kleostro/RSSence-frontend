@@ -14,10 +14,22 @@ export const postMainAuthorGuard: CanActivateFn = (route: ActivatedRouteSnapshot
   const postService = inject(PostsService);
   const rolesService = inject(RolesService);
   const router = inject(Router);
-  const postId = Number(route.paramMap.get('id'));
+  const paramId = route.paramMap.get('id');
 
-  if (postId) {
-    return forkJoin([usersService.getMe(), postService.getPostById(postId)]).pipe(
+  let postIdOrSlug = null;
+  if (paramId) {
+    if (/^\d+$/.test(paramId)) {
+      postIdOrSlug = parseInt(paramId, 10);
+    } else {
+      postIdOrSlug = paramId;
+    }
+
+    const action =
+      typeof postIdOrSlug === 'string'
+        ? postService.getPostBySlug(postIdOrSlug)
+        : postService.getPostById(postIdOrSlug);
+
+    return forkJoin([usersService.getMe(), action]).pipe(
       switchMap(([me, post]) => {
         if (
           rolesService.hasAccess(me?.roles ?? [], ROLE.MODERATOR) ||
