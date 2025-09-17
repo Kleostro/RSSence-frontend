@@ -1,14 +1,24 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { Params } from '@angular/router';
 
 import { InputText } from 'primeng/inputtext';
 import { RadioButton } from 'primeng/radiobutton';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 
-import { PostsService } from '@/app/api/services/posts/posts.service';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
-const DEBOUNCE_TIME = 400;
+const DEBOUNCE_TIME = 1000;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,15 +30,25 @@ const DEBOUNCE_TIME = 400;
 export class PostSearchComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly postsService = inject(PostsService);
+  private readonly navigationService = inject(NavigationService);
   public readonly searchFields = [
-    { label: 'Title', value: 'title' },
-    { label: 'Content', value: 'content' },
+    { label: 'Title', placeholder: 'A very interesting title', value: 'title' },
+    { label: 'Content', placeholder: 'Lorem ipsum dolor sit amet', value: 'content' },
+    { label: 'Authors', placeholder: 'john_doe, stardustmeg, kleostro', value: 'username' },
   ];
-  public readonly searchForm = this.fb.group({
-    search: [''],
-    searchField: [this.searchFields[0].value],
+  private initialSelectedSearchField = computed(() => {
+    return (
+      this.searchFields.find((field) => field.value === this.navigationService.queryParams()['searchField']) ??
+      this.searchFields[0]
+    );
   });
+  public readonly searchForm = this.fb.group({
+    search: [this.navigationService.queryParams()['search'] ?? ''],
+    searchField: [this.initialSelectedSearchField().value],
+  });
+
+  public inputPlaceholder = signal<string>(this.initialSelectedSearchField().placeholder);
+  public searchEvent = output<Params>();
 
   public ngOnInit(): void {
     this.searchForm.valueChanges
@@ -36,12 +56,9 @@ export class PostSearchComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         debounceTime(DEBOUNCE_TIME),
         distinctUntilChanged(),
-        tap((formFalue) => {
-          this.postsService.query.update((q) => ({
-            ...q,
-            search: formFalue.search,
-            searchField: formFalue.searchField,
-          }));
+        tap(({ search, searchField }) => {
+          const params = { search, searchField };
+          this.searchEvent.emit(params);
         }),
       )
       .subscribe();

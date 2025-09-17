@@ -1,6 +1,7 @@
-@let posts = paginatedPostResponse()?.items;
-@let limit = paginatedPostResponse()?.limit ?? 10;
-@let total = paginatedPostResponse()?.total ?? 0;
+@let posts = this.paginatedPostResponse()?.items;
+@let limit = this.paginatedPostResponse()?.limit ?? 10;
+@let total = this.paginatedPostResponse()?.total ?? 0;
+@let first = this.paginatedPostResponse()?.first ?? 0;
 @let skeletonHeights = ['3.5rem', '12rem', '12rem', '12rem', '12rem', '12rem', '3.5rem'];
 
 @if (this.isPostsLoaded()) {
@@ -22,7 +23,7 @@
   }
 
   <p-paginator
-    class="posts-list-paginator"
+    class="posts-list-paginator mt-auto"
     (onPageChange)="onPageChange($event)"
     [first]="first"
     [rows]="limit"
