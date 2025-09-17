@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const PaginationResponseSchema = <T extends z.ZodSchema>(
   schema: T,
 ): z.ZodObject<{
+  first: z.ZodNumber;
   hasMore: z.ZodBoolean;
   items: z.ZodArray<T>;
   limit: z.ZodNumber;
@@ -11,6 +12,7 @@ export const PaginationResponseSchema = <T extends z.ZodSchema>(
   totalPages: z.ZodNumber;
 }> =>
   z.object({
+    first: z.number(),
     hasMore: z.boolean(),
     items: z.array(schema),
     limit: z.number(),

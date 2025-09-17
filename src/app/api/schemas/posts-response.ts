@@ -25,6 +25,7 @@ export const PostSchema = z.object({
   content: z.string(),
   createdAt: z.string(),
   id: z.number(),
+  slug: z.string().optional(),
   status: z.string(),
   title: z.string(),
   updatedAt: z.string(),

@@ -68,7 +68,7 @@ export class UsersComponent implements OnInit {
     this.handleDelete(() => this.usersService.deleteUser(userId));
   }
 
-  public handlePageChangeEvent(event: PaginatorState): void {
+  public handlePageChange(event: PaginatorState): void {
     const { page = 1, rows } = event;
     this.loadUsers({ limit: rows, page: page + 1 })
       .pipe(takeUntilDestroyed(this.destroyRef))

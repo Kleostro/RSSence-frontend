@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { ProfileSchema } from '@/app/api/schemas/profiles-response';
 
 export const ModerationHistorySchema = z.object({
+  actionType: z.string(),
   comment: z.string().nullable(),
   createdAt: z.string().nullable(),
   id: z.number(),
