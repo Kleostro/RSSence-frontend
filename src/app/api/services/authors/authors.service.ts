@@ -1,18 +1,20 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
 import { map, Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
+import { POST_QUERY_KEYS, PostQuery } from '@/app/api/interfaces/post-query';
+import { PostStatuses } from '@/app/api/interfaces/post/post-statuses';
 import {
   AuthorResponse,
   PaginatedAuthorResponse,
   PaginatedAuthorResponseSchema,
 } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse, PaginatedPostResponseSchema } from '@/app/api/schemas/posts-response';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
+import { buildHttpParams } from '@/app/utils/http-params';
 import { ENVIRONMENT } from '@/environment/environment';
 
 @Injectable({
@@ -48,28 +50,26 @@ export class AuthorsService {
     return this.http.get<AuthorResponse | null>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`);
   }
 
-  public getAuthorContributionStats(username: string): Observable<{ count: number; label: string; value: string }[]> {
-    return this.http.get<{ count: number; label: string; value: string }[]>(
+  public getAuthorContributionStats(
+    username: string,
+    query?: PostQuery,
+  ): Observable<{ count: number; label: string; value: boolean | undefined }[]> {
+    const params = query ? buildHttpParams(query, POST_QUERY_KEYS) : new HttpParams();
+    return this.http.get<{ count: number; label: string; value: boolean | undefined }[]>(
       `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.CONTRIBUTION_STATS}`,
+      {
+        params,
+      },
     );
   }
 
-  public getAuthorPosts(username: string, query?: PaginationQueryDto): Observable<null | PaginatedPostResponse> {
-    return this.http
-      .get<PaginatedPostResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.POSTS}`, {
-        params: { ...query },
-      })
-      .pipe(
-        map((response: PaginatedPostResponse) => {
-          const { data, success } = PaginatedPostResponseSchema.safeParse(response);
-          return success ? data : null;
-        }),
-      );
-  }
-
-  public getAuthorPostStatuses(username: string): Observable<{ count: number; name: string }[]> {
-    return this.http.get<{ count: number; name: string }[]>(
+  public getAuthorPostStatuses(username: string, query?: PostQuery): Observable<PostStatuses[]> {
+    const params = query ? buildHttpParams(query, POST_QUERY_KEYS) : new HttpParams();
+    return this.http.get<PostStatuses[]>(
       `${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}/${ENDPOINTS.POSTS.slice(0, -1)}-statuses`,
+      {
+        params,
+      },
     );
   }
 
@@ -86,8 +86,8 @@ export class AuthorsService {
       );
   }
 
-  public updateAuthor(username: string, author: FormData): Observable<AuthorResponse> {
-    return this.http.patch<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}/${username}`, author).pipe(
+  public updateAuthor(author: FormData): Observable<AuthorResponse> {
+    return this.http.patch<AuthorResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.AUTHORS}`, author).pipe(
       tap(() => {
         this.message.success(MESSAGE.UPDATE_AUTHOR_SUCCESS);
       }),
