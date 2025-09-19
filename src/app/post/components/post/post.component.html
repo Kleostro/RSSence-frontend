@@ -135,16 +135,13 @@
 
     <body class="post-body" [class]="'post-body-' + post.status.toLowerCase()">
       @if (this.navigationService.isPostDetailedPage()) {
-        <div class="post-content" [@postBody] [innerHTML]="this.safeHtml()"></div>
+        <app-post-body [post]="post" />
       }
     </body>
 
-    <footer class="post-footer"></footer>
-  </div>
-} @else {
-  <div class="not-found">
-    <p class="not-found-text">Not found post</p>
-    <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
+    <footer class="post-footer">
+      <app-post-footer [post]="post" />
+    </footer>
   </div>
 }
 

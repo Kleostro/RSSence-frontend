@@ -33,12 +33,6 @@
     min-height: 4rem;
   }
 
-  &-title,
-  &-content {
-    line-height: 1.5;
-    color: var(--p-text-color);
-  }
-
   &-title {
     cursor: pointer;
 
@@ -48,6 +42,8 @@
 
     font-size: 1.5rem;
     font-weight: bold;
+    line-height: 1.5;
+    color: var(--p-text-color);
     text-overflow: ellipsis;
     letter-spacing: 0.1rem;
     white-space: nowrap;
@@ -88,12 +84,6 @@
     }
   }
 
-  &-content {
-    overflow: hidden;
-    margin: 1rem 0;
-    font-size: 1rem;
-  }
-
   &-actions {
     display: flex;
     gap: 0.5rem;
@@ -112,6 +102,13 @@
   }
 
   &-times {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  &-footer {
     display: flex;
     gap: 0.5rem;
     align-items: center;
