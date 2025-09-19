@@ -1,0 +1,66 @@
+@let postViewAggregation = this.post()?.postViewAggregation;
+@let currentDayViewStats = this.post()?.currentDayViewStats;
+
+@let viewsInfoTooltipText =
+  `
+    Unique Views:
+    The number of different people who have read this post.
+    If the same person reads it multiple times, it’s still counted as one.
+    Authors and co-authors are automatically excluded to keep metrics fair.
+
+    Total Views:
+    Every single time this post was opened — regardless of who opened it.
+    Includes repeats by the same reader, authors, or co-authors.`;
+
+<div class="post-views">
+  <div class="post-views-top">
+    <span class="post-views-info">
+      <span class="post-views-info-icon" autoHide="false" tooltipPosition="right" [pTooltip]="viewsInfoTooltipText"
+        >i</span
+      >
+    </span>
+    <span class="post-views-title">Views:</span>
+  </div>
+
+  <div class="post-views-bottom">
+    <div class="post-views-unique">
+      @if (!this.navigationService.isPostDetailedPage()) {
+        <span class="post-views-unique-title" tooltipPosition="top" pTooltip="Updated every day at 02:00">
+          Unique
+        </span>
+        <span class="post-views-unique-count">
+          <span class="pi pi-eye"></span>
+          {{ postViewAggregation?.uniqueViews ?? 0 }}
+        </span>
+      } @else {
+        <span class="post-views-unique-title" tooltipPosition="bottom" pTooltip="Includes today">Unique</span>
+        <span class="post-views-unique-count">
+          <span class="pi pi-eye"></span>
+          {{ (postViewAggregation?.uniqueViews ?? 0) + (currentDayViewStats?.uniqueViewsToday ?? 0) }}
+          @if (currentDayViewStats?.uniqueViewsToday; as uniqueViewsToday) {
+            <span class="post-views-unique-today"> (+{{ uniqueViewsToday }}) </span>
+          }
+        </span>
+      }
+    </div>
+
+    <div class="post-views-total">
+      @if (!this.navigationService.isPostDetailedPage()) {
+        <span class="post-views-total-title" tooltipPosition="top" pTooltip="Updated every day at 02:00"> Total </span>
+        <span class="post-views-total-count">
+          <span class="pi pi-eye"></span>
+          {{ postViewAggregation?.totalViews ?? 0 }}
+        </span>
+      } @else {
+        <span class="post-views-total-title" tooltipPosition="bottom" pTooltip="Includes today">Total</span>
+        <span class="post-views-total-count">
+          <span class="pi pi-eye"></span>
+          {{ (postViewAggregation?.totalViews ?? 0) + (currentDayViewStats?.totalViewsToday ?? 0) }}
+          @if (currentDayViewStats?.totalViewsToday; as totalViewsToday) {
+            <span class="post-views-total-today"> (+{{ totalViewsToday }}) </span>
+          }
+        </span>
+      }
+    </div>
+  </div>
+</div>
