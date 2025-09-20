@@ -25,6 +25,8 @@ export class PostSortingComponent implements OnInit {
     { label: 'Title', value: 'title' },
     { label: 'Creation date', value: 'createdAt' },
     { label: 'Last updated date', value: 'updatedAt' },
+    { label: 'Unique views', value: 'uniqueViews' },
+    { label: 'Total views', value: 'totalViews' },
   ];
 
   private initialSelectedSortField = computed(() => {
