@@ -1,24 +1,19 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
-  effect,
   EventEmitter,
   inject,
   input,
-  OnInit,
   Output,
   signal,
   TemplateRef,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import * as marked from 'marked';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
@@ -36,24 +31,14 @@ import { ROLE } from '@/app/constants/roles';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { CoauthorsListComponent } from '@/app/post/components/coauthors-list/coauthors-list.component';
 import { PostAvatarComponent } from '@/app/post/components/post-avatar/post-avatar.component';
+import { PostBodyComponent } from '@/app/post/components/post-body/post-body.component';
+import { PostFooterComponent } from '@/app/post/components/post-footer/post-footer.component';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
-  animations: [
-    trigger('postBody', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'scaleY(0)', transformOrigin: 'top' }),
-        animate('300ms ease-in', style({ opacity: 1, transform: 'scaleY(1)' })),
-      ]),
-      transition(':leave', [
-        style({ opacity: 1, transform: 'scaleY(1)', transformOrigin: 'top' }),
-        animate('300ms ease-out', style({ opacity: 0, transform: 'scaleY(0)' })),
-      ]),
-    ]),
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CoauthorsListComponent,
@@ -61,6 +46,8 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     ButtonModule,
     RippleModule,
     PostAvatarComponent,
+    PostBodyComponent,
+    PostFooterComponent,
     PostFormComponent,
     TooltipModule,
     ConfirmComponent,
@@ -69,7 +56,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   styleUrl: './post.component.scss',
   templateUrl: './post.component.html',
 })
-export class PostComponent implements OnInit {
+export class PostComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly message = inject(MessageService);
   private readonly postsService = inject(PostsService);
@@ -78,7 +65,6 @@ export class PostComponent implements OnInit {
   @Output() public postFormEvent = new EventEmitter<unknown>();
   public readonly modalService = inject(ModalService);
   public readonly navigationService = inject(NavigationService);
-  public readonly sanitizer = inject(DomSanitizer);
   public readonly usersService = inject(UsersService);
   public post = input<null | PostResponse>(null);
 
@@ -105,22 +91,6 @@ export class PostComponent implements OnInit {
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostUserActions = input<boolean>(false);
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
-
-  public safeHtml = signal<SafeHtml>('');
-
-  constructor() {
-    if (this.navigationService.isPostDetailedPage()) {
-      effect(() => {
-        this.parseHtml();
-      });
-    }
-  }
-
-  private async parseHtml(): Promise<string> {
-    const parsedHtml = await marked.parse(this.post()?.content ?? '');
-    this.safeHtml.set(this.sanitizer.bypassSecurityTrustHtml(parsedHtml));
-    return parsedHtml;
-  }
 
   public deletePost(): void {
     const post = this.post();
@@ -171,10 +141,6 @@ export class PostComponent implements OnInit {
   public handlePostFormSubmit(): void {
     this.modalService.closeModal();
     this.postFormEvent.emit();
-  }
-
-  public ngOnInit(): void {
-    this.parseHtml();
   }
 
   public submitPost(): void {

@@ -1,0 +1,70 @@
+.post {
+  &-views {
+    &-top {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    &-bottom {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    &-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--p-text-color);
+    }
+
+    &-info {
+      cursor: pointer;
+
+      &-icon {
+        padding: 0.4rem 0.8rem;
+        border-radius: 50%;
+
+        font-size: 0.8rem;
+        font-weight: 900;
+        color: var(--p-text-muted-color);
+
+        background-color: var(--p-surface-900);
+      }
+    }
+
+    &-unique,
+    &-total {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+
+      padding: 1rem;
+      border-radius: 0.5rem;
+
+      background-color: var(--p-surface-900);
+
+      &-title {
+        font-size: 0.9rem;
+        color: var(--p-surface-400);
+        letter-spacing: 0.05rem;
+      }
+
+      &-count {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
+
+        font-size: 0.8rem;
+        color: var(--p-text-color);
+      }
+
+      &-today {
+        font-style: italic;
+        color: var(--p-green-400);
+      }
+    }
+  }
+}
