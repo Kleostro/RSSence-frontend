@@ -12,10 +12,11 @@ import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 
 import { AuthorContributions } from '@/app/api/interfaces/author/author-contributions';
 import { PostStatuses } from '@/app/api/interfaces/post/post-statuses';
+import { TIME } from '@/app/constants/time';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { parseBooleanParam } from '@/app/utils/parse-boolean-param';
 
-const DEBOUNCE_TIME = 1000;
+const DEBOUNCE_TIME = TIME.SECOND;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
