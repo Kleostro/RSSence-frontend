@@ -5,6 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 
 import { ENDPOINTS } from '@/app/api/constants/endpoints';
+import { PostAnalyticsQuery } from '@/app/api/interfaces/post-analytics-query';
 import { POST_QUERY_KEYS, PostQuery } from '@/app/api/interfaces/post-query';
 import { ModerationHistoryResponse } from '@/app/api/schemas/moderation-history-response';
 import { PostVersionDiffResponse } from '@/app/api/schemas/post-version-diff-response';
@@ -13,6 +14,7 @@ import {
   PaginatedPostVersionResponseSchema,
   PostVersionResponse,
 } from '@/app/api/schemas/post-version-response';
+import { PostViewDailyStatResponse } from '@/app/api/schemas/post-view-daily-stat-response';
 import { PaginatedPostResponse, PaginatedPostResponseSchema, PostResponse } from '@/app/api/schemas/posts-response';
 import { NewPost } from '@/app/interfaces/post-form';
 import { MESSAGE } from '@/app/shared/services/constants/message';
@@ -66,6 +68,15 @@ export class PostsService {
           return success ? data : null;
         }),
       );
+  }
+
+  public getPostAnalytics(postId: number, query?: PostAnalyticsQuery): Observable<PostViewDailyStatResponse[]> {
+    return this.http.get<PostViewDailyStatResponse[]>(
+      `${ENVIRONMENT.API_URL}post-views/post/${postId.toString()}/trend`,
+      {
+        params: { ...query },
+      },
+    );
   }
 
   public getPostById(postId: number): Observable<PostResponse> {

@@ -68,6 +68,14 @@ export class PostComponent {
   public readonly usersService = inject(UsersService);
   public post = input<null | PostResponse>(null);
 
+  public canViewPostAnalytics = computed(() => {
+    const post = this.post();
+    return (
+      ((post?.authors.some((postAuthor) => postAuthor.authorId === this.usersService.me()?.author?.id) ?? false) ||
+        this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)) &&
+      post?.status === POST_STATUS.APPROVED
+    );
+  });
   public canViewPostHistory = computed(() => {
     const post = this.post();
     return (

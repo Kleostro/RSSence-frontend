@@ -63,6 +63,7 @@ export class MeAuthorComponent implements OnInit {
       this.deleteAuthor();
     },
   );
+
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
   public paginatedPostResponseOnTab = signal<null | PaginatedPostResponse>(null);
   public postStatuses = signal<PostStatuses[]>([]);

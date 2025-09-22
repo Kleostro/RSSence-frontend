@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 
 import { forkJoin, of, switchMap } from 'rxjs';
@@ -14,6 +15,7 @@ export const postAuthorGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
   const postService = inject(PostsService);
   const rolesService = inject(RolesService);
   const router = inject(Router);
+  const title = inject(Title);
   const paramId = route.paramMap.get('id');
 
   let postIdOrSlug = null;
@@ -35,6 +37,7 @@ export const postAuthorGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
           rolesService.hasAccess(me?.roles ?? [], ROLE.MODERATOR) ||
           post.authors.some(({ author }) => author.id === me?.author?.id)
         ) {
+          title.setTitle(post.title);
           return of(true);
         }
         return of(router.createUrlTree([APP_ROUTE.FORBIDDEN]));
