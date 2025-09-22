@@ -11,7 +11,6 @@
   color: var(--p-text-color);
   text-align: center;
   letter-spacing: 0.05rem;
-
 }
 
 .views-wrapper {
@@ -30,23 +29,9 @@
 .views {
   &-info {
     cursor: pointer;
-
     display: flex;
     align-items: center;
-    justify-content: center;
-
-    font-style: normal;
-
-    &-icon {
-      padding: 0.35rem 0.65rem;
-      border-radius: 50%;
-
-      font-size: 0.65rem;
-      font-weight: 900;
-      color: var(--p-text-color);
-
-      background-color: var(--p-surface-600);
-    }
+    color: var(--p-blue-300);
   }
 }
 
@@ -61,7 +46,7 @@
 
   font-size: 1.2rem;
   font-weight: 500;
-  color: var(--p-text-muted-color);
+  color: var(--p-text-color);
   text-align: left;
   letter-spacing: 0.05rem;
 }
