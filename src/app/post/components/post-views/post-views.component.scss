@@ -19,19 +19,9 @@
       color: var(--p-text-color);
     }
 
-    &-info {
+    &-info-icon {
       cursor: pointer;
-
-      &-icon {
-        padding: 0.4rem 0.8rem;
-        border-radius: 50%;
-
-        font-size: 0.8rem;
-        font-weight: 900;
-        color: var(--p-text-muted-color);
-
-        background-color: var(--p-surface-900);
-      }
+      color: var(--p-blue-300);
     }
 
     &-unique,

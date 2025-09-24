@@ -6,20 +6,18 @@
     Unique Views:
     The number of different people who have read this post.
     If the same person reads it multiple times, it’s still counted as one.
-    Authors and co-authors are automatically excluded to keep metrics fair.
 
     Total Views:
     Every single time this post was opened — regardless of who opened it.
-    Includes repeats by the same reader, authors, or co-authors.`;
+    Includes repeats by the same reader, authors, or co-authors.
+
+    The views of the author and co-authors are automatically excluded from the list to ensure the reliability of the indicators.
+    `;
 
 <div class="post-views">
   <div class="post-views-top">
-    <span class="post-views-info">
-      <span class="post-views-info-icon" autoHide="false" tooltipPosition="right" [pTooltip]="viewsInfoTooltipText"
-        >i</span
-      >
-    </span>
-    <span class="post-views-title">Views:</span>
+    <span class="post-views-title">Views</span>
+    <span class="pi pi-info-circle post-views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
   </div>
 
   <div class="post-views-bottom">

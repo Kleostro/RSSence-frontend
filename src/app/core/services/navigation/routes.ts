@@ -1,5 +1,6 @@
 export const APP_PATH = {
   ADMIN: 'Admin',
+  ANALYTICS: 'Analytics',
   AUTHOR: 'Author',
   DEFAULT: '',
   FORBIDDEN: '403',
@@ -26,6 +27,7 @@ export const MODERATOR_PATH = {
 
 export const APP_ROUTE = {
   ADMIN: `/${APP_PATH.ADMIN.toLowerCase()}`,
+  ANALYTICS: `/${APP_PATH.ANALYTICS.toLowerCase()}`,
   AUTHOR: `/${APP_PATH.AUTHOR.toLowerCase()}`,
   FORBIDDEN: `/${APP_PATH.FORBIDDEN.toLowerCase()}`,
   HISTORY: `/${APP_PATH.HISTORY.toLowerCase()}`,

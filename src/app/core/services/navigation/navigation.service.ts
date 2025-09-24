@@ -5,7 +5,7 @@ import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 
 import { filter } from 'rxjs';
 
-import { APP_ROUTE } from '@/app/core/services/navigation/routes';
+import { APP_PATH, APP_ROUTE } from '@/app/core/services/navigation/routes';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +59,10 @@ export class NavigationService {
 
   public navigateToNotFound(): void {
     this.router.navigate([APP_ROUTE.NOT_FOUND]);
+  }
+
+  public navigateToPostAnalytics(postId: null | number): void {
+    this.router.navigate([APP_ROUTE.POSTS, postId, APP_PATH.ANALYTICS.toLowerCase()]);
   }
 
   public navigateToPostBySlug(slug?: string): void {

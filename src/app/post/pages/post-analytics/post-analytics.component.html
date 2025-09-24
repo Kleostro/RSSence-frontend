@@ -1,0 +1,44 @@
+@let viewsInfoTooltipText =
+  `
+    Unique Views:
+    The number of different people who have read this post.
+    If the same person reads it multiple times, it’s still counted as one.
+
+    Total Views:
+    Every single time this post was opened — regardless of who opened it.
+    Includes repeats by the same reader, authors, or co-authors.
+
+    The views of the author and co-authors are automatically excluded from the list to ensure the reliability of the indicators.
+    `;
+
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="info"
+    outlined="true"
+  ></button>
+
+  @if (this.currentPost(); as post) {
+    <h1 class="title">Analytics of the post: {{ post.title }}</h1>
+
+    <h2 class="subtitle">
+      Views
+      <span class="views-info">
+        <span class="pi pi-info-circle views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
+      </span>
+    </h2>
+    <div class="views-wrapper">
+      <app-post-views-analytics
+        [postCreatedAt]="post.createdAt"
+        [analyticDataByPost]="this.analyticDataByPost()"
+        (redrawChart)="this.redrawChart($event)"
+      />
+    </div>
+  }
+</div>

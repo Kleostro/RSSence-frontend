@@ -12,20 +12,20 @@ export const routes: Routes = [
     canActivate: [userGuard],
     loadComponent: () => import('./home/pages/home/home.component').then((c) => c.HomeComponent),
     path: APP_PATH.DEFAULT,
-    title: 'RSS | Home',
+    title: 'Home',
   },
   {
     canActivate: [loginGuard],
     loadComponent: () => import('./auth/pages/login/login.component').then((c) => c.LoginComponent),
     path: APP_PATH.LOGIN.toLowerCase(),
-    title: `RSS | ${APP_PATH.LOGIN}`,
+    title: APP_PATH.LOGIN,
   },
   {
     canActivate: [loginGuard],
     loadComponent: () =>
       import('./auth/pages/registration/registration.component').then((c) => c.RegistrationComponent),
     path: APP_PATH.SIGN_UP.toLowerCase(),
-    title: `RSS | ${APP_PATH.SIGN_UP}`,
+    title: APP_PATH.SIGN_UP,
   },
   {
     canActivate: [userGuard],
@@ -55,7 +55,7 @@ export const routes: Routes = [
     canActivate: [userGuard],
     loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
     path: APP_PATH.POSTS.toLowerCase(),
-    title: `RSS | ${APP_PATH.POSTS}`,
+    title: APP_PATH.POSTS,
   },
   {
     canActivate: [userGuard],
@@ -65,20 +65,26 @@ export const routes: Routes = [
     title: `RSSence | ${APP_PATH.POSTS.slice(0, -1)}`,
   },
   {
-    canActivate: [userGuard, postAuthorGuard],
+    canActivate: [postAuthorGuard],
     loadComponent: () => import('./post/pages/post-history/post-history.component').then((c) => c.PostHistoryComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.HISTORY.toLowerCase()}`,
     title: `Post | ${APP_PATH.HISTORY}`,
   },
   {
-    canActivate: [userGuard, postMainAuthorGuard],
+    canActivate: [postAuthorGuard],
+    loadComponent: () =>
+      import('./post/pages/post-analytics/post-analytics.component').then((c) => c.PostAnalyticsComponent),
+    path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.ANALYTICS.toLowerCase()}`,
+  },
+  {
+    canActivate: [postMainAuthorGuard],
     loadComponent: () =>
       import('./post/pages/post-versions/post-versions.component').then((c) => c.PostVersionsComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.VERSIONS.toLowerCase()}`,
     title: `Post | ${APP_PATH.VERSIONS}`,
   },
   {
-    canActivate: [userGuard, postMainAuthorGuard],
+    canActivate: [postMainAuthorGuard],
     loadComponent: () =>
       import('./post/pages/post-version-diff/post-version-diff.component').then((c) => c.PostVersionDiffComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.VERSION_DIFF.toLowerCase()}`,
@@ -101,7 +107,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./admin/layout/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
     path: APP_PATH.ADMIN.toLowerCase(),
-    title: `Tu-Tu | ${APP_PATH.ADMIN}`,
+    title: APP_PATH.ADMIN,
   },
   {
     canActivate: [moderatorGuard],
@@ -131,17 +137,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./moderator/layout/moderator-layout/moderator-layout.component').then((c) => c.ModeratorLayoutComponent),
     path: APP_PATH.MODERATOR.toLowerCase(),
-    title: `Tu-Tu | ${APP_PATH.MODERATOR}`,
+    title: APP_PATH.MODERATOR,
   },
   {
     loadComponent: () => import('./core/pages/not-found/not-found.component').then((c) => c.NotFoundComponent),
     path: APP_PATH.NOT_FOUND,
-    title: `RSS | ${APP_PATH.NOT_FOUND}`,
+    title: APP_PATH.NOT_FOUND,
   },
   {
     loadComponent: () => import('./core/pages/forbidden/forbidden.component').then((c) => c.ForbiddenComponent),
     path: APP_PATH.FORBIDDEN,
-    title: `RSS | ${APP_PATH.FORBIDDEN}`,
+    title: APP_PATH.FORBIDDEN,
   },
   {
     path: APP_PATH.NO_MATCH,
