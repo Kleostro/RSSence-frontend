@@ -1,4 +1,5 @@
 @let post = this.currentPost();
+@let canWriteComment = this.usersService.me()?.profile;
 
 <div class="page">
   <button
@@ -15,5 +16,36 @@
 
   @if (post !== undefined) {
     <app-post [isShowPostUserActions]="true" [post]="post" (postFormEvent)="this.getCurrentPost()" />
+
+    @if (canWriteComment) {
+      <div class="post-comment-form">
+        <app-post-comment-form
+          [isProcessing]="this.isProcessing()"
+          [isDisabled]="this.commentService.isLoading()"
+          (createCommentEvent)="this.createComment($event)"
+        />
+      </div>
+    } @else {
+      <div class="profile-not-found">
+        <p-message severity="warn" class="profile-not-found-message" icon="pi pi-exclamation-circle"
+          >You need to create a profile to write a comment.</p-message
+        >
+        <button
+          pButton
+          pRipple
+          type="button"
+          (click)="this.navigationService.navigateToProfile()"
+          label="Create profile"
+          class="create-profile-button"
+          icon="pi pi-arrow-right"
+          severity="info"
+          outlined="true"
+        ></button>
+      </div>
+    }
+
+    <div class="post-comment-list">
+      <app-post-comments-list (pageChange)="this.handlePageChange($event)" />
+    </div>
   }
 </div>

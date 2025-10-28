@@ -12,7 +12,7 @@ import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { PostQuery } from '@/app/api/interfaces/post-query';
 import { PostStatuses } from '@/app/api/interfaces/post/post-statuses';
 import { AuthorResponse, AuthorSchema } from '@/app/api/schemas/authors-response';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/post/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
@@ -149,11 +149,6 @@ export class MeAuthorComponent implements OnInit {
   }
 
   public handlePageChange(event: PaginatorState): void {
-    const username = this.currentAuthor()?.username;
-    if (!username) {
-      return;
-    }
-
     const { page = 0, rows } = event;
     this.navigationService.updateQueryParams({ limit: rows, page: page + 1 });
   }

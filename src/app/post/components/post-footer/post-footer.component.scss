@@ -1,0 +1,13 @@
+.post-stats {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 0.1rem solid var(--p-surface-500);
+  border-radius: 0.5rem;
+
+  background-color: var(--p-surface-700);
+}

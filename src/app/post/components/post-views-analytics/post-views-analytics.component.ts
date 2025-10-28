@@ -20,7 +20,7 @@ import { ChartModule } from 'primeng/chart';
 import { DatePicker } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
 
-import { PostViewDailyStatResponse } from '@/app/api/schemas/post-view-daily-stat-response';
+import { PostViewDailyStatResponse } from '@/app/api/schemas/post/post-view-daily-stat-response';
 import { TIME } from '@/app/constants/time';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { toUTCDateString } from '@/app/utils/to-utc-date-string';
@@ -34,7 +34,7 @@ const BASE_DATASET = {
   tension: 0.4,
 };
 const DEFAULT_START_DATE = new Date(Date.now() - TIME.WEEK);
-const DEFAULT_END_DATE = new Date();
+const DEFAULT_END_DATE = new Date(new Date().getTime() - TIME.DAY);
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,7 +53,7 @@ export class PostViewsAnalyticsComponent implements OnInit {
     computation: () => this.analyticDataByPost() !== null,
     source: this.analyticDataByPost,
   });
-  public maxDate = new Date();
+  public maxDate = DEFAULT_END_DATE;
   public postCreatedAt = input<string>('');
   public minDate = computed(() => {
     const createdAt = new Date(this.postCreatedAt());
@@ -143,10 +143,6 @@ export class PostViewsAnalyticsComponent implements OnInit {
       aspectRatio: 1.6,
       maintainAspectRatio: true,
       plugins: {
-        tooltip: {
-          intersect: false,
-          mode: 'index',
-        },
         legend: {
           labels: {
             color: textColor,
@@ -156,6 +152,10 @@ export class PostViewsAnalyticsComponent implements OnInit {
             usePointStyle: true,
           },
           position: 'top',
+        },
+        tooltip: {
+          intersect: false,
+          mode: 'index',
         },
       },
       responsive: true,

@@ -10,9 +10,9 @@
         class="post-title"
         aria-disabled="true"
         [class.post-title-disabled]="!canMoveToDetailsPage"
-        (click)="this.navigationService.navigateToPostModerationBySlug(post.slug)"
-        (keyup)="this.navigationService.navigateToPostModerationBySlug(post.slug)"
-        (keydown)="this.navigationService.navigateToPostModerationBySlug(post.slug)"
+        (click)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
+        (keyup)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
+        (keydown)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
       >
         {{ post.title }}
       </h1>
@@ -25,7 +25,7 @@
             tooltipPosition="bottom"
             type="button"
             [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostModerationBySlug(post.slug)"
+            (click)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
             [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
             class="post-moderation-details-button"
             severity="success"

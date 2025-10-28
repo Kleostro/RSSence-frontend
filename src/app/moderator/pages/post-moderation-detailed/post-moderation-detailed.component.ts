@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { tap } from 'rxjs';
 
-import { PostResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ModerationPostComponent } from '@/app/moderator/components/moderation-post/moderation-post.component';

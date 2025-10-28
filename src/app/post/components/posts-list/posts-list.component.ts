@@ -13,7 +13,7 @@ import {
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
 
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/post/posts-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 @Component({

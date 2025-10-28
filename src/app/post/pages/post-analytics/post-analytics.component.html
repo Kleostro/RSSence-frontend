@@ -11,6 +11,15 @@
     The views of the author and co-authors are automatically excluded from the list to ensure the reliability of the indicators.
     `;
 
+@let commentsInfoTooltipText =
+  `
+    Active comments:
+    The number of comments that have not been deleted.
+
+    Total comments:
+    The total number of comments, including deleted comments.
+    `;
+
 <div class="page">
   <button
     pButton
@@ -25,20 +34,42 @@
   ></button>
 
   @if (this.currentPost(); as post) {
-    <h1 class="title">Analytics of the post: {{ post.title }}</h1>
-
-    <h2 class="subtitle">
-      Views
-      <span class="views-info">
-        <span class="pi pi-info-circle views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
-      </span>
-    </h2>
-    <div class="views-wrapper">
-      <app-post-views-analytics
-        [postCreatedAt]="post.createdAt"
-        [analyticDataByPost]="this.analyticDataByPost()"
-        (redrawChart)="this.redrawChart($event)"
-      />
+    <h1 class="title">Analytics of the post "{{ post.title }}"</h1>
+    <div class="analytics-wrapper">
+      <div class="views-box">
+        <h2 class="subtitle">
+          Views
+          <span class="views-info">
+            <span class="pi pi-info-circle views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
+          </span>
+        </h2>
+        <div class="views-wrapper">
+          <app-post-views-analytics
+            [postCreatedAt]="post.createdAt"
+            [analyticDataByPost]="this.viewsAnalyticDataByPost()"
+            (redrawChart)="this.redrawChart($event, 'views')"
+          />
+        </div>
+      </div>
+      <div class="comments-box">
+        <h2 class="subtitle">
+          Comments
+          <span class="comments-info">
+            <span
+              class="pi pi-info-circle comments-info-icon"
+              autoHide="false"
+              [pTooltip]="commentsInfoTooltipText"
+            ></span>
+          </span>
+        </h2>
+        <div class="comments-wrapper">
+          <app-post-comments-analytics
+            [postCreatedAt]="post.createdAt"
+            [analyticDataByPost]="this.commentsAnalyticDataByPost()"
+            (redrawChart)="this.redrawChart($event, 'comments')"
+          />
+        </div>
+      </div>
     </div>
   }
 </div>

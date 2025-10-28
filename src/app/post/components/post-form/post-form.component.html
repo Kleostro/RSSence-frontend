@@ -66,18 +66,19 @@
           }
         </div>
         <div class="buttons-wrapper">
-          <p-button
-            pRipple
-            type="button"
-            label="Add"
-            fluid="true"
-            [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
-            severity="success"
-            outlined="true"
-            *ngIf="form.controls.coauthors.controls.length < 5"
-            (click)="this.addCoauthor()"
-            [disabled]="this.isProcessing()"
-          />
+          @if (this.form.controls.coauthors.controls.length < 5) {
+            <p-button
+              pRipple
+              type="button"
+              label="Add"
+              fluid="true"
+              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
+              severity="success"
+              outlined="true"
+              (click)="this.addCoauthor()"
+              [disabled]="this.isProcessing()"
+            />
+          }
         </div>
       </div>
     </ng-container>

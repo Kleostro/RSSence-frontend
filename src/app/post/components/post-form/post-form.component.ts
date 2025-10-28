@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,10 +20,10 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { finalize, map, switchMap, take, tap } from 'rxjs';
+import { finalize, map, switchMap, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { POST_STATUS, PostResponse } from '@/app/api/schemas/posts-response';
+import { POST_STATUS, PostResponse } from '@/app/api/schemas/post/posts-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
@@ -46,7 +45,6 @@ import { arraysEqual } from '@/app/utils/arrays-equal';
     TextareaModule,
     PostEditorComponent,
     FloatLabelModule,
-    NgIf,
     AutoCompleteModule,
     AvatarModule,
     EditorModule,
@@ -111,13 +109,13 @@ export class PostFormComponent implements OnInit {
     const action$ = post ? this.postsService.updatePost(post.id, postData) : this.postsService.createPost(postData);
     action$
       .pipe(
-        take(1),
+        takeUntilDestroyed(this.destroyRef),
         switchMap((newPost) => {
           if (isDraftPost) {
             return this.postsService.performPostAuthorAction(newPost.id, POST_ACTION.SAVE_AS_DRAFT);
+          } else {
+            return this.postsService.performPostAuthorAction(newPost.id, POST_ACTION.SUBMIT);
           }
-
-          return this.postsService.performPostAuthorAction(newPost.id, POST_ACTION.SUBMIT);
         }),
         map(() => {
           this.form.reset();
