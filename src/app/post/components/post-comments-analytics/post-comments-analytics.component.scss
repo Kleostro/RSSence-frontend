@@ -1,0 +1,35 @@
+:host {
+  display: contents;
+}
+
+.chart {
+  width: 100% !important;
+}
+
+.datepicker {
+  width: 16rem;
+  margin-left: auto;
+}
+
+.skeleton-wrapper {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+
+  &-text {
+    font-size: 1.2rem;
+    color: var(--p-text-muted-color);
+    text-align: center;
+  }
+
+  &-img {
+    width: 20rem;
+    height: 20rem;
+  }
+}

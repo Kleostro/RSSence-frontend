@@ -1,0 +1,39 @@
+@let contentControl = this.form.controls.content;
+
+<form class="form" [formGroup]="this.form" [class.disabled]="this.isDisabled()">
+  <label class="control-label" for="content">{{
+    this.mode() === 'REPLY' ? 'Reply to a comment' : this.mode() === 'EDIT' ? 'Editing a comment' : 'Write a comment'
+  }}</label>
+  <textarea
+    id="content"
+    rows="5"
+    pInputTextarea
+    variant="filled"
+    formControlName="content"
+    class="control-input p-inputtext control-textarea"
+  ></textarea>
+  <div class="control-errors">
+    @if (contentControl.dirty) {
+      <app-form-field-error
+        [control]="contentControl"
+        field="content"
+        [fieldBoundaries]="this.POST_COMMENT_FORM_FIELD_CONFIG.content"
+        [errorMessages]="this.POST_COMMENT_FORM_FIELD_CONFIG.content.messages"
+      />
+    }
+  </div>
+
+  <div class="form-footer">
+    <button
+      pButton
+      pRipple
+      type="button"
+      [label]="this.isProcessing() ? 'Sending...' : 'Send'"
+      (click)="this.submit()"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+      [disabled]="form.invalid || this.isProcessing() || this.isDisabled()"
+      severity="success"
+      outlined="true"
+    ></button>
+  </div>
+</form>

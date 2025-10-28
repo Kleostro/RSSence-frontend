@@ -1,0 +1,257 @@
+@let canEditComment = this.usersService.me()?.profile?.id === this.comment().profileId;
+@let canDeleteComment =
+  this.usersService.me()?.profile?.id === this.comment().profileId || this.usersService.isModerator();
+@let canWriteComment = this.usersService.me()?.profile;
+@let comment = this.comment();
+
+@if (comment && !this.isCommentLoading()) {
+  <div class="comment" [class.replyComment]="comment.parentId">
+    @if (comment.parentId) {
+      <div class="separator"></div>
+    }
+    <div class="comment-right">
+      <header class="comment-header">
+        <div class="profile-info">
+          <p-avatar
+            shape="circle"
+            class="profile-avatar-img"
+            [image]="comment.profile?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+            size="normal"
+            [routerLink]="['/profile', comment.profile?.username]"
+          />
+          <a [routerLink]="['/profile', comment.profile?.username]" class="profile-link">{{
+            comment.profile?.username
+          }}</a>
+        </div>
+        @if (!comment.isDeleted) {
+          <div class="comment-actions">
+            @if (canEditComment) {
+              <button
+                pButton
+                pRipple
+                [disabled]="this.isReplyProcessing()"
+                (click)="this.isEditMode.set(!this.isEditMode())"
+                [severity]="this.isEditMode() ? 'info' : 'primary'"
+                outlined="true"
+                size="small"
+                [icon]="
+                  this.isReplyProcessing()
+                    ? 'pi pi-spin pi-spinner'
+                    : this.isEditMode()
+                      ? 'pi pi-arrow-left'
+                      : 'pi pi-pencil'
+                "
+              ></button>
+            }
+
+            @if (canDeleteComment) {
+              <button
+                pButton
+                [disabled]="this.isReplyProcessing()"
+                pRipple
+                outlined="true"
+                (click)="this.modalService.openModal(this.deleteCommentConfirm(), `Deleting a comment`); this.modalService.contentWidth.set('50%')"
+                size="small"
+                severity="danger"
+                [icon]="this.isReplyProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+              ></button>
+            }
+          </div>
+        }
+
+        <div class="comment-times">
+          <span class="comment-createdAt">
+            <span class="pi pi-clock"></span>
+            {{ comment.createdAt | date: 'mediumDate' }}
+            at {{ comment.createdAt | date: 'shortTime' }}
+          </span>
+        </div>
+      </header>
+
+      @if (!comment.isDeleted) {
+        @if (this.isReplyProcessing() || this.commentService.isLoading() || this.isProcessing()) {
+          <body class="comment-content">
+            <p-skeleton width="100%" height="4rem" />
+          </body>
+        } @else {
+          @if (this.isEditMode()) {
+            <app-post-comment-form
+              mode="EDIT"
+              [isDisabled]="this.isProcessing()"
+              [isProcessing]="this.isProcessing()"
+              [initialContent]="comment.content"
+              (updateCommentEvent)="
+                comment.parentId
+                  ? this.onEditReplyComment({ content: $event.content, replyId: comment.id })
+                  : this.onEdit($event)
+              "
+            />
+          } @else {
+            <body class="comment-content">
+              {{ comment.content }}
+            </body>
+          }
+        }
+
+        <div class="comment-votes">
+          <button
+            pButton
+            pRipple
+            (click)="this.onVote(this.isCommentLiked() ? 'NEUTRAL' : 'LIKE')"
+            severity="success"
+            [disabled]="this.isReplyProcessing()"
+            outlined="true"
+            size="small"
+            [icon]="
+              this.isReplyProcessing()
+                ? 'pi pi-spin pi-spinner'
+                : this.isCommentLiked()
+                  ? 'pi pi-thumbs-up-fill'
+                  : 'pi pi-thumbs-up'
+            "
+            [label]="this.commentLikesCount().toString()"
+          ></button>
+          <button
+            pButton
+            [disabled]="this.isReplyProcessing()"
+            pRipple
+            (click)="this.onVote(this.isCommentDisliked() ? 'NEUTRAL' : 'DISLIKE')"
+            severity="danger"
+            outlined="true"
+            size="small"
+            [icon]="
+              this.isReplyProcessing()
+                ? 'pi pi-spin pi-spinner'
+                : this.isCommentDisliked()
+                  ? 'pi pi-thumbs-down-fill'
+                  : 'pi pi-thumbs-down'
+            "
+            [label]="this.commentDislikesCount().toString()"
+          ></button>
+
+          @if (!comment.isDeleted && canWriteComment) {
+            <button
+              pButton
+              pRipple
+              [disabled]="this.isReplyProcessing()"
+              (click)="this.onReply()"
+              [severity]="this.isReplyFormOpen() ? 'info' : 'primary'"
+              outlined="true"
+              size="small"
+              [label]="this.isReplyFormOpen() ? 'Cancel' : 'Reply'"
+              class="reply-comment-button"
+              [icon]="
+                this.isReplyProcessing()
+                  ? 'pi pi-spin pi-spinner'
+                  : this.isReplyFormOpen()
+                    ? 'pi pi-arrow-left'
+                    : 'pi pi-reply'
+              "
+            ></button>
+          }
+        </div>
+      } @else {
+        <body class="comment-content" [class.deleted]="comment.isDeleted">
+          <em>The comment has been deleted.</em>
+        </body>
+      }
+
+      @if (this.isReplyFormOpen()) {
+        <app-post-comment-form
+          mode="REPLY"
+          [isDisabled]="this.isReplyProcessing()"
+          [isProcessing]="this.isReplyProcessing()"
+          [parentId]="comment.id"
+          (createCommentEvent)="this.createReplyComment($event)"
+        />
+      }
+
+      @if (this.isReplyProcessing()) {
+        <div class="show-replies-button">
+          <p-skeleton width="9rem" height="1.7rem" />
+        </div>
+      } @else {
+        @if (this.childrenCount() > 0) {
+          <button
+            pButton
+            pRipple
+            (click)="this.toggleReplies()"
+            severity="info"
+            outlined="true"
+            size="small"
+            [label]="this.isRepliesShown() ? 'Hide replies' : 'Show ' + this.childrenCount() + ' replies'"
+            class="show-replies-button"
+            [icon]="
+              this.isReplyProcessing()
+                ? 'pi pi-spin pi-spinner'
+                : this.isRepliesShown()
+                  ? 'pi pi-arrow-up'
+                  : 'pi pi-arrow-down'
+            "
+          ></button>
+        }
+      }
+
+      @if (this.childrenCount() > 0) {
+        <div class="comment-replies">
+          @if (this.isReplyProcessing()) {
+            @for (i of this.childrenCountArray(); track i) {
+              <div class="reply-comment">
+                <app-post-comment-loader />
+              </div>
+            }
+          } @else {
+            @for (child of this.children(); track child.id) {
+              <div class="reply-comment" [@replyCollapse]>
+                <app-post-comment
+                  [comment]="child"
+                  (deleteComment)="this.deleteReplyComment($event)"
+                  (editComment)="this.editReplyComment($event)"
+                  [isProcessing]="this.isReplyProcessing()"
+                />
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <app-post-comment-loader />
+}
+
+<ng-template #deleteCommentConfirm>
+  <div class="delete-comment-confirm">
+    <strong class="delete-comment-confirm-title">Are you certain about deleting this profile's comment?</strong>
+    <p-message severity="info" icon="pi pi-exclamation-circle"
+      >Responses to this comment will not be deleted.</p-message
+    >
+    <div class="delete-comment-confirm-actions">
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.modalService.closeModal()"
+        label="Cancel"
+        [disabled]="this.isReplyProcessing()"
+        [icon]="this.isReplyProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+        class="cancel-post-confirm-button"
+        severity="primary"
+        outlined="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        (click)="this.onDelete()"
+        label="Delete"
+        [disabled]="this.isReplyProcessing()"
+        [icon]="this.isReplyProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+        class="delete-comment-confirm-button"
+        severity="danger"
+        outlined="true"
+      ></button>
+    </div>
+  </div>
+</ng-template>

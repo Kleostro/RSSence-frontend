@@ -21,7 +21,7 @@ import { catchError, EMPTY, finalize, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
-import { POST_STATUS, PostResponse } from '@/app/api/schemas/posts-response';
+import { POST_STATUS, PostResponse } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
@@ -67,7 +67,6 @@ export class PostComponent {
   public readonly navigationService = inject(NavigationService);
   public readonly usersService = inject(UsersService);
   public post = input<null | PostResponse>(null);
-
   public canViewPostAnalytics = computed(() => {
     const post = this.post();
     return (
@@ -76,6 +75,7 @@ export class PostComponent {
       post?.status === POST_STATUS.APPROVED
     );
   });
+
   public canViewPostHistory = computed(() => {
     const post = this.post();
     return (

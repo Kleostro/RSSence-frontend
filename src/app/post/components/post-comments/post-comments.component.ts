@@ -1,0 +1,18 @@
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+
+import { TooltipModule } from 'primeng/tooltip';
+
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TooltipModule],
+  selector: 'app-post-comments',
+  styleUrl: './post-comments.component.scss',
+  templateUrl: './post-comments.component.html',
+})
+export class PostCommentsComponent {
+  public readonly navigationService = inject(NavigationService);
+  public post = input<null | PostResponse>(null);
+}

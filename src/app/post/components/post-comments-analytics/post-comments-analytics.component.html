@@ -1,0 +1,30 @@
+<p-datepicker
+  [(ngModel)]="this.selectedDates"
+  [numberOfMonths]="2"
+  selectionMode="range"
+  [readonlyInput]="true"
+  [showIcon]="true"
+  [minDate]="this.minDate()"
+  [maxDate]="this.maxDate"
+  [disabled]="!this.isAnalyticLoaded()"
+  [fluid]="true"
+  variant="filled"
+  (onSelect)="this.onDateSelectHandler()"
+  class="datepicker"
+/>
+
+@if (this.isAnalyticLoaded() && this.analyticDataByPost()?.length) {
+  <p-chart type="line" [data]="this.data()" [options]="this.options" class="chart" />
+} @else if (this.isAnalyticLoaded() && !this.analyticDataByPost()?.length) {
+  <div class="not-found">
+    <p class="not-found-text">
+      No comments were found during this period. <br />
+      Try changing the period.
+    </p>
+    <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
+  </div>
+} @else {
+  <div class="skeleton-wrapper">
+    <p-skeleton width="100%" height="20.9rem" />
+  </div>
+}
