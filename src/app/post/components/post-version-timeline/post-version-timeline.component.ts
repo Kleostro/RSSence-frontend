@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { Timeline } from 'primeng/timeline';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { PostVersionResponse } from '@/app/api/schemas/post-version-response';
+import { PostVersionResponse } from '@/app/api/schemas/post/post-version-response';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

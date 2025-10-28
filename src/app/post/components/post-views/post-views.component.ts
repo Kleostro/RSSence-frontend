@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 
 import { TooltipModule } from 'primeng/tooltip';
 
-import { PostResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 @Component({

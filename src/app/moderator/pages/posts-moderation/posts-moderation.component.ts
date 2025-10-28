@@ -5,7 +5,7 @@ import { PaginatorState } from 'primeng/paginator';
 import { Observable, tap } from 'rxjs';
 
 import { PostQuery } from '@/app/api/interfaces/post-query';
-import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ModerationPostComponent } from '@/app/moderator/components/moderation-post/moderation-post.component';

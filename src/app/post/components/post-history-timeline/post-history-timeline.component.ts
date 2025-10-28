@@ -10,8 +10,8 @@ import { TagModule } from 'primeng/tag';
 import { Timeline } from 'primeng/timeline';
 
 import { isModerationHistoryResponse, ModerationHistoryResponse } from '@/app/api/schemas/moderation-history-response';
-import { isPostHistoryResponse, PostHistoryResponse } from '@/app/api/schemas/post-history';
-import { POST_STATUS } from '@/app/api/schemas/posts-response';
+import { isPostHistoryResponse, PostHistoryResponse } from '@/app/api/schemas/post/post-history';
+import { POST_STATUS } from '@/app/api/schemas/post/posts-response';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 @Component({

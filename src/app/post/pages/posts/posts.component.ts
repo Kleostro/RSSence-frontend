@@ -7,7 +7,7 @@ import { RippleModule } from 'primeng/ripple';
 import { Observable, tap } from 'rxjs';
 
 import { PostQuery } from '@/app/api/interfaces/post-query';
-import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse, POST_STATUS } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';

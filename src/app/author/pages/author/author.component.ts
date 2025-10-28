@@ -11,7 +11,7 @@ import { map, Observable, switchMap, tap } from 'rxjs';
 import { AuthorContributions } from '@/app/api/interfaces/author/author-contributions';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
 import { PostQuery } from '@/app/api/interfaces/post-query';
-import { PaginatedPostResponse } from '@/app/api/schemas/posts-response';
+import { PaginatedPostResponse } from '@/app/api/schemas/post/posts-response';
 import { UserResponse, UserSchema } from '@/app/api/schemas/users-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';

@@ -1,0 +1,72 @@
+@let commentAggregation = this.post()?.commentAggregation;
+@let currentDayCommentsStats = this.post()?.currentDayCommentsStats;
+
+@let commentsInfoTooltipText =
+  `
+    Active comments:
+    The number of comments that have not been deleted.
+
+    Total comments:
+    The total number of comments, including deleted comments.
+    `;
+
+<div class="post-comments">
+  <div class="post-comments-top">
+    <span class="post-comments-title">Comments</span>
+    <span
+      class="pi pi-info-circle post-comments-info-icon"
+      autoHide="false"
+      [pTooltip]="commentsInfoTooltipText"
+    ></span>
+  </div>
+
+  <div
+    class="post-comments-bottom"
+    tooltipPosition="bottom"
+    [pTooltip]="this.navigationService.isPostDetailedPage() ? 'Includes today' : 'Updated every day at 02:00'"
+  >
+    @if (!this.navigationService.isPostDetailedPage()) {
+      <div class="post-comments-unique">
+        <span class="post-comments-unique-title"> Active </span>
+        <span class="post-comments-unique-count">
+          <span class="pi pi-comment"></span>
+          {{ commentAggregation?.activeComments ?? 0 }}
+        </span>
+      </div>
+    } @else {
+      <div class="post-comments-unique">
+        <span class="post-comments-unique-title">Active</span>
+        <span class="post-comments-unique-count">
+          <span class="pi pi-comment"></span>
+          {{ (commentAggregation?.activeComments ?? 0) + (currentDayCommentsStats?.activeCommentsToday ?? 0) }}
+          @if (currentDayCommentsStats?.activeCommentsToday; as activeCommentsToday) {
+            <span class="post-comments-unique-today"> (+{{ activeCommentsToday }}) </span>
+          }
+        </span>
+      </div>
+    }
+
+    <span class="post-comments-separator"></span>
+
+    @if (!this.navigationService.isPostDetailedPage()) {
+      <div class="post-comments-total">
+        <span class="post-comments-total-title"> Total </span>
+        <span class="post-comments-total-count">
+          <span class="pi pi-comment"></span>
+          {{ commentAggregation?.totalComments ?? 0 }}
+        </span>
+      </div>
+    } @else {
+      <div class="post-comments-total">
+        <span class="post-comments-total-title">Total</span>
+        <span class="post-comments-total-count">
+          <span class="pi pi-comment"></span>
+          {{ (commentAggregation?.totalComments ?? 0) + (currentDayCommentsStats?.totalCommentsToday ?? 0) }}
+          @if (currentDayCommentsStats?.totalCommentsToday; as totalCommentsToday) {
+            <span class="post-comments-total-today"> (+{{ totalCommentsToday }}) </span>
+          }
+        </span>
+      </div>
+    }
+  </div>
+</div>

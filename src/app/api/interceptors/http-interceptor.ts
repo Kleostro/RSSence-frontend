@@ -13,6 +13,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const loaderService = inject(LoaderService);
   const ls = inject(WA_LOCAL_STORAGE);
   const accessToken = ls.getItem(STORE_KEYS.ACCESS_TOKEN);
+
   loaderService.turnOn();
   if (!req.url.startsWith(ENVIRONMENT.API_URL)) {
     return next(req).pipe(

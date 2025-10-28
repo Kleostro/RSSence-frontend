@@ -20,18 +20,22 @@
     <span class="pi pi-info-circle post-views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
   </div>
 
-  <div class="post-views-bottom">
-    <div class="post-views-unique">
-      @if (!this.navigationService.isPostDetailedPage()) {
-        <span class="post-views-unique-title" tooltipPosition="top" pTooltip="Updated every day at 02:00">
-          Unique
-        </span>
+  <div
+    class="post-views-bottom"
+    tooltipPosition="bottom"
+    [pTooltip]="this.navigationService.isPostDetailedPage() ? 'Includes today' : 'Updated every day at 02:00'"
+  >
+    @if (!this.navigationService.isPostDetailedPage()) {
+      <div class="post-views-unique">
+        <span class="post-views-unique-title"> Unique </span>
         <span class="post-views-unique-count">
           <span class="pi pi-eye"></span>
           {{ postViewAggregation?.uniqueViews ?? 0 }}
         </span>
-      } @else {
-        <span class="post-views-unique-title" tooltipPosition="bottom" pTooltip="Includes today">Unique</span>
+      </div>
+    } @else {
+      <div class="post-views-unique">
+        <span class="post-views-unique-title">Unique</span>
         <span class="post-views-unique-count">
           <span class="pi pi-eye"></span>
           {{ (postViewAggregation?.uniqueViews ?? 0) + (currentDayViewStats?.uniqueViewsToday ?? 0) }}
@@ -39,18 +43,22 @@
             <span class="post-views-unique-today"> (+{{ uniqueViewsToday }}) </span>
           }
         </span>
-      }
-    </div>
+      </div>
+    }
 
-    <div class="post-views-total">
-      @if (!this.navigationService.isPostDetailedPage()) {
-        <span class="post-views-total-title" tooltipPosition="top" pTooltip="Updated every day at 02:00"> Total </span>
+    <span class="post-views-separator"></span>
+
+    @if (!this.navigationService.isPostDetailedPage()) {
+      <div class="post-views-total">
+        <span class="post-views-total-title"> Total </span>
         <span class="post-views-total-count">
           <span class="pi pi-eye"></span>
           {{ postViewAggregation?.totalViews ?? 0 }}
         </span>
-      } @else {
-        <span class="post-views-total-title" tooltipPosition="bottom" pTooltip="Includes today">Total</span>
+      </div>
+    } @else {
+      <div class="post-views-total">
+        <span class="post-views-total-title">Total</span>
         <span class="post-views-total-count">
           <span class="pi pi-eye"></span>
           {{ (postViewAggregation?.totalViews ?? 0) + (currentDayViewStats?.totalViewsToday ?? 0) }}
@@ -58,7 +66,7 @@
             <span class="post-views-total-today"> (+{{ totalViewsToday }}) </span>
           }
         </span>
-      }
-    </div>
+      </div>
+    }
   </div>
 </div>

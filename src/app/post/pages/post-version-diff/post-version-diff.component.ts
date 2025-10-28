@@ -5,8 +5,8 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { catchError, EMPTY, tap } from 'rxjs';
 
-import { PostVersionDiffResponse } from '@/app/api/schemas/post-version-diff-response';
-import { PostsService } from '@/app/api/services/posts/posts.service';
+import { PostVersionDiffResponse } from '@/app/api/schemas/post/post-version-diff-response';
+import { PostVersionsService } from '@/app/api/services/posts/services/post-versions.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 @Component({
@@ -18,7 +18,7 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
 })
 export class PostVersionDiffComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly postsService = inject(PostsService);
+  private readonly postVersionsService = inject(PostVersionsService);
   public readonly navigationService = inject(NavigationService);
   public currentPostVersionDiff = signal<null | PostVersionDiffResponse | undefined>(undefined);
 
@@ -30,7 +30,7 @@ export class PostVersionDiffComponent implements OnInit {
     const to = +this.navigationService.queryParams()['to'];
 
     if (postId) {
-      this.postsService
+      this.postVersionsService
         .getPostVersionDiff(+postId, from, to)
         .pipe(
           takeUntilDestroyed(this.destroyRef),

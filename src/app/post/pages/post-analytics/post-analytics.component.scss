@@ -13,12 +13,19 @@
   letter-spacing: 0.05rem;
 }
 
-.views-wrapper {
+.analytics-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.views-wrapper,
+.comments-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  max-width: 54rem;
+  width: 100%;
+  margin-right: auto;
   padding: 1rem 2rem;
   border: 0.1rem solid var(--p-surface-600);
   border-radius: 0.5rem;
@@ -26,7 +33,8 @@
   background-color: var(--p-surface-900);
 }
 
-.views {
+.views,
+.comments {
   &-info {
     cursor: pointer;
     display: flex;
@@ -35,18 +43,25 @@
   }
 }
 
+.views-box,
+.comments-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+
+  width: 49%;
+  margin-bottom: 2rem;
+}
+
 .subtitle {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 
-  width: 100%;
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
-
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--p-text-color);
-  text-align: left;
+  text-align: center;
   letter-spacing: 0.05rem;
 }

@@ -15,9 +15,9 @@
         aria-disabled="true"
         class="post-title"
         [class.post-title-disabled]="!canMoveToDetailsPage"
-        (click)="this.navigationService.navigateToPostBySlug(post.slug)"
-        (keyup)="this.navigationService.navigateToPostBySlug(post.slug)"
-        (keydown)="this.navigationService.navigateToPostBySlug(post.slug)"
+        (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+        (keyup)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+        (keydown)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
         >{{ post.title }}</a
       >
 
@@ -30,7 +30,7 @@
             tooltipPosition="bottom"
             type="button"
             [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostBySlug(post.slug)"
+            (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
             [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
             class="post-read-button"
             severity="success"

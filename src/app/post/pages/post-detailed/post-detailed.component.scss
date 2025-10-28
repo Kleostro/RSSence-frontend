@@ -2,3 +2,23 @@
   width: max-content;
   margin-bottom: 1rem;
 }
+
+.post-comment-form {
+  margin-top: 1.5rem;
+}
+
+.profile-not-found {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+
+  &-message {
+    width: 80%;
+  }
+}
+
+.create-profile-button {
+  width: 20%;
+  margin-left: auto;
+}

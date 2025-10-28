@@ -8,8 +8,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { finalize, map, tap } from 'rxjs';
 
 import { PostQuery } from '@/app/api/interfaces/post-query';
-import { PaginatedPostVersionResponse, PostVersionResponse } from '@/app/api/schemas/post-version-response';
-import { PostsService } from '@/app/api/services/posts/posts.service';
+import { PaginatedPostVersionResponse, PostVersionResponse } from '@/app/api/schemas/post/post-version-response';
+import { PostVersionsService } from '@/app/api/services/posts/services/post-versions.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 // eslint-disable-next-line max-len
 import { PostVersionTimelineComponent } from '@/app/post/components/post-version-timeline/post-version-timeline.component';
@@ -23,14 +23,14 @@ import { PostVersionTimelineComponent } from '@/app/post/components/post-version
 })
 export class PostVersionsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly postsService = inject(PostsService);
+  private readonly postVersionsService = inject(PostVersionsService);
   public readonly navigationService = inject(NavigationService);
   public first = 0;
   public isProcessing = signal<boolean>(false);
   public paginatedPostVersionResponse = signal<null | PaginatedPostVersionResponse>(null);
   public pageTitle = computed(() => {
     const postTitle = this.paginatedPostVersionResponse()?.items.find((v) => v.isCurrent)?.title ?? '';
-    return `Versions of "${postTitle}"`;
+    return `Versions of the post "${postTitle}"`;
   });
   public postId = input<null | string>(null, { alias: 'id' });
   public selectedVersions = signal<number[]>([]);
@@ -49,7 +49,7 @@ export class PostVersionsComponent implements OnInit {
     const postId = this.postId();
     if (postId) {
       this.isProcessing.set(true);
-      this.postsService
+      this.postVersionsService
         .deletePostVersion(+postId, version.version)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
@@ -68,7 +68,7 @@ export class PostVersionsComponent implements OnInit {
   public getCurrentPostVersions(query?: PostQuery): void {
     const postId = this.postId();
     if (postId) {
-      this.postsService
+      this.postVersionsService
         .getVersionsByPost(+postId, query)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
@@ -107,7 +107,7 @@ export class PostVersionsComponent implements OnInit {
     const postId = this.postId();
     if (postId) {
       this.isProcessing.set(true);
-      this.postsService
+      this.postVersionsService
         .revertToVersion(+postId, version.version)
         .pipe(
           takeUntilDestroyed(this.destroyRef),

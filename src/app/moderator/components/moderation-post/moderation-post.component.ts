@@ -24,7 +24,7 @@ import { catchError, EMPTY, finalize, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
-import { PostResponse } from '@/app/api/schemas/posts-response';
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { POST_ACTION } from '@/app/constants/post-action';
