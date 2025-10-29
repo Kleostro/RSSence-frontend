@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
 import { httpInterceptor } from '@/app/api/interceptors/http-interceptor';
+import { refreshInterceptor } from '@/app/api/interceptors/refresh-interceptor';
 import { routes } from '@/app/app.routes';
 import { MyPreset } from '@/app/utils/my-preset';
 
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     MessageService,
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
-    provideHttpClient(withInterceptors([httpInterceptor])),
+    provideHttpClient(withInterceptors([httpInterceptor, refreshInterceptor])),
     providePrimeNG({
       ripple: true,
       theme: {
