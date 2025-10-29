@@ -1,4 +1,5 @@
 export const ENDPOINTS = {
+  AUTH: 'auth',
   AUTHORS: 'authors',
   COMMENTS: 'comments',
   CONTRIBUTION_STATS: 'contribution-stats',
@@ -6,15 +7,11 @@ export const ENDPOINTS = {
   GOOGLE_CALLBACK: 'auth/google/callback',
   HIERARCHY: 'hierarchy',
   IMAGES: 'images',
-  LOGIN: 'auth/login',
-  LOGOUT: 'auth/logout',
   ME: 'me',
   POST_VIEWS: 'post-views',
   POSTS: 'posts',
   PROFILES: 'profiles',
-  REFRESH: 'auth/refresh',
   ROLES: 'roles',
-  SIGN_UP: 'auth/register',
   USERNAME_CHECK: 'username-check',
   USERS: 'users',
 } as const;
