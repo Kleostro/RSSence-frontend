@@ -55,7 +55,7 @@ export class PostVersionsService {
 
   public revertToVersion(postId: number, version: number): Observable<PostResponse> {
     const url = buildApiUrl(ENDPOINTS.POSTS, postId.toString(), PART.VERSIONS, version.toString(), PART.REVERT);
-    return this.http.post<PostResponse>(url, {}).pipe(
+    return this.http.post<PostResponse>(url, null).pipe(
       tap(() => {
         this.message.info(MESSAGE.REVERT_POST_SUCCESS);
       }),
