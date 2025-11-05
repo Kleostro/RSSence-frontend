@@ -2,7 +2,7 @@ export const PART = {
   AUDIT: 'audit',
   CHILDREN: 'children',
   CHILDREN_COUNT: 'children-count',
-  FULL_HISTORY: 'full-history',
+  HISTORY: 'history',
   ID: 'id',
   LOGIN: 'login',
   LOGOUT: 'logout',

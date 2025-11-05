@@ -17,14 +17,14 @@ export class PostAnalyticsService {
   private readonly http = inject(HttpClient);
 
   public getPostCommentTrend(postId: number, query?: PostAnalyticsQuery): Observable<PostCommentDailyStatResponse[]> {
-    const url = buildApiUrl(ENDPOINTS.COMMENTS, PART.POST, postId.toString(), PART.TREND);
+    const url = buildApiUrl(ENDPOINTS.COMMENTS, postId.toString(), PART.TREND);
     return this.http.get<PostCommentDailyStatResponse[]>(url, {
       params: { ...query },
     });
   }
 
   public getPostViewsTrend(postId: number, query?: PostAnalyticsQuery): Observable<PostViewDailyStatResponse[]> {
-    const url = buildApiUrl(ENDPOINTS.POST_VIEWS, PART.POST, postId.toString(), PART.TREND);
+    const url = buildApiUrl(ENDPOINTS.POST_VIEWS, postId.toString(), PART.TREND);
     return this.http.get<PostViewDailyStatResponse[]>(url, {
       params: { ...query },
     });

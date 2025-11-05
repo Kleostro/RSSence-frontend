@@ -1,15 +1,13 @@
 import { Routes } from '@angular/router';
 
-import { adminGuard, loginGuard, moderatorGuard, userGuard } from '@/app/auth/guards/login.guard';
+import { adminGuard, authGuard, loginGuard, moderatorGuard } from '@/app/auth/guards/login.guard';
 import { authorResolver, meAuthorResolver } from '@/app/author/resolvers/author.resolver';
 import { ADMIN_PATH, APP_PATH, MODERATOR_PATH } from '@/app/core/services/navigation/routes';
-import { postAuthorGuard } from '@/app/post/guards/post-author.guard';
-import { postMainAuthorGuard } from '@/app/post/guards/post-main-author.guard';
 import { meProfileResolver, profileResolver } from '@/app/profile/resolvers/profile.resolver';
 
 export const routes: Routes = [
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./home/pages/home/home.component').then((c) => c.HomeComponent),
     path: APP_PATH.DEFAULT,
     title: 'Home',
@@ -28,63 +26,63 @@ export const routes: Routes = [
     title: APP_PATH.SIGN_UP,
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./profile/pages/me-profile/me-profile.component').then((c) => c.MeProfileComponent),
     path: APP_PATH.PROFILE.toLowerCase(),
     resolve: { profile: meProfileResolver },
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./profile/pages/profile/profile.component').then((c) => c.ProfileComponent),
     path: `${APP_PATH.PROFILE.toLowerCase()}/:id`,
     resolve: { user: profileResolver },
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./author/pages/me-author/me-author.component').then((c) => c.MeAuthorComponent),
     path: APP_PATH.AUTHOR.toLowerCase(),
     resolve: { author: meAuthorResolver },
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./author/pages/author/author.component').then((c) => c.AuthorComponent),
     path: `${APP_PATH.AUTHOR.toLowerCase()}/:id`,
     resolve: { user: authorResolver },
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./post/pages/posts/posts.component').then((c) => c.PostsComponent),
     path: APP_PATH.POSTS.toLowerCase(),
     title: APP_PATH.POSTS,
   },
   {
-    canActivate: [userGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./post/pages/post-detailed/post-detailed.component').then((c) => c.PostDetailedComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id`,
     title: `RSSence | ${APP_PATH.POSTS.slice(0, -1)}`,
   },
   {
-    canActivate: [postAuthorGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./post/pages/post-history/post-history.component').then((c) => c.PostHistoryComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.HISTORY.toLowerCase()}`,
     title: `Post | ${APP_PATH.HISTORY}`,
   },
   {
-    canActivate: [postAuthorGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./post/pages/post-analytics/post-analytics.component').then((c) => c.PostAnalyticsComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.ANALYTICS.toLowerCase()}`,
   },
   {
-    canActivate: [postMainAuthorGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./post/pages/post-versions/post-versions.component').then((c) => c.PostVersionsComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.VERSIONS.toLowerCase()}`,
     title: `Post | ${APP_PATH.VERSIONS}`,
   },
   {
-    canActivate: [postMainAuthorGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./post/pages/post-version-diff/post-version-diff.component').then((c) => c.PostVersionDiffComponent),
     path: `${APP_PATH.POSTS.toLowerCase()}/:id/${APP_PATH.VERSION_DIFF.toLowerCase()}`,

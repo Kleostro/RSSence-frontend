@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { AuthorSchema } from '@/app/api/schemas/authors-response';
 import { PaginationResponse, PaginationResponseSchema } from '@/app/api/schemas/pagination-response';
 import { ProfileSchema } from '@/app/api/schemas/profiles-response';
+import { UserRoleSchema } from '@/app/api/schemas/roles-response';
 
 export const UserSchema = z.object({
   author: AuthorSchema.nullable().optional(),
@@ -10,7 +11,7 @@ export const UserSchema = z.object({
   email: z.string(),
   id: z.number(),
   profile: ProfileSchema.nullable().optional(),
-  roles: z.string().array(),
+  roles: UserRoleSchema.array(),
   updatedAt: z.string(),
 });
 

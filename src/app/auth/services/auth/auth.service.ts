@@ -1,10 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, Observable, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, Observable, of, switchMap, tap } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
+import { UserResponse } from '@/app/api/schemas/users-response';
 import { LoginService } from '@/app/api/services/login/login.service';
 import { LogoutService } from '@/app/api/services/logout/logout.service';
 import { RefreshTokenService } from '@/app/api/services/refresh-token/refresh-token.service';
@@ -41,22 +42,22 @@ export class AuthService {
     this.message.success(MESSAGE.LOGIN_SUCCESS);
   }
 
-  public checkAuth(): boolean {
+  public checkAuth(): Observable<null | UserResponse> {
     const token = this.tokenService.getToken();
     if (token) {
-      this.refreshToken().subscribe();
-      return true;
+      return this.refreshToken();
     }
     this.isUserLoggedIn.set(false);
-    return false;
+    return of(null);
   }
 
-  public login({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
+  public login({ email, password }: { email: string; password: string }): Observable<null | UserResponse> {
     return this.loginService.login(email, password).pipe(
       tap((data) => {
         this.handleAuthSuccess(data);
         this.navigationService.navigateToHome();
       }),
+      switchMap(() => this.usersService.getMe()),
       catchError(this.handleAuthError.bind(this)),
     );
   }
@@ -77,11 +78,12 @@ export class AuthService {
     );
   }
 
-  public refreshToken(): Observable<AuthResponse> {
+  public refreshToken(): Observable<null | UserResponse> {
     return this.refreshTokenService.refreshToken().pipe(
       tap((data) => {
         this.handleAuthSuccess(data);
       }),
+      switchMap(() => this.usersService.getMe()),
 
       catchError(() => {
         this.isUserLoggedIn.set(false);
@@ -92,7 +94,7 @@ export class AuthService {
     );
   }
 
-  public register({ email, password }: { email: string; password: string }): Observable<AuthResponse> {
+  public register({ email, password }: { email: string; password: string }): Observable<null | UserResponse> {
     return this.signUpService.register(email, password).pipe(
       tap(() => {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
