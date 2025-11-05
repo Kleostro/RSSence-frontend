@@ -110,6 +110,7 @@ export class AuthorComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         tap(({ user }) => {
           const result = UserSchema.safeParse(user);
+
           if (result.success) {
             this.currentUser.set(result.data);
             this.paginatedPostResponse.set(null);

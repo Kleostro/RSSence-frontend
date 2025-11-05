@@ -16,10 +16,10 @@ import { InputText } from 'primeng/inputtext';
 import { RadioButton } from 'primeng/radiobutton';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs';
 
-import { TIME } from '@/app/constants/time';
+import { TIME_MILLISECONDS } from '@/app/constants/time';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
-const DEBOUNCE_TIME = TIME.SECOND;
+const DEBOUNCE_TIME = TIME_MILLISECONDS.SECOND;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

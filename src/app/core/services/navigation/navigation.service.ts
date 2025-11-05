@@ -49,6 +49,10 @@ export class NavigationService {
     this.router.navigate([APP_ROUTE.AUTHOR, username]);
   }
 
+  public navigateToForbidden(): void {
+    this.router.navigate([APP_ROUTE.FORBIDDEN]);
+  }
+
   public navigateToHome(): void {
     this.router.navigate([APP_ROUTE.HOME]);
   }

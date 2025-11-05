@@ -21,7 +21,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
 
 import { PostCommentDailyStatResponse } from '@/app/api/schemas/post/post-comment-daily-stat-response';
-import { TIME } from '@/app/constants/time';
+import { TIME_MILLISECONDS } from '@/app/constants/time';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { toUTCDateString } from '@/app/utils/to-utc-date-string';
 
@@ -33,8 +33,8 @@ const BASE_DATASET = {
   pointRadius: 5,
   tension: 0.4,
 };
-const DEFAULT_START_DATE = new Date(Date.now() - TIME.WEEK);
-const DEFAULT_END_DATE = new Date(new Date().getTime() - TIME.DAY);
+const DEFAULT_START_DATE = new Date(Date.now() - TIME_MILLISECONDS.WEEK);
+const DEFAULT_END_DATE = new Date(new Date().getTime() - TIME_MILLISECONDS.DAY);
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
