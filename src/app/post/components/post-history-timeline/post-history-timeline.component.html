@@ -18,11 +18,16 @@
           <i class="history-item-changes-in-status">Changes in status</i>
           <div class="tags">
             <p-tag
+              class="status-tag"
               [value]="history.previousStatus ?? 'N/A'"
               [severity]="this.getStatusSeverity(history.previousStatus)"
             />
-            ->
-            <p-tag [value]="history.newStatus" [severity]="this.getStatusSeverity(history.newStatus)" />
+            <span class="status-tag-separator">→</span>
+            <p-tag
+              class="status-tag"
+              [value]="history.newStatus"
+              [severity]="this.getStatusSeverity(history.newStatus)"
+            />
           </div>
         }
       </div>

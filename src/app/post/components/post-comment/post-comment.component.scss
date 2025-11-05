@@ -29,9 +29,12 @@
 
   &-header {
     position: relative;
+
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+
+    margin-bottom: 1rem;
   }
 
   &-actions {
@@ -58,7 +61,6 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    margin-bottom: 1rem;
   }
 
   &-content {

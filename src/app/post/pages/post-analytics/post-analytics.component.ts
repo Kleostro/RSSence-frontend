@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
-import { forkJoin, Observable, switchMap, tap } from 'rxjs';
+import { catchError, forkJoin, Observable, switchMap, tap } from 'rxjs';
 
 import { PostAnalyticsQuery } from '@/app/api/interfaces/post-analytics-query';
 import { PostCommentDailyStatResponse } from '@/app/api/schemas/post/post-comment-daily-stat-response';
@@ -71,6 +71,11 @@ export class PostAnalyticsComponent implements OnInit {
       tap((data) => {
         this.commentsAnalyticDataByPost.set(data);
       }),
+      catchError(() => {
+        this.commentsAnalyticDataByPost.set([]);
+        this.viewsAnalyticDataByPost.set([]);
+        return [];
+      }),
     );
   }
 
@@ -78,6 +83,11 @@ export class PostAnalyticsComponent implements OnInit {
     return this.postAnalyticsService.getPostViewsTrend(postId, query).pipe(
       tap((data) => {
         this.viewsAnalyticDataByPost.set(data);
+      }),
+      catchError(() => {
+        this.commentsAnalyticDataByPost.set([]);
+        this.viewsAnalyticDataByPost.set([]);
+        return [];
       }),
     );
   }

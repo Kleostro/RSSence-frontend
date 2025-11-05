@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,6 +34,7 @@ import { PostBodyComponent } from '@/app/post/components/post-body/post-body.com
 import { PostFooterComponent } from '@/app/post/components/post-footer/post-footer.component';
 import { PostFormComponent } from '@/app/post/components/post-form/post-form.component';
 import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
+import { TimeAgoPipe } from '@/app/shared/pipes/time-ago.pipe';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
@@ -42,7 +42,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CoauthorsListComponent,
-    DatePipe,
+    TimeAgoPipe,
     ButtonModule,
     RippleModule,
     PostAvatarComponent,
@@ -67,38 +67,31 @@ export class PostComponent {
   public readonly navigationService = inject(NavigationService);
   public readonly usersService = inject(UsersService);
   public post = input<null | PostResponse>(null);
-  public canViewPostAnalytics = computed(() => {
-    const post = this.post();
-    return (
-      ((post?.authors.some((postAuthor) => postAuthor.authorId === this.usersService.me()?.author?.id) ?? false) ||
-        this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)) &&
-      post?.status === POST_STATUS.APPROVED
-    );
-  });
+  public canViewPostAnalytics = computed(
+    () => this.hasPostAccess(this.post()) && this.post()?.status === POST_STATUS.APPROVED,
+  );
+  public canViewPostHistory = computed(() => this.hasPostAccess(this.post()));
+  public canViewPostVersions = computed(
+    () => this.hasPostAccess(this.post()) && this.post()?.status === POST_STATUS.APPROVED,
+  );
 
-  public canViewPostHistory = computed(() => {
-    const post = this.post();
-    return (
-      (post?.authors.some(({ author }) => author.id === this.usersService.me()?.author?.id) ?? false) ||
-      this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)
-    );
-  });
-  public canViewPostVersions = computed(() => {
-    const post = this.post();
-    return (
-      ((post?.authors.some(
-        (postAuthor) => postAuthor.authorId === this.usersService.me()?.author?.id && postAuthor.isMainAuthor,
-      ) ??
-        false) ||
-        this.rolesService.hasAccess(this.usersService.me()?.roles ?? [], ROLE.MODERATOR)) &&
-      post?.status === POST_STATUS.APPROVED
-    );
-  });
   public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostUserActions = input<boolean>(false);
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
+
+  private hasPostAccess(post: null | PostResponse): boolean {
+    const me = this.usersService.me();
+    if (!post || !me) {
+      return false;
+    }
+
+    const isAuthor = post.authors.some(({ author }) => author.id === me.author?.id);
+    const isModeratorOrHigher = this.rolesService.hasAccess(me.roles, ROLE.MODERATOR);
+
+    return isAuthor || isModeratorOrHigher;
+  }
 
   public deletePost(): void {
     const post = this.post();

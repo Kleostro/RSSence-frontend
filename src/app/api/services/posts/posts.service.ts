@@ -68,7 +68,7 @@ export class PostsService {
   }
 
   public getPostModerationHistory(postId: number): Observable<ModerationHistoryResponse[]> {
-    const url = buildApiUrl(ENDPOINTS.POSTS, postId.toString(), PART.AUDIT, PART.FULL_HISTORY);
+    const url = buildApiUrl(ENDPOINTS.POSTS, postId.toString(), PART.HISTORY);
     return this.http.get<ModerationHistoryResponse[]>(url);
   }
 

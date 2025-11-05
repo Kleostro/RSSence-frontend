@@ -1,5 +1,4 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,6 +30,7 @@ import { UsersService } from '@/app/api/services/users/users.service';
 import { PostCommentFormComponent } from '@/app/post/components/post-comment-form/post-comment-form.component';
 import { PostCommentLoaderComponent } from '@/app/post/components/post-comment-loader/post-comment-loader.component';
 import { CommentService } from '@/app/post/services/comment.service';
+import { TimeAgoPipe } from '@/app/shared/pipes/time-ago.pipe';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
@@ -48,7 +48,6 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    DatePipe,
     Avatar,
     RouterLink,
     AutoFocusModule,
@@ -56,6 +55,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     RippleModule,
     PostCommentFormComponent,
     Message,
+    TimeAgoPipe,
     PostCommentLoaderComponent,
     SkeletonModule,
   ],

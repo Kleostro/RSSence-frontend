@@ -22,6 +22,10 @@
           <a [routerLink]="['/profile', comment.profile?.username]" class="profile-link">{{
             comment.profile?.username
           }}</a>
+
+          <div class="comment-times">
+            <span class="comment-createdAt"> <span class="pi pi-clock"></span> {{ comment.createdAt | timeAgo }} </span>
+          </div>
         </div>
         @if (!comment.isDeleted) {
           <div class="comment-actions">
@@ -58,14 +62,6 @@
             }
           </div>
         }
-
-        <div class="comment-times">
-          <span class="comment-createdAt">
-            <span class="pi pi-clock"></span>
-            {{ comment.createdAt | date: 'mediumDate' }}
-            at {{ comment.createdAt | date: 'shortTime' }}
-          </span>
-        </div>
       </header>
 
       @if (!comment.isDeleted) {

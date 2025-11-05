@@ -144,8 +144,8 @@
       <td>
         <div class="td-roles">
           @for (role of user.roles; track role; let i = $index) {
-            @if (this.rolesService.rolePriority?.get(role); as rolePriority) {
-              <p-tag [value]="role" [severity]="rolesSeverity[rolePriority - 1]" />
+            @if (this.rolesService.rolePriority?.get(role.role.name); as rolePriority) {
+              <p-tag [value]="role.role.name" [severity]="rolesSeverity[role.role.priority - 1]" />
             }
           }
         </div>

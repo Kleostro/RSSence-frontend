@@ -2,11 +2,12 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { WA_LOCAL_STORAGE } from '@ng-web-apis/common';
 
-import { catchError, of, switchMap } from 'rxjs';
+import { of } from 'rxjs';
 
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { STORE_KEYS } from '@/app/constants/store-keys';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
 
 export const loginGuard: CanActivateFn = () => {
@@ -15,30 +16,24 @@ export const loginGuard: CanActivateFn = () => {
   return !isUserLoggedIn || inject(Router).navigate([APP_ROUTE.HOME]);
 };
 
+export const authGuard: CanActivateFn = () => {
+  const ls = inject(WA_LOCAL_STORAGE);
+  const isUserLoggedIn = ls.getItem(STORE_KEYS.ACCESS_TOKEN);
+  return Boolean(isUserLoggedIn) || inject(Router).navigate([APP_ROUTE.LOGIN]);
+};
+
 export const createRoleGuard = (minRequiredRole?: string): CanActivateFn => {
   return () => {
-    const router = inject(Router);
+    const navigationService = inject(NavigationService);
     const usersService = inject(UsersService);
     const rolesService = inject(RolesService);
 
-    return rolesService.getRoleHierarchy().pipe(
-      switchMap(() =>
-        usersService.getMe().pipe(
-          switchMap((me) => {
-            if (!me) {
-              return of(router.createUrlTree([APP_ROUTE.LOGIN]));
-            }
-
-            if (rolesService.hasAccess(me.roles, minRequiredRole)) {
-              return of(true);
-            } else {
-              return of(router.createUrlTree([APP_ROUTE.FORBIDDEN]));
-            }
-          }),
-          catchError(() => of(router.createUrlTree([APP_ROUTE.LOGIN]))),
-        ),
-      ),
-    );
+    if (rolesService.hasAccess(usersService.me()?.roles ?? [], minRequiredRole)) {
+      return of(true);
+    } else {
+      navigationService.navigateToForbidden();
+      return of(false);
+    }
   };
 };
 

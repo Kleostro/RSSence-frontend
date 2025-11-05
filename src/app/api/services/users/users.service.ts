@@ -38,7 +38,8 @@ export class UsersService {
     return this.http.get<null | UserResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.USERS}/${ENDPOINTS.ME}`).pipe(
       tap((me) => {
         this.me.set(me);
-        this.isModerator.set(me?.roles.includes(ROLE.MODERATOR) ?? false);
+        const moderatorRole = me?.roles.find((role) => role.role.name === ROLE.MODERATOR);
+        this.isModerator.set(!!moderatorRole);
       }),
     );
   }

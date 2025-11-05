@@ -7,8 +7,8 @@
 .action-type-tag,
 .status-tag {
   width: max-content;
-  margin-bottom: 0.5rem;
   padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
 }
 
 .tags {
@@ -21,12 +21,10 @@
 }
 
 .history-item {
-  display: grid;
-  grid-template-columns: 2fr 4.5fr 0.5fr;
-  gap: 1rem;
+  display: flex;
 
   margin: 1rem 0;
-  padding: 1rem 2rem;
+  padding: 1rem;
   border: 0.1rem solid var(--p-surface-600);
   border-radius: 0.5rem;
 
@@ -41,23 +39,34 @@
   }
 
   &-left {
+    overflow: scroll;
     display: flex;
+    flex: 2;
     flex-direction: column;
     gap: 0.5rem;
+
     border-right: 0.1rem dotted var(--p-surface-600);
+
+    font-size: 0.8rem;
   }
 
   &-center {
+    overflow: scroll;
     display: flex;
+    flex: 4;
     flex-direction: column;
     gap: 0.5rem;
+
     border-right: 0.1rem dotted var(--p-surface-600);
   }
 
   &-right {
+    overflow: scroll;
     display: flex;
+    flex: 1.5;
     flex-direction: column;
     gap: 0.5rem;
+
     margin-left: auto;
   }
 }
