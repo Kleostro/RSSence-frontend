@@ -7,7 +7,6 @@ import {
   inject,
   input,
   linkedSignal,
-  OnInit,
   output,
   signal,
   TemplateRef,
@@ -19,10 +18,9 @@ import { RouterLink } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { Avatar } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
-import { Message } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
 import { SkeletonModule } from 'primeng/skeleton';
-import { finalize, switchMap, tap } from 'rxjs';
+import { finalize, Observable, switchMap, tap } from 'rxjs';
 
 import { PostCommentResponse, PostCommentVoteType } from '@/app/api/schemas/post/post-comment-response';
 import { PostCommentsService } from '@/app/api/services/posts/services/post-comments.service';
@@ -30,6 +28,7 @@ import { UsersService } from '@/app/api/services/users/users.service';
 import { PostCommentFormComponent } from '@/app/post/components/post-comment-form/post-comment-form.component';
 import { PostCommentLoaderComponent } from '@/app/post/components/post-comment-loader/post-comment-loader.component';
 import { CommentService } from '@/app/post/services/comment.service';
+import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { TimeAgoPipe } from '@/app/shared/pipes/time-ago.pipe';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
@@ -54,7 +53,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     ButtonModule,
     RippleModule,
     PostCommentFormComponent,
-    Message,
+    ConfirmComponent,
     TimeAgoPipe,
     PostCommentLoaderComponent,
     SkeletonModule,
@@ -63,16 +62,16 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
   styleUrl: './post-comment.component.scss',
   templateUrl: './post-comment.component.html',
 })
-export class PostCommentComponent implements OnInit {
+export class PostCommentComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly postCommentsService = inject(PostCommentsService);
   public readonly commentService = inject(CommentService);
   public readonly modalService = inject(ModalService);
   public readonly usersService = inject(UsersService);
   public children = signal<PostCommentResponse[]>([]);
-  public childrenCount = signal<number>(0);
-  public childrenCountArray = computed(() => Array.from({ length: this.childrenCount() }, (_, i) => i));
   public comment = input.required<PostCommentResponse>();
+  public childrenCount = linkedSignal(() => (this.comment().childrenCount > 0 ? this.comment().childrenCount : 0));
+  public childrenCountArray = computed(() => Array.from({ length: this.childrenCount() }, (_, i) => i));
   public commentDislikesCount = linkedSignal(() => this.comment().dislikes);
   public commentLikesCount = linkedSignal(() => this.comment().likes);
   public deleteComment = output<number>();
@@ -88,13 +87,25 @@ export class PostCommentComponent implements OnInit {
       (vote) => vote.userId === this.usersService.me()?.id && vote.voteType === PostCommentVoteType.LIKE,
     ),
   );
-  public isCommentLoading = signal<boolean>(false);
   public isEditMode = signal<boolean>(false);
+
   public isProcessing = input<boolean>(false);
   public isRepliesShown = signal<boolean>(false);
+  public isReplyComment = input<boolean>(false);
   public isReplyFormOpen = signal<boolean>(false);
 
   public isReplyProcessing = signal<boolean>(false);
+
+  private getCommentReplies(): Observable<PostCommentResponse[]> {
+    return this.postCommentsService.getCommentReplies(this.comment().id).pipe(
+      tap((children) => {
+        this.children.set(children);
+      }),
+      finalize(() => {
+        this.isReplyProcessing.set(false);
+      }),
+    );
+  }
 
   public createReplyComment(comment: { content: string; parentId?: number }): void {
     this.isReplyProcessing.set(true);
@@ -135,26 +146,7 @@ export class PostCommentComponent implements OnInit {
             deletedComment,
             ...children.slice(replyIndex + 1),
           ]);
-        }),
-        finalize(() => {
-          this.isReplyProcessing.set(false);
-        }),
-      )
-      .subscribe();
-  }
-
-  public editReplyComment($event: { content: string; replyId: number }): void {
-    this.isReplyProcessing.set(true);
-    this.postCommentsService
-      .updateComment($event.replyId, { content: $event.content })
-      .pipe(
-        tap((updatedComment) => {
-          const replyIndex = this.children().findIndex((child) => child.id === $event.replyId);
-          this.children.update((children) => [
-            ...children.slice(0, replyIndex),
-            updatedComment,
-            ...children.slice(replyIndex + 1),
-          ]);
+          this.modalService.closeModal();
         }),
         finalize(() => {
           this.isReplyProcessing.set(false);
@@ -168,45 +160,24 @@ export class PostCommentComponent implements OnInit {
     this.children.set([]);
   }
 
-  public ngOnInit(): void {
-    this.isCommentLoading.set(true);
-    this.postCommentsService
-      .getCommentRepliesCount(this.comment().id)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap((res) => {
-          this.childrenCount.set(res.count);
-        }),
-        finalize(() => {
-          this.isCommentLoading.set(false);
-        }),
-      )
-      .subscribe();
-  }
-
   public onDelete(): void {
-    this.isReplyProcessing.set(true);
-
     this.commentService
       .deleteComment(this.comment().id)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.modalService.closeModal();
-          this.isReplyProcessing.set(false);
         }),
       )
       .subscribe();
   }
 
   public onEdit($event: { content: string }): void {
-    this.isReplyProcessing.set(true);
-
     this.commentService
       .updateComment(this.comment().id, $event)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          this.isReplyProcessing.set(false);
           this.isEditMode.set(false);
         }),
       )
@@ -215,7 +186,24 @@ export class PostCommentComponent implements OnInit {
 
   public onEditReplyComment($event: { content: string; replyId: number }): void {
     this.isEditMode.set(false);
-    this.editComment.emit($event);
+    this.isReplyProcessing.set(true);
+    this.postCommentsService
+      .updateComment($event.replyId, { content: $event.content })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap((updatedComment) => {
+          const replyIndex = this.children().findIndex((child) => child.id === $event.replyId);
+          this.children.update((children) => [
+            ...children.slice(0, replyIndex),
+            updatedComment,
+            ...children.slice(replyIndex + 1),
+          ]);
+        }),
+        finalize(() => {
+          this.isReplyProcessing.set(false);
+        }),
+      )
+      .subscribe();
   }
 
   public onReply(): void {
@@ -242,25 +230,18 @@ export class PostCommentComponent implements OnInit {
           this.commentLikesCount.set(updatedComment.likes);
           this.commentDislikesCount.set(updatedComment.dislikes);
         }),
-        finalize(() => {
-          this.isReplyProcessing.set(false);
-        }),
+        switchMap(() => this.getCommentReplies().pipe(takeUntilDestroyed(this.destroyRef))),
       )
       .subscribe();
   }
 
   public showReplies(): void {
     this.isReplyProcessing.set(true);
-    this.postCommentsService
-      .getCommentReplies(this.comment().id)
+    this.getCommentReplies()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        tap((children) => {
+        tap(() => {
           this.isRepliesShown.set(true);
-          this.children.set(children);
-        }),
-        finalize(() => {
-          this.isReplyProcessing.set(false);
         }),
       )
       .subscribe();

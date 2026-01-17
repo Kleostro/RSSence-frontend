@@ -1,13 +1,34 @@
-<div class="header-wrapper">
-  <header class="header">
-    @if (this.authService.isUserLoggedIn()) {
-      <app-sidebar />
-    }
-  </header>
-  @if (this.loaderService.isProcessing()) {
-    <p-progressbar
-      mode="indeterminate"
-      [style]="{ height: '0.05rem', position: 'absolute', bottom: '0', width: '100%' }"
-    />
+<header class="header">
+  @if (this.authService.isUserLoggedIn()) {
+    <div class="header-top">
+      <div class="header-left">
+        <button
+          pButton
+          pRipple
+          text="true"
+          rounded="true"
+          (click)="this.sidebarService.toggle()"
+          [icon]="
+            this.windowSizeService.width() <= 991
+              ? 'pi pi-bars'
+              : this.sidebarService.isSidebarOpen()
+                ? 'pi pi-chevron-right'
+                : 'pi pi-chevron-left'
+          "
+        ></button>
+        <span class="header-separator"></span>
+        <span>RSSence</span>
+      </div>
+      <div class="header-center"></div>
+      <div class="header-right">
+        <app-user-menu />
+      </div>
+    </div>
   }
-</div>
+
+  <div class="header-bottom">
+    @if (this.loaderService.isProcessing()) {
+      <p-progressbar mode="indeterminate" [style]="{ height: '0.05rem', width: '100%' }" />
+    }
+  </div>
+</header>

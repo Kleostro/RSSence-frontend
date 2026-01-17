@@ -1,4 +1,7 @@
+import { animate, style, transition, trigger } from '@angular/animations';
+import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -19,6 +22,7 @@ import { EditorModule } from 'primeng/editor';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
+import { StepperModule } from 'primeng/stepper';
 import { TextareaModule } from 'primeng/textarea';
 import { finalize, map, switchMap, tap } from 'rxjs';
 
@@ -27,14 +31,26 @@ import { POST_STATUS, PostResponse } from '@/app/api/schemas/post/posts-response
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { POST_FORM_FIELD_CONFIG } from '@/app/constants/form/post-form';
 import { POST_ACTION } from '@/app/constants/post-action';
-import { POST_FORM_FIELD_CONFIG } from '@/app/constants/post-form';
 import { CoauthorsFGType, NewPost, PostForm } from '@/app/interfaces/post-form';
 import { PostEditorComponent } from '@/app/post/components/post-editor/post-editor.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 import { arraysEqual } from '@/app/utils/arrays-equal';
 
 @Component({
+  animations: [
+    trigger('coauthorCollapse', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0)', transformOrigin: 'center' }),
+        animate('400ms cubic-bezier(0.22, 0.61, 0.36, 1)', style({ opacity: 1, transform: 'scale(1)' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'scale(1)', transformOrigin: 'center' }),
+        animate('400ms cubic-bezier(0.22, 0.61, 0.36, 1)', style({ opacity: 0, transform: 'scale(0)' })),
+      ]),
+    ]),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormFieldErrorComponent,
@@ -48,17 +64,21 @@ import { arraysEqual } from '@/app/utils/arrays-equal';
     AutoCompleteModule,
     AvatarModule,
     EditorModule,
+    StepperModule,
+
+    CommonModule,
   ],
   selector: 'app-post-form',
   styleUrl: './post-form.component.scss',
   templateUrl: './post-form.component.html',
 })
-export class PostFormComponent implements OnInit {
+export class PostFormComponent implements AfterViewInit, OnInit {
   private readonly authorsService = inject(AuthorsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly postsService = inject(PostsService);
   private readonly usersService = inject(UsersService);
+  public activeStep = signal<number>(1);
   public filteredAuthors = signal<AuthorResponse[]>([]);
   public form!: FormGroup<PostForm>;
   public formSubmitEvent = output<string>();
@@ -134,8 +154,8 @@ export class PostFormComponent implements OnInit {
     const formValue = this.form.getRawValue();
     return {
       coauthorIds,
-      content: formValue.content,
-      title: formValue.title,
+      content: formValue.content.trim(),
+      title: formValue.title.trim(),
     };
   }
 
@@ -189,6 +209,9 @@ export class PostFormComponent implements OnInit {
         Validators.pattern(this.POST_FORM_FIELD_CONFIG.title.pattern),
       ]),
     });
+  }
+
+  public ngAfterViewInit(): void {
     const post = this.post();
 
     if (post) {

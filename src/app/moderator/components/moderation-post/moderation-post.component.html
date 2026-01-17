@@ -1,119 +1,86 @@
 @let post = this.post();
-@let isShowPostModeratorActions =
-  this.isShowPostModeratorActions() && this.usersService.me()?.author?.id !== this.getAuthor()?.id;
 @let canMoveToDetailsPage = !this.navigationService.isPostDetailedModerationPage();
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
-    <div class="post-top">
-      <h1
-        class="post-title"
-        aria-disabled="true"
-        [class.post-title-disabled]="!canMoveToDetailsPage"
-        (click)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
-        (keyup)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
-        (keydown)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
-      >
-        {{ post.title }}
-      </h1>
-      <div class="post-actions">
-        @if (canMoveToDetailsPage) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Details"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostModerationBySlug(post.slug ?? '')"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
-            class="post-moderation-details-button"
-            severity="success"
-            outlined="true"
-          ></button>
-        }
-        <button
-          pButton
-          pRipple
-          pTooltip="Logs"
-          tooltipPosition="bottom"
-          type="button"
-          [disabled]="isProcessing()"
-          (click)="this.navigationService.navigateToPostHistory(post.id)"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
-          class="post-moderation-history-button"
-          severity="primary"
-          outlined="true"
-        ></button>
-
-        @if (isShowPostModeratorActions) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Approve"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.approvePost()"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-            class="approve-post-button"
-            severity="success"
-            outlined="true"
-          ></button>
-
-          <button
-            pButton
-            pRipple
-            pTooltip="Send for revision"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)=" this.modalService.openModal(this.revisionPostConfirm(), `Send a post for revision: ${post.title}`); this.modalService.contentWidth.set('50%')"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
-            class="reject-post-button"
-            severity="warn"
-            outlined="true"
-          ></button>
-
-          <button
-            pButton
-            pRipple
-            pTooltip="Reject"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)=" this.modalService.openModal(this.rejectPostConfirm(), `Reject a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-times'"
-            class="reject-post-button"
-            severity="danger"
-            outlined="true"
-          ></button>
-        }
-      </div>
-    </div>
-
     <header class="post-header">
-      <div class="post-authors">
-        <app-post-avatar [author]="this.getAuthor()" />
-        @if (this.getCoauthors().length) {
-          <div class="post-coauthors-wrapper">
+      <div class="post-header-top">
+        <a
+          aria-disabled="true"
+          class="post-title"
+          [class.post-title-disabled]="!canMoveToDetailsPage"
+          (click)="this.navigationService.navigateToPostModerationById(post.id)"
+          (keyup)="this.navigationService.navigateToPostModerationById(post.id)"
+          (keydown)="this.navigationService.navigateToPostModerationById(post.id)"
+          >{{ post.title }}</a
+        >
+
+        <div class="post-header-top-right">
+          @if (this.getCoauthors().length) {
             <app-coauthors-list [coauthors]="this.getCoauthors()" />
-          </div>
-        }
-        <div class="post-times">
-          <span class="post-createdAt">
-            <span class="pi pi-clock"></span>
-            {{ post.createdAt | date: 'mediumDate' }}
-            at {{ post.createdAt | date: 'shortTime' }}
-          </span>
+          }
+          <app-post-avatar [author]="this.getAuthor()" avatarSize="large" avatarPosition="right" />
         </div>
       </div>
+      <div class="post-header-bottom">
+        <div class="post-actions">
+          @if (canMoveToDetailsPage) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Details"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.navigationService.navigateToPostModerationById(post.id)"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+              class="post-moderation-details-button"
+              severity="info"
+              text="true"
+            ></button>
+          }
+          <button
+            pButton
+            pRipple
+            pTooltip="Logs"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)="this.navigationService.navigateToPostHistory(post.id)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
+            class="post-moderation-history-button"
+            severity="info"
+            text="true"
+          ></button>
+
+          <button
+            pButton
+            pRipple
+            pTooltip="Review"
+            tooltipPosition="bottom"
+            type="button"
+            [disabled]="isProcessing()"
+            (click)="this.navigationService.navigateToPostReview(post.id)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right-arrow-left'"
+            class="post-review-button"
+            severity="success"
+            text="true"
+          ></button>
+        </div>
+
+        <span class="post-createdAt"> <span class="pi pi-clock"></span> {{ post.createdAt | timeAgo }} </span>
+      </div>
     </header>
+
     <body class="post-body">
       @if (this.navigationService.isPostDetailedModerationPage()) {
-        <div class="post-content" [@postBody] [innerHTML]="this.safeHtml()"></div>
+        <app-post-body [post]="post" />
       }
     </body>
+
+    <footer class="post-footer">
+      <app-post-footer [post]="post" />
+    </footer>
   </div>
 } @else {
   <div class="not-found">
@@ -121,15 +88,3 @@
     <img class="not-found-img" src="img/png/not-found.png" alt="not found" />
   </div>
 }
-
-<ng-template #revisionPostConfirm>
-  @if (post) {
-    <app-post-revision (postRevisionEvent)="this.postEvent.emit()" [postId]="post.id" />
-  }
-</ng-template>
-
-<ng-template #rejectPostConfirm>
-  @if (post) {
-    <app-post-reject (postRejectEvent)="this.postEvent.emit()" [postId]="post.id" />
-  }
-</ng-template>

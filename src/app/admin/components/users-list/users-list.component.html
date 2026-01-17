@@ -187,108 +187,41 @@
 }
 
 <ng-template #deleteUserConfirm>
-  <div class="delete-user-confirm">
-    <strong class="delete-user-confirm-title">Are you certain about deleting this user's usership?</strong>
-    <p-message severity="warn" icon="pi pi-exclamation-circle"
-      >All information about the user will be permanently deleted!</p-message
-    >
-    <div class="delete-user-confirm-actions">
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.modalService.closeModal()"
-        label="Cancel"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
-        class="cancel-post-confirm-button"
-        severity="primary"
-        outlined="true"
-      ></button>
-
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.isProcessing.set(true); this.deleteUserEvent.emit(this.candidateUser()?.id ?? 0)"
-        label="Delete"
-        [disabled]="isProcessing()"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-        class="delete-user-confirm-button"
-        severity="danger"
-        outlined="true"
-      ></button>
-    </div>
-  </div>
+  <app-confirm
+    infoMessage="Are you certain about deleting this user's usership?"
+    warningMessage="All information about the user will be permanently deleted!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="this.isProcessing.set(true); this.deleteUserEvent.emit(this.candidateUser()?.id ?? 0)"
+    [isProcessing]="this.isProcessing()"
+  />
 </ng-template>
 
 <ng-template #deleteProfileConfirm>
-  <div class="delete-profile-confirm">
-    <strong class="delete-profile-confirm-title">Are you certain about deleting this user's profileship?</strong>
-    <p-message severity="warn" icon="pi pi-exclamation-circle"
-      >All information about the profile will be permanently deleted!</p-message
-    >
-    <div class="delete-profile-confirm-actions">
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.modalService.closeModal()"
-        label="Cancel"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
-        class="cancel-post-confirm-button"
-        severity="primary"
-        outlined="true"
-      ></button>
-
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="
-          this.isProcessing.set(true); this.deleteProfileEvent.emit(this.candidateUser()?.profile?.username ?? '')
-        "
-        label="Delete"
-        [disabled]="isProcessing()"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-        class="delete-profile-confirm-button"
-        severity="danger"
-        outlined="true"
-      ></button>
-    </div>
-  </div>
+  <app-confirm
+    infoMessage="Are you certain about deleting this user's profileship?"
+    warningMessage="All information about the profile will be permanently deleted!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="
+      this.isProcessing.set(true); this.deleteProfileEvent.emit(this.candidateUser()?.profile?.username ?? '')
+    "
+    [isProcessing]="this.isProcessing()"
+  />
 </ng-template>
 
 <ng-template #deleteAuthorConfirm>
-  <div class="delete-author-confirm">
-    <strong class="delete-author-confirm-title">Are you certain about deleting this user's authorship?</strong>
-    <p-message severity="warn" icon="pi pi-exclamation-circle"
-      >All information about the author will be permanently deleted!</p-message
-    >
-    <div class="delete-author-confirm-actions">
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.modalService.closeModal()"
-        label="Cancel"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
-        class="cancel-post-confirm-button"
-        severity="primary"
-        outlined="true"
-      ></button>
-
-      <button
-        pButton
-        pRipple
-        type="button"
-        (click)="this.isProcessing.set(true); this.deleteAuthorEvent.emit(this.candidateUser()?.author?.username ?? '')"
-        label="Delete"
-        [disabled]="isProcessing()"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-        class="delete-author-confirm-button"
-        severity="danger"
-        outlined="true"
-      ></button>
-    </div>
-  </div>
+  <app-confirm
+    infoMessage="Are you certain about deleting this user's authorship?"
+    warningMessage="All information about the author will be permanently deleted!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="
+      this.isProcessing.set(true); this.deleteAuthorEvent.emit(this.candidateUser()?.author?.username ?? '')
+    "
+    [isProcessing]="this.isProcessing()"
+  />
 </ng-template>

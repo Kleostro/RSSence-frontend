@@ -8,6 +8,7 @@ import { Timeline } from 'primeng/timeline';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { PostVersionResponse } from '@/app/api/schemas/post/post-version-response';
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,6 +18,7 @@ import { PostVersionResponse } from '@/app/api/schemas/post/post-version-respons
   templateUrl: './post-version-timeline.component.html',
 })
 export class PostVersionTimelineComponent {
+  public currentPost = input<null | PostResponse>(null);
   public deleteVersion = output<PostVersionResponse>();
   public isProcessing = input<boolean>(false);
   public revertVersion = output<PostVersionResponse>();

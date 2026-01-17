@@ -34,11 +34,6 @@ export class PostCommentsService {
     return this.http.get<PostCommentResponse[]>(url);
   }
 
-  public getCommentRepliesCount(parentId: number): Observable<{ count: number }> {
-    const url = buildApiUrl(ENDPOINTS.COMMENTS, parentId.toString(), PART.CHILDREN_COUNT);
-    return this.http.get<{ count: number }>(url);
-  }
-
   public getCommentsByPostId(postId: number, query?: PaginationQueryDto): Observable<PaginatedPostCommentResponse> {
     const url = buildApiUrl(ENDPOINTS.COMMENTS, PART.POST, postId.toString());
     return this.http.get<PaginatedPostCommentResponse>(url, {

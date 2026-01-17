@@ -62,10 +62,16 @@ export class PostEditorComponent implements ControlValueAccessor {
 
   private extractUsedImages(): Set<string> {
     const usedImages = new Set<string>();
-    const imgRegex = /!\[.*?\]\((.*?)\)/g;
     const content = this.markdownContent();
-    for (let match = imgRegex.exec(content); match !== null; match = imgRegex.exec(content)) {
-      usedImages.add(match[1]);
+
+    const imgRegex = /!\[[^\]]*\]\(\s*(<([^>]+)>|([^\s)]+))\s*\)/g;
+
+    let match;
+    while ((match = imgRegex.exec(content)) !== null) {
+      const url = match[2] || match[3];
+      if (url) {
+        usedImages.add(url);
+      }
     }
 
     return usedImages;
@@ -88,7 +94,9 @@ export class PostEditorComponent implements ControlValueAccessor {
           tap(({ url }) => {
             this.uploadedImages.add(url);
             this.markdownContent.update((content) => content.replace(imgPlaceholder, ''));
-            this.insertAtCursor(`![${blob.name}](${url})`);
+            const needsAngleBrackets = /[()\s]/.test(url);
+            const mdUrl = needsAngleBrackets ? `<${url}>` : url;
+            this.insertAtCursor(`![${blob.name}](${mdUrl})`);
           }),
         )
         .subscribe();

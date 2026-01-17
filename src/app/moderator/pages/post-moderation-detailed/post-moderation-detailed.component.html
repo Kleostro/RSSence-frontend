@@ -8,12 +8,12 @@
     type="button"
     (click)="this.navigationService.goBack()"
     label="Back"
-    icon="pi pi-arrow-left"
+    icon="pi pi-chevron-left"
     severity="info"
-    outlined="true"
+    text="true"
   ></button>
 
   @if (post !== undefined) {
-    <app-moderation-post [isShowPostModeratorActions]="true" [post]="post" />
+    <app-moderation-post [post]="post" />
   }
 </div>

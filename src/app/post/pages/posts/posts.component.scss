@@ -1,5 +1,11 @@
-.switch-mode-button,
 .back-button {
   width: max-content;
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
+}
+
+.posts-list {
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
 }

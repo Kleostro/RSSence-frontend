@@ -1,5 +1,7 @@
 @let profile = this.profile();
 @let bio = profile?.bio ?? '';
 
-<app-profile-header [profile]="profile" />
-<app-profile-bio class="bio" [bio]="bio" />
+<div class="preview-wrapper">
+  <app-profile-header [profile]="profile" />
+  <app-profile-bio [bio]="bio" />
+</div>

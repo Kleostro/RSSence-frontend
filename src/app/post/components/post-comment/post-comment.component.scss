@@ -2,25 +2,30 @@
   display: contents;
 }
 
-.separator {
-  border-left: 0.1rem solid var(--p-surface-600);
-}
 
 .comment {
   display: flex;
 
-  margin-bottom: 1rem;
-  padding: 1rem;
-  padding-bottom: 0;
-  border-radius: 0.5rem;
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
 
-  background-color: var(--p-surface-800);
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
+
+  &-replies {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-xs);
+  }
+
 
   &.replyComment {
-    gap: 1rem;
     margin-bottom: 0;
-    padding-right: 0;
-    padding-left: 0;
+    padding: 0;
+    padding-left: 0.5rem;
+
+    background-color: transparent;
+    box-shadow: none;
   }
 
   &-right {
@@ -32,50 +37,49 @@
 
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: var(--offset-xs);
 
-    margin-bottom: 1rem;
+    margin-bottom: var(--offset-xs);
   }
 
-  &-actions {
+  &-actions:not(:empty) {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0;
+    right: 0;
 
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    gap: var(--offset-xxs);
+    align-self: flex-start;
   }
 
   &-createdAt {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--offset-xxs);
     align-items: center;
 
-    font-size: 0.9rem;
-    color: var(--p-text-muted-color);
-    letter-spacing: 0.05rem;
+    font: var(--font-text-xs);
+    color: var(--text-color-muted);
   }
 
   &-times {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--offset-xxs);
     align-items: center;
   }
 
   &-content {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    margin-bottom: var(--offset-xs);
+    padding: var(--offset-xs);
+    border-radius: var(--border-radius-s);
 
-    font-size: 0.9rem;
+    font: var(--font-text-xs);
     hyphens: auto;
-    color: var(--p-text-color);
-    letter-spacing: 0.05rem;
+    color: var(--text-color-darked);
     word-wrap: break-word;
     overflow-wrap: break-word;
 
-    background-color: var(--p-surface-700);
+    background-color: var(--bg-light);
+    box-shadow: var(--shadow-s);
 
     &.deleted {
       opacity: 0.7;
@@ -84,20 +88,26 @@
 
   &-votes {
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin: 1rem 0;
-  }
-}
+    gap: var(--offset-xxs);
+    align-self: flex-start;
 
-.show-replies-button {
-  margin-bottom: 0.5rem;
+    width: max-content;
+    margin: var(--offset-xs) 0;
+
+  }
 }
 
 .profile-info {
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: var(--offset-xxs);
+  align-items: flex-start;
+
+  &-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--offset-xxs);
+    align-items: flex-start;
+  }
 }
 
 .profile-avatar-img {
@@ -105,7 +115,12 @@
   transition: filter 0.3s;
 
   &:hover {
-    filter: brightness(1.5);
+    filter: brightness(1.2);
+  }
+
+  &-deleted {
+    pointer-events: none;
+    opacity: 0.7;
   }
 }
 
@@ -121,14 +136,24 @@
 .delete-comment-confirm {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--offset-xs);
 
   &-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   &-actions {
     display: flex;
-    gap: 2rem;
+    gap: var(--offset-xs);
   }
+}
+
+.show-replies-button {
+  margin-bottom: var(--offset-xs);
+}
+
+.profile-deleted {
+  font: var(--font-text-xs);
+  color: var(--text-color-darked);
+  opacity: 0.7;
 }

@@ -1,8 +1,10 @@
+@use 'forms';
+
 .control-label-text {
   display: flex;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
+  margin-bottom: var(--offset-xs);
+  font: var(--font-text-s);
+  color: var(--text-color);
 }
 
 .control-file {
@@ -10,29 +12,32 @@
 }
 
 .control-file-label {
+
+
+  @extend %form-input-base;
   cursor: copy;
 
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   align-items: center;
   justify-content: center;
 
-  width: 100%;
-  min-height: 15rem;
-  max-height: 15rem;
-  border: 0.1rem dashed var(--p-surface-600);
-  border-radius: 0.5rem;
 
-  line-height: 1.5;
+  height: 15rem;
+  border: 0.1rem dashed var(--p-surface-600);
+
+
+  color: var(--text-color-muted);
   text-align: center;
+
+
+
 
   transition: border 0.3s;
 
   &-text {
     max-width: 18rem;
-    font-size: 0.9rem;
 
     &-upload {
       color: var(--p-primary-600);

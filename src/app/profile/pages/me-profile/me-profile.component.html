@@ -20,3 +20,15 @@
     </div>
   }
 </div>
+
+<ng-template #deleteProfileConfirm>
+  <app-confirm
+    infoMessage="Are you sure you want to delete profile?"
+    warningMessage="The profile will be permanently deleted!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="this.deleteProfile()"
+    [isProcessing]="this.isProcessing()"
+  />
+</ng-template>

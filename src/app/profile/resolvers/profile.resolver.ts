@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ResolveFn } from '@angular/router';
 
-import { of, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, of, switchMap } from 'rxjs';
 
 import { ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { UserResponse } from '@/app/api/schemas/users-response';
@@ -29,16 +29,11 @@ export const profileResolver: ResolveFn<null | UserResponse> = (route) => {
 
   if (typeof username === 'string') {
     return profilesService.getProfileByUsername(username).pipe(
-      tap((profile) => {
-        if (!profile) {
-          navigationService.navigateToNotFound();
-        }
-      }),
       switchMap((profile) =>
         usersService.getUserById(profile?.userId ?? 0).pipe(
           switchMap((user) => {
             if (user?.profile?.id === usersService.me()?.profile?.id) {
-              navigationService.navigateToAuthor();
+              navigationService.navigateToProfile();
               return of(usersService.me());
             } else {
               title.setTitle('Profile | ' + (profile?.username ?? ''));
@@ -47,6 +42,10 @@ export const profileResolver: ResolveFn<null | UserResponse> = (route) => {
           }),
         ),
       ),
+      catchError(() => {
+        navigationService.navigateToNotFound();
+        return EMPTY;
+      }),
     );
   }
   return of(null);

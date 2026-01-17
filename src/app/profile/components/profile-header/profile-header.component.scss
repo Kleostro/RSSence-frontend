@@ -1,42 +1,69 @@
-.header-top {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-
-  padding: 1rem;
-  border-bottom: 0.1rem solid var(--p-surface-600);
-  border-radius: 2rem 2rem 0 0;
-
-  background-color: var(--p-surface-800);
+.header {
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }
 
+.header-top {
+  display: flex;
+  gap: var(--offset-ms);
+  align-items: stretch;
+}
+
+
 .avatar-img {
-  overflow: hidden;
   width: 10rem;
   height: 10rem;
-  border-radius: 50%;
+
 
   ::ng-deep img {
-    object-fit: cover;
+    overflow: hidden;
+    border-radius: 50%;
   }
 }
 
 .profile-name-wrapper {
   display: flex;
   flex-direction: column;
-  border-radius: 0.5rem;
+  gap: var(--offset-xs);
+  width: 100%;
 }
 
 .profile-name {
-  padding: 0.3rem 0.6rem;
-  font-size: 1.4rem;
-  line-height: 125%;
-  letter-spacing: 0.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--offset-xxs);
+
+
+
+  font: var(--font-title);
+  color: var(--text-color);
+
+  &-text {
+    word-break: break-all;
+    word-wrap: break-word;
+  }
+
+}
+
+.profile-username,
+.profile-birthdate {
+  display: flex;
+  gap: var(--offset-xxs);
+  align-items: center;
+
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
 }
 
 .profile-username {
-  padding: 0.3rem 0.6rem;
-  font-size: 1rem;
-  font-weight: 100;
-  letter-spacing: 0.05rem;
+  color: var(--text-color-darked);
+  word-wrap: break-word;
+}
+
+.profile-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--offset-xxs);
 }

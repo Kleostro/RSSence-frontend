@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ResolveFn } from '@angular/router';
 
-import { of, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, of, switchMap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
 import { UserResponse } from '@/app/api/schemas/users-response';
@@ -29,11 +29,6 @@ export const authorResolver: ResolveFn<null | UserResponse> = (route) => {
 
   if (typeof username === 'string') {
     return authorsService.getAuthorByUsername(username).pipe(
-      tap((author) => {
-        if (!author) {
-          navigationService.navigateToNotFound();
-        }
-      }),
       switchMap((author) =>
         usersService.getUserById(author?.userId ?? 0).pipe(
           switchMap((user) => {
@@ -47,6 +42,10 @@ export const authorResolver: ResolveFn<null | UserResponse> = (route) => {
           }),
         ),
       ),
+      catchError(() => {
+        navigationService.navigateToNotFound();
+        return EMPTY;
+      }),
     );
   }
   return of(null);

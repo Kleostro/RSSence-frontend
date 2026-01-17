@@ -1,10 +1,10 @@
 .post {
   position: relative;
 
-  padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: var(--border-radius-m);
 
-  background-color: var(--p-surface-800);
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
 
   transition: opacity 0.3s;
 
@@ -13,45 +13,55 @@
     opacity: 0.5;
   }
 
-  &-top {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  &-authors {
-    display: flex;
-    flex-direction: column;
-  }
-
   &-header {
     position: relative;
 
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    flex-direction: column;
+    gap: var(--offset-xs);
 
-    min-height: 4rem;
+    padding: var(--offset-xs);
+    border-radius: var(--border-radius-m) var(--border-radius-m) 0 0;
+
+    background-color: var(--bg);
+    box-shadow: var(--shadow-s);
+
+    &-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &-right {
+        display: flex;
+        gap: var(--offset-xs);
+        align-items: center;
+      }
+    }
+
+    &-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 
-  &-title,
-  &-content {
-    line-height: 1.5;
-    color: var(--p-text-color);
-  }
 
   &-title {
     cursor: pointer;
 
-    margin-bottom: 1.5rem;
+    overflow: hidden;
 
-    font-size: 1.5rem;
+
+    font: var(--font-title);
     font-weight: bold;
-    letter-spacing: 0.1rem;
+    color: var(--text-color);
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
-    transition: color 0.3s;
 
     &:hover {
       color: var(--p-primary-400);
+      transition: color 0.3s;
     }
 
     &-disabled {
@@ -60,50 +70,41 @@
   }
 
   &-body {
-    margin-top: 2rem;
-    border-top: 0.1rem solid var(--p-surface-400);
+    border-top: 0.1rem solid transparent;
+
+    &-approved {
+      border-color: var(--p-green-400);
+    }
+
+    &-draft {
+      border-color: var(--p-surface-400);
+    }
+
+    &-submitted {
+      border-color: var(--p-primary-400);
+    }
+
+    &-rejected {
+      border-color: var(--p-red-400);
+    }
+
+    &-revision_required {
+      border-color: var(--p-orange-400);
+    }
   }
 
-  &-content {
-    overflow: hidden;
-    margin: 1rem 0;
-    font-size: 1rem;
-  }
-
-  &-actions {
-    position: relative;
-    z-index: 2;
-
+  &-actions:not(:empty) {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--offset-xxs);
     align-self: flex-start;
   }
 
   &-createdAt {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--offset-xxs);
     align-items: center;
 
-    font-size: 0.9rem;
-    color: var(--p-text-muted-color);
-    letter-spacing: 0.05rem;
-  }
-
-  &-times {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-top: 1.5rem;
-  }
-}
-
-.not-found {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  &-text {
-    font-size: 1.5rem;
-    color: var(--p-text-muted-color);
+    font: var(--font-text-xs);
+    color: var(--text-color-muted);
   }
 }

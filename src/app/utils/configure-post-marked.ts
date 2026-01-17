@@ -37,9 +37,7 @@ const renderCodeBlock = (token: marked.Tokens.Code): string => {
   const validLanguage = token.lang && hljs.getLanguage(token.lang) ? token.lang : 'plaintext';
   return `
     <pre>
-      <code class="hljs ${token.lang ?? 'text'}">
-        ${hljs.highlight(token.text, { language: validLanguage }).value}
-      </code>
+      <code class="hljs ${token.lang ?? 'text'}">${hljs.highlight(token.text, { language: validLanguage }).value}</code>
     </pre>
   `;
 };
@@ -57,10 +55,11 @@ const renderImage = (token: marked.Tokens.Image): string => {
       style="max-width: 100%; height: auto;"
       src="${token.href}"
       alt="${token.text}"
-      title="${token.title ?? token.text}""
+      title="${token.title === 'null' ? token.text : token.title}"
     />
   `;
 };
+
 const renderListitem = (item: marked.Tokens.ListItem): string => {
   const text = marked.parseInline(item.tokens.map((t) => t.raw).join(''));
   if (typeof text === 'string') {

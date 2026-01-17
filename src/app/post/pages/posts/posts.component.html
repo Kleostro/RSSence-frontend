@@ -5,14 +5,16 @@
     type="button"
     (click)="this.navigationService.goBack()"
     label="Back"
-    icon="pi pi-arrow-left"
+    icon="pi pi-chevron-left"
     severity="info"
-    outlined="true"
+    text="true"
   />
 
-  <app-posts-list [paginatedPostResponse]="this.paginatedPostResponse()" (pageChange)="this.handlePageChange($event)">
-    <ng-template let-post>
-      <app-post [post]="post" [isShowPostUserActions]="post.status !== 'SUBMITTED'" />
-    </ng-template>
-  </app-posts-list>
+  <div class="posts-list">
+    <app-posts-list [paginatedPostResponse]="this.paginatedPostResponse()" (pageChange)="this.handlePageChange($event)">
+      <ng-template let-post>
+        <app-post [post]="post" [isShowPostUserActions]="post.status !== 'SUBMITTED'" />
+      </ng-template>
+    </app-posts-list>
+  </div>
 </div>

@@ -1,9 +1,26 @@
 :host {
+  display: contents;
+}
+
+.bio-wrapper {
   display: flex;
   flex-direction: column;
+
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }
 
 .title {
-  font-size: 1.6rem;
-  letter-spacing: 0.05rem;
+  margin-bottom: 0.5rem;
+  font: var(--font-title-s);
+  color: var(--text-color);
+}
+
+.text {
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
+  word-wrap: break-word;
 }

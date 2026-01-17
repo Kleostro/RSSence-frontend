@@ -1,0 +1,17 @@
+<div class="page">
+  <button
+    pButton
+    pRipple
+    class="back-button"
+    type="button"
+    (click)="this.navigationService.goBack()"
+    label="Back"
+    icon="pi pi-chevron-left"
+    severity="info"
+    text="true"
+  ></button>
+
+  @if (this.currentPost(); as post) {
+    <app-post-form [post]="post" (formSubmitEvent)="this.navigationService.navigateToAuthor()" />
+  }
+</div>

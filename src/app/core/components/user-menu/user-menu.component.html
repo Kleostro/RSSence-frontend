@@ -1,0 +1,36 @@
+<p-avatar
+  (click)="op.toggle($event)"
+  class="profile-avatar"
+  [pTooltip]="this.usersService.me()?.profile?.username ?? ''"
+  [tooltipPosition]="'bottom'"
+  [image]="this.usersService.me()?.profile?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+  size="normal"
+  shape="circle"
+/>
+<p-popover #op>
+  <ng-template #content>
+    <div class="popover-box">
+      <button
+        pButton
+        pRipple
+        fluid="true"
+        label="Profile"
+        (click)="this.navigationService.navigateToProfile(); op.hide()"
+        icon="pi pi-user"
+        severity="info"
+        text="true"
+      ></button>
+
+      <button
+        pButton
+        pRipple
+        fluid="true"
+        label="Logout"
+        (click)="this.logout(); op.hide()"
+        icon="pi pi-sign-out"
+        severity="danger"
+        text="true"
+      ></button>
+    </div>
+  </ng-template>
+</p-popover>

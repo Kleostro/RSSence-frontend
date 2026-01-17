@@ -1,7 +1,9 @@
 <div class="page">
-  <app-posts-list [paginatedPostResponse]="this.paginatedPostResponse()" (pageChange)="this.handlePageChange($event)">
-    <ng-template let-post>
-      <app-moderation-post [post]="post" [isShowPostModeratorActions]="true" (postEvent)="this.handlePostEvent()" />
-    </ng-template>
-  </app-posts-list>
+  <div class="posts-list">
+    <app-posts-list [paginatedPostResponse]="this.paginatedPostResponse()" (pageChange)="this.handlePageChange($event)">
+      <ng-template let-post>
+        <app-moderation-post [post]="post" />
+      </ng-template>
+    </app-posts-list>
+  </div>
 </div>

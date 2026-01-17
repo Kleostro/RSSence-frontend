@@ -19,6 +19,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { ChartModule } from 'primeng/chart';
 import { DatePicker } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { PostViewDailyStatResponse } from '@/app/api/schemas/post/post-view-daily-stat-response';
 import { TIME_MILLISECONDS } from '@/app/constants/time';
@@ -38,7 +39,7 @@ const DEFAULT_END_DATE = new Date(new Date().getTime() - TIME_MILLISECONDS.DAY);
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ChartModule, FormsModule, DatePicker, SkeletonModule],
+  imports: [ChartModule, FormsModule, DatePicker, SkeletonModule, TooltipModule],
   selector: 'app-post-views-analytics',
   styleUrl: './post-views-analytics.component.scss',
   templateUrl: './post-views-analytics.component.html',
@@ -136,7 +137,7 @@ export class PostViewsAnalyticsComponent implements OnInit {
 
   private setChartOptions(): void {
     const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--p-text-color');
+    const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
     const surfaceBorder = documentStyle.getPropertyValue('--p-content-border-color');
     this.options = {

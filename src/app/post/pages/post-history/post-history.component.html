@@ -6,10 +6,11 @@
     type="button"
     (click)="this.navigationService.goBack()"
     label="Back"
-    icon="pi pi-arrow-left"
+    icon="pi pi-chevron-left"
     severity="info"
-    outlined="true"
+    text="true"
   ></button>
+
   <div class="history-wrapper">
     <app-post-history-timeline [historyResponse]="this.currentHistory()" />
   </div>

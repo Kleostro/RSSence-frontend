@@ -11,6 +11,7 @@ export const PostCommentVoteType = {
 
 export interface PostComment {
   children: PostComment[];
+  childrenCount: number;
   commentVotes: PostCommentVote[];
   content: string;
   createdAt: string;
@@ -21,7 +22,7 @@ export interface PostComment {
   parentId: null | number;
   postId: number;
   profile: null | ProfileResponse;
-  profileId: number;
+  profileId: null | number;
   updatedAt: string;
 }
 
@@ -36,6 +37,7 @@ export type PostCommentVoteType = (typeof PostCommentVoteType)[keyof typeof Post
 
 export const PostCommentSchema: z.ZodType<PostComment> = z.object({
   children: z.array(z.lazy(() => PostCommentSchema)),
+  childrenCount: z.number(),
   commentVotes: z.array(
     z.object({
       commentId: z.number(),
@@ -53,7 +55,7 @@ export const PostCommentSchema: z.ZodType<PostComment> = z.object({
   parentId: z.number().nullable(),
   postId: z.number(),
   profile: ProfileSchema.nullable(),
-  profileId: z.number(),
+  profileId: z.number().nullable(),
   updatedAt: z.string(),
 });
 

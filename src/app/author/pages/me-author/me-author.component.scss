@@ -1,21 +1,60 @@
 .posts-wrapper {
-  display: flex;
-  gap: 1%;
-}
-
-.posts-list {
-  width: 79%;
-}
-
-.posts-list-settings {
   position: relative;
 
   display: flex;
   flex-direction: column;
+  gap: var(--offset-xs);
 
-  width: 20%;
-  height: auto;
-  border-radius: var(--p-content-border-radius);
+  margin-top: var(--offset-ms);
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
 
-  background-color: var(--p-content-background);
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
+
+  &-top {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+
+    display: flex;
+    gap: var(--offset-ms);
+    align-items: center;
+    justify-content: space-between;
+
+    padding: var(--offset-xxs);
+    border-radius: var(--border-radius-s);
+
+    background-color: var(--bg);
+    box-shadow: var(--shadow-s);
+
+    transition: all 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    &-outer {
+      position: sticky;
+      z-index: 2;
+      top: 0;
+
+      width: 100%;
+
+      transition: all 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    &.stuck {
+      width: max-content;
+      margin: 0 auto;
+      padding: var(--offset-xxs);
+
+      background-color: var(--bg-dark);
+      box-shadow: var(--shadow-m);
+    }
+  }
+}
+
+:host-context(.stuck) .posts-wrapper-top-outer,
+.posts-wrapper-top.stuck+.posts-wrapper-top-outer,
+.posts-wrapper-top-outer:has(.posts-wrapper-top.stuck) {
+  width: fit-content !important;
+  margin: 0 auto;
+  padding: 0 var(--offset-ml);
 }

@@ -1,34 +1,71 @@
-<form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit()">
-  <header>
-    <h2 class="login-title">Sign In</h2>
-    <span class="login-subtitle">Welcome back</span>
-  </header>
+@let emailControl = this.form.controls.email;
+@let passwordControl = this.form.controls.password;
 
-  <div class="login-inputs-container">
-    <p-iconfield>
-      <p-floatlabel variant="on">
-        <input id="email" type="email" pInputText formControlName="email" />
-        <label for="email">Email</label>
-        <p-inputicon styleClass="pi pi-envelope" />
-      </p-floatlabel>
-    </p-iconfield>
+<form [formGroup]="this.form" class="form" (ngSubmit)="this.onSubmit()">
+  <div class="text-box">
+    <h2 class="title">Sign In</h2>
+    <p class="subtitle">Welcome back</p>
+  </div>
+  <div class="form-center">
+    <div class="control">
+      <label for="email" class="control-label">Email <span style="color: red">*</span></label>
+      <input id="email" type="text" pInputText formControlName="email" class="control-input p-inputtext" />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="emailControl"
+          field="email"
+          [fieldBoundaries]="this.LOGIN_FORM_FIELD_CONFIG.email"
+          [errorMessages]="this.LOGIN_FORM_FIELD_CONFIG.email.messages"
+        />
+      </div>
+    </div>
 
-    <p-floatLabel variant="on">
-      <p-password formControlName="password" [toggleMask]="true" />
-      <label class="label" for="password">Password</label>
-    </p-floatLabel>
+    <div class="control">
+      <label for="password" class="control-label">Password <span style="color: red">*</span></label>
+      <p-password
+        fluid="true"
+        id="password"
+        feedback="false"
+        class="control-input"
+        inputStyleClass="control-input p-inputtext"
+        formControlName="password"
+        [toggleMask]="true"
+      />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="passwordControl"
+          field="password"
+          [fieldBoundaries]="this.LOGIN_FORM_FIELD_CONFIG.password"
+          [errorMessages]="this.LOGIN_FORM_FIELD_CONFIG.password.messages"
+        />
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <div class="login-button-container">
-      <p-button
-        type="submit"
-        label="Login"
-        [disabled]="!loginForm.valid || isLoginInProgress()"
-        class="p-mt-2"
-        [icon]="isLoginInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
-      />
-      <p-link [routerLink]="APP_ROUTE.SIGN_UP" label="Sign Up" class="p-button-text p-mt-2" />
-    </div>
-  </footer>
+  <div class="form-footer">
+    <button
+      pButton
+      pRipple
+      type="submit"
+      fluid="true"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
+      [disabled]="this.isProcessing()"
+      severity="success"
+      text="true"
+      label="Login"
+    ></button>
+
+    <button
+      pButton
+      pRipple
+      type="button"
+      fluid="true"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
+      [disabled]="this.isProcessing()"
+      severity="info"
+      text="true"
+      label="Register"
+      (click)="this.navigationService.navigateToRegister()"
+    ></button>
+  </div>
 </form>

@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -10,6 +11,18 @@ import { PostVersionsService } from '@/app/api/services/posts/services/post-vers
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 
 @Component({
+  animations: [
+    trigger('boxCollapse', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scaleY(0)', transformOrigin: 'top' }),
+        animate('300ms ease-in', style({ opacity: 1, transform: 'scaleY(1)' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'scaleY(1)', transformOrigin: 'top' }),
+        animate('300ms ease-out', style({ opacity: 0, transform: 'scaleY(0)' })),
+      ]),
+    ]),
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ButtonModule, RippleModule],
   selector: 'app-post-version-diff',
@@ -20,6 +33,8 @@ export class PostVersionDiffComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly postVersionsService = inject(PostVersionsService);
   public readonly navigationService = inject(NavigationService);
+  public collapsedBoxes = signal<Set<string>>(new Set());
+
   public currentPostVersionDiff = signal<null | PostVersionDiffResponse | undefined>(undefined);
 
   public postId = input<null | string>(null, { alias: 'id' });
@@ -46,7 +61,24 @@ export class PostVersionDiffComponent implements OnInit {
     }
   }
 
+  public isBoxCollapsed(boxId: string): boolean {
+    return this.collapsedBoxes().has(boxId);
+  }
+
   public ngOnInit(): void {
     this.getPostVersionDiff();
+  }
+
+  public toggleBox(boxId: string): void {
+    const current = this.collapsedBoxes();
+    const updated = new Set(current);
+
+    if (updated.has(boxId)) {
+      updated.delete(boxId);
+    } else {
+      updated.add(boxId);
+    }
+
+    this.collapsedBoxes.set(updated);
   }
 }

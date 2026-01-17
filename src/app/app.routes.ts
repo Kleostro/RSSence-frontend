@@ -22,8 +22,8 @@ export const routes: Routes = [
     canActivate: [loginGuard],
     loadComponent: () =>
       import('./auth/pages/registration/registration.component').then((c) => c.RegistrationComponent),
-    path: APP_PATH.SIGN_UP.toLowerCase(),
-    title: APP_PATH.SIGN_UP,
+    path: APP_PATH.REGISTER.toLowerCase(),
+    title: APP_PATH.REGISTER,
   },
   {
     canActivate: [authGuard],
@@ -89,6 +89,20 @@ export const routes: Routes = [
     title: `Post | ${APP_PATH.VERSIONS} | Diff`,
   },
   {
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./post/pages/creation-post-page/creation-post-page.component').then((c) => c.CreationPostPageComponent),
+    path: `${APP_PATH.POSTS.toLowerCase()}/${APP_PATH.PROCESS.toLowerCase()}/${APP_PATH.CREATION.toLowerCase()}`,
+    title: `Post | ${APP_PATH.CREATION}`,
+  },
+  {
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./post/pages/update-post-page/update-post-page.component').then((c) => c.UpdatePostPageComponent),
+    path: `${APP_PATH.POSTS.toLowerCase()}/${APP_PATH.PROCESS.toLowerCase()}/${APP_PATH.UPDATE.toLowerCase()}/:id`,
+    title: `Post | ${APP_PATH.UPDATE}`,
+  },
+  {
     canActivate: [adminGuard],
     children: [
       {
@@ -129,6 +143,12 @@ export const routes: Routes = [
             (c) => c.PostModerationDetailedComponent,
           ),
         path: `${MODERATOR_PATH.POSTS.toLowerCase()}/:id`,
+        title: `Moderator | ${MODERATOR_PATH.POSTS.slice(0, -1)}`,
+      },
+      {
+        loadComponent: () =>
+          import('./moderator/pages/post-review/post-review.component').then((c) => c.PostReviewComponent),
+        path: `${MODERATOR_PATH.POSTS.toLowerCase()}/:id/${MODERATOR_PATH.REVIEW.toLowerCase()}`,
         title: `Moderator | ${MODERATOR_PATH.POSTS.slice(0, -1)}`,
       },
     ],

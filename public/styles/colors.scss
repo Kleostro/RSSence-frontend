@@ -1,0 +1,22 @@
+:root {
+  --mobile-sidebar-bg-color: #fff;
+  --bg-dark: oklch(100% 0 0deg);
+  --bg: oklch(98% 0.02 268.2deg);
+  --bg-light: oklch(100% 0.02 268.2deg);
+  --shadow-s: inset 0 0.125rem 0.3rem #ffffff30, 0 0.125rem 0.3rem #00000030, 0 0.3rem 0.45rem #00000015;
+  --shadow-m: inset 0 0.125rem 0.3rem #ffffff50, 0 0.3rem 0.45rem #00000030, 0 0.45rem 0.9rem #00000015;
+  --shadow-l: inset 0 0.125rem 0.3rem #ffffff70, 0 0.45rem 0.7rem #00000030, 0 0.7rem 1.125rem #00000015;
+  --text-color: hsl(0deg 0% 10%);
+  --text-color-muted: hsl(0deg 0% 50%);
+  --text-color-darked: hsl(0deg 0 30%);
+}
+
+.app-dark {
+  --mobile-sidebar-bg-color: #1b1b1b;
+  --bg-dark: oklch(10% 0 264deg);
+  --bg: oklch(20% 0 264deg);
+  --bg-light: oklch(30% 0 264deg);
+  --text-color: hsl(0deg 0% 100%);
+  --text-color-muted: hsl(0deg 0% 50%);
+  --text-color-darked: hsl(0deg 0 80%);
+}

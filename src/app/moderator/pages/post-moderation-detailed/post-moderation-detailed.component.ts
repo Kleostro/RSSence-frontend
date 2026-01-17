@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { tap } from 'rxjs';
+import { catchError, EMPTY, tap } from 'rxjs';
 
 import { PostResponse } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
@@ -23,17 +23,21 @@ export class PostModerationDetailedComponent implements OnInit {
   public readonly navigationService = inject(NavigationService);
 
   public currentPost = signal<null | PostResponse | undefined>(undefined);
-  public postSlug = input<null | string>(null, { alias: 'id' });
+  public postId = input<null | string>(null, { alias: 'id' });
 
-  public getCurrentPost(): void {
-    const postSlug = this.postSlug();
-    if (postSlug) {
+  private getCurrentPost(): void {
+    const postId = this.postId();
+    if (postId) {
       this.postsService
-        .getPostBySlug(postSlug)
+        .getPostById(+postId)
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           tap((post: PostResponse) => {
             this.currentPost.set(post);
+          }),
+          catchError(() => {
+            this.navigationService.navigateToNotFound();
+            return EMPTY;
           }),
         )
         .subscribe();

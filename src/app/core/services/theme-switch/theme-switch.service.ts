@@ -13,29 +13,23 @@ export class ThemeSwitchService {
 
   private isDarkTheme = false;
 
+  constructor() {
+    const savedTheme = this.localStorage.getItem(this.key);
+    if (!savedTheme) {
+      this.isDarkTheme = this.isDarkPreferred();
+    } else {
+      this.isDarkTheme = savedTheme === 'dark';
+    }
+    this.applyTheme();
+  }
+
   private applyTheme(): void {
     const htmlElement = this.document.querySelector('html');
-    if (this.isDarkTheme) {
-      htmlElement?.classList.add('app-dark');
-    } else {
-      htmlElement?.classList.remove('app-dark');
-    }
+    htmlElement?.classList.toggle('app-dark', this.isDarkTheme);
   }
 
   private isDarkPreferred(): boolean {
     return this.media.matches;
-  }
-
-  public initAppTheme(): void {
-    const savedTheme = this.localStorage.getItem(this.key);
-    if (savedTheme === 'dark') {
-      this.isDarkTheme = true;
-    } else if (savedTheme === 'light') {
-      this.isDarkTheme = false;
-    } else {
-      this.isDarkTheme = this.isDarkPreferred();
-    }
-    this.applyTheme();
   }
 
   public toggle(): void {

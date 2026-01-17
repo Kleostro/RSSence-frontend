@@ -1,0 +1,16 @@
+  .profile-avatar {
+    cursor: pointer;
+    user-select: none;
+    transition: filter 0.3s;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+
+  .popover-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+  }

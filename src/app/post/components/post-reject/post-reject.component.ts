@@ -2,16 +2,15 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, finalize, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
+import { POST_REJECT_FORM_FIELD_CONFIG } from '@/app/constants/form/post-reject-form';
 import { POST_ACTION } from '@/app/constants/post-action';
-import { POST_REJECT_FORM_FIELD_CONFIG } from '@/app/constants/post-reject-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
@@ -30,7 +29,6 @@ interface ReasonOption {
     ReactiveFormsModule,
     InputTextModule,
     FormFieldErrorComponent,
-    FloatLabelModule,
     TextareaModule,
     ListboxModule,
   ],
@@ -89,10 +87,7 @@ export class PostRejectComponent {
           }
           this.postRejectEvent.emit();
         }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
-          return EMPTY;
-        }),
+        handleHttpError(this.message),
         finalize(() => {
           this.isProcessing.set(false);
         }),

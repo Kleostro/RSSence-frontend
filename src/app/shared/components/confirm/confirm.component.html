@@ -15,25 +15,27 @@
       pButton
       pRipple
       type="button"
+      fluid="true"
       (click)="this.modalService.closeModal()"
       [label]="this.cancelButtonText()"
       [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : this.cancelButtonIcon()"
       class="confirm-button-cancel"
       [severity]="this.cancelButtonSeverity()"
-      outlined="true"
+      text="true"
     ></button>
 
     <button
       pButton
       pRipple
       type="button"
+      fluid="true"
       (click)="this.confirmEvent.emit()"
       [label]="this.confirmButtonText()"
       [disabled]="this.isProcessing() || this.confirmButtonDisabled()"
       [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : this.confirmButtonIcon()"
       class="confirm-button-confirm"
       [severity]="this.confirmButtonSeverity()"
-      outlined="true"
+      text="true"
     ></button>
   </div>
 </div>

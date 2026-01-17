@@ -1,3 +1,9 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--offset-xs);
+}
+
 .clear-filter-button {
   display: flex;
   margin-left: auto;
@@ -11,41 +17,28 @@
 .td-roles {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 0.5rem;
+  gap: var(--offset-xxs);
   text-transform: lowercase;
 }
 
 .td-id,
 .td-time {
-  font-size: 0.8rem;
+  font: var(--font-text-xs);
   font-style: italic;
-  color: var(--p-text-muted-color);
+  color: var(--text-color-muted);
 }
 
 .td-email {
-  font-size: 0.8rem;
-  color: var(--p-text-color);
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
 }
 
 .users-list-paginator {
   ::ng-deep.p-paginator-page.p-paginator-page-selected {
     pointer-events: none;
   }
-}
 
-.delete-user-confirm,
-.delete-profile-confirm,
-.delete-author-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  &-title {
-    font-size: 1.2rem;
-  }
-
-  &-actions {
-    display: flex;
-    gap: 2rem;
+  ::ng-deep.p-paginator {
+    background: var(--bg);
   }
 }

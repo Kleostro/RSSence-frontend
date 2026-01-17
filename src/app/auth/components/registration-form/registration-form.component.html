@@ -1,49 +1,94 @@
-<form [formGroup]="registrationForm" class="registration-form" (ngSubmit)="onSubmit()">
-  <header>
-    <h2 class="registration-title">Sign Up</h2>
-    <span class="registration-subtitle">Tell us about yourself</span>
-  </header>
+@let emailControl = this.form.controls.email;
+@let passwordControl = this.form.controls.password;
+@let confirmControl = this.form.controls.confirm;
 
-  <div class="registration-inputs-container">
-    <p-iconfield>
-      <p-floatlabel variant="on">
-        <input id="email" type="email" pInputText formControlName="email" />
-        <label for="email">Email</label>
-        <p-inputicon styleClass="pi pi-envelope" />
-      </p-floatlabel>
-    </p-iconfield>
+<form [formGroup]="this.form" class="form" (ngSubmit)="this.onSubmit()">
+  <div class="text-box">
+    <h2 class="title">Sign Up</h2>
+    <p class="subtitle">Create your account</p>
+  </div>
+  <div class="form-center">
+    <div class="control">
+      <label for="email" class="control-label">Email <span style="color: red">*</span></label>
+      <input id="email" type="text" pInputText formControlName="email" class="control-input p-inputtext" />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="emailControl"
+          field="email"
+          [fieldBoundaries]="this.REGISTRATION_FORM_FIELD_CONFIG.email"
+          [errorMessages]="this.REGISTRATION_FORM_FIELD_CONFIG.email.messages"
+        />
+      </div>
+    </div>
 
-    <p-floatLabel variant="on">
-      <p-password formControlName="password" [toggleMask]="true">
-        <ng-template #footer>
-          <p-divider />
-          <ul class="pl-2 ml-2 my-0 leading-normal">
-            <li>At least one lowercase</li>
-            <li>At least one uppercase</li>
-            <li>At least one numeric</li>
-            <li>Minimum 8 characters</li>
-          </ul>
-        </ng-template>
-      </p-password>
-      <label class="label" for="password">Password</label>
-    </p-floatLabel>
+    <div class="control">
+      <label for="password" class="control-label">Password <span style="color: red">*</span></label>
+      <p-password
+        fluid="true"
+        id="password"
+        feedback="false"
+        class="control-input"
+        inputStyleClass="control-input p-inputtext"
+        formControlName="password"
+        [toggleMask]="true"
+      />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="passwordControl"
+          field="password"
+          [fieldBoundaries]="this.REGISTRATION_FORM_FIELD_CONFIG.password"
+          [errorMessages]="this.REGISTRATION_FORM_FIELD_CONFIG.password.messages"
+        />
+      </div>
+    </div>
 
-    <p-floatLabel variant="on">
-      <p-password formControlName="confirm" [toggleMask]="true" />
-      <label class="label" for="confirm">Confirm Password</label>
-    </p-floatLabel>
+    <div class="control">
+      <label for="confirm" class="control-label">Confirm Password <span style="color: red">*</span></label>
+      <p-password
+        fluid="true"
+        id="confirm"
+        feedback="false"
+        class="control-input"
+        inputStyleClass="control-input p-inputtext"
+        formControlName="confirm"
+        [toggleMask]="true"
+      />
+
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="confirmControl"
+          field="confirm"
+          [fieldBoundaries]="this.REGISTRATION_FORM_FIELD_CONFIG.confirm"
+          [errorMessages]="this.REGISTRATION_FORM_FIELD_CONFIG.confirm.messages"
+        />
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <div class="registration-button-container">
-      <p-button
-        type="submit"
-        label="Register"
-        [disabled]="!registrationForm.valid || isRegistrationInProgress()"
-        class="p-mt-2"
-        [icon]="isRegistrationInProgress() ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
-      />
-      <p-link [routerLink]="APP_ROUTE.LOGIN" label="Sign In" class="p-button-text p-mt-2" />
-    </div>
-  </footer>
+  <div class="form-footer">
+    <button
+      pButton
+      pRipple
+      type="submit"
+      fluid="true"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
+      [disabled]="this.isProcessing()"
+      severity="success"
+      text="true"
+      label="Register"
+    ></button>
+
+    <button
+      pButton
+      pRipple
+      type="button"
+      fluid="true"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
+      [disabled]="this.isProcessing()"
+      severity="info"
+      text="true"
+      label="Login"
+      (click)="this.navigationService.navigateToLogin()"
+    ></button>
+  </div>
 </form>

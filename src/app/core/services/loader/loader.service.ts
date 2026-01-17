@@ -1,10 +1,13 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
+
+import { Subject, takeUntil } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class LoaderService {
+export class LoaderService implements OnDestroy {
+  private readonly destroy$ = new Subject<void>();
   private readonly router = inject(Router);
   private lastRoutePath = '';
   public isPageLoading = signal(false);
@@ -12,7 +15,7 @@ export class LoaderService {
   public isProcessing = signal(false);
 
   constructor() {
-    this.router.events.subscribe((event) => {
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe((event) => {
       if (event instanceof NavigationStart) {
         const nextRoutePath = event.url.split('?')[0];
 
@@ -28,6 +31,11 @@ export class LoaderService {
         this.isPageLoading.set(false);
       }
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public turnOff(): void {

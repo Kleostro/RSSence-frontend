@@ -9,6 +9,8 @@ import { finalize, map, tap } from 'rxjs';
 
 import { PostQuery } from '@/app/api/interfaces/post-query';
 import { PaginatedPostVersionResponse, PostVersionResponse } from '@/app/api/schemas/post/post-version-response';
+import { PostResponse } from '@/app/api/schemas/post/posts-response';
+import { PostsService } from '@/app/api/services/posts/posts.service';
 import { PostVersionsService } from '@/app/api/services/posts/services/post-versions.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 // eslint-disable-next-line max-len
@@ -23,8 +25,10 @@ import { PostVersionTimelineComponent } from '@/app/post/components/post-version
 })
 export class PostVersionsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly postsService = inject(PostsService);
   private readonly postVersionsService = inject(PostVersionsService);
   public readonly navigationService = inject(NavigationService);
+  public currentPost = signal<null | PostResponse>(null);
   public first = 0;
   public isProcessing = signal<boolean>(false);
   public paginatedPostVersionResponse = signal<null | PaginatedPostVersionResponse>(null);
@@ -82,6 +86,17 @@ export class PostVersionsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.getCurrentPostVersions();
+    const postId = this.postId();
+
+    if (!postId) {
+      return;
+    }
+    this.postsService
+      .getPostById(+postId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((post) => {
+        this.currentPost.set(post);
+      });
   }
 
   public onPageChange(event: PaginatorState): void {

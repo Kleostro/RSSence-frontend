@@ -3,6 +3,7 @@ import {
   ApplicationConfig,
   inject,
   provideAppInitializer,
+  provideEnvironmentInitializer,
   provideExperimentalZonelessChangeDetection,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -24,8 +25,6 @@ import { MyPreset } from '@/app/utils/my-preset';
 const appInitializer = (): Observable<null | UserResponse> => {
   const authService = inject(AuthService);
   const rolesService = inject(RolesService);
-  const themeSwitchService = inject(ThemeSwitchService);
-  themeSwitchService.initAppTheme();
   return rolesService.getRoleHierarchy().pipe(switchMap(() => authService.checkAuth()));
 };
 
@@ -38,11 +37,14 @@ export const appConfig: ApplicationConfig = {
     ThemeSwitchService,
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideHttpClient(withInterceptors([httpInterceptor, refreshInterceptor])),
+    provideEnvironmentInitializer(() => {
+      inject(ThemeSwitchService);
+    }),
     providePrimeNG({
       ripple: true,
       theme: {
         options: {
-          cssLayer: false,
+          cssLayer: true,
           darkModeSelector: '.app-dark',
         },
         preset: MyPreset,

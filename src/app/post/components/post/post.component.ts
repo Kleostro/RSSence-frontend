@@ -16,15 +16,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
-import { catchError, EMPTY, finalize, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 
 import { AuthorResponse } from '@/app/api/schemas/authors-response';
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { POST_STATUS, PostResponse } from '@/app/api/schemas/post/posts-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
-import MODAL_POSITION_DIRECTION from '@/app/constants/modal-position';
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
 import { POST_ACTION } from '@/app/constants/post-action';
 import { ROLE } from '@/app/constants/roles';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
@@ -48,7 +47,6 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
     PostAvatarComponent,
     PostBodyComponent,
     PostFooterComponent,
-    PostFormComponent,
     TooltipModule,
     ConfirmComponent,
   ],
@@ -74,11 +72,17 @@ export class PostComponent {
   public canViewPostVersions = computed(
     () => this.hasPostAccess(this.post()) && this.post()?.status === POST_STATUS.APPROVED,
   );
-
   public deletePostConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deletePostConfirm');
+
   public isProcessing = signal<boolean>(false);
   public isShortCoauthors = signal<boolean>(true);
   public isShowPostUserActions = input<boolean>(false);
+  public isShowPostUserActionsMark = computed(
+    () =>
+      this.isShowPostUserActions() &&
+      this.usersService.me()?.author &&
+      this.usersService.me()?.author?.id === this.getAuthor()?.id,
+  );
   public postForm = viewChild.required<TemplateRef<PostFormComponent>>('postForm');
 
   private hasPostAccess(post: null | PostResponse): boolean {
@@ -111,20 +115,12 @@ export class PostComponent {
             this.postEvent.emit();
           }
         }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
-          return EMPTY;
-        }),
+        handleHttpError(this.message),
         finalize(() => {
           this.isProcessing.set(false);
         }),
       )
       .subscribe();
-  }
-
-  public editPost(): void {
-    this.modalService.position.set(MODAL_POSITION_DIRECTION.CENTER_TOP);
-    this.modalService.openModal(this.postForm(), `Update post: ${this.post()?.title}`);
   }
 
   public getAuthor(): AuthorResponse | null {
@@ -139,9 +135,12 @@ export class PostComponent {
     );
   }
 
-  public handlePostFormSubmit(): void {
-    this.modalService.closeModal();
-    this.postFormEvent.emit();
+  public isPostAuthor(): boolean {
+    const meAuthor = this.usersService.me()?.author;
+    if (!meAuthor) {
+      return false;
+    }
+    return meAuthor.id === this.getAuthor()?.id;
   }
 
   public submitPost(): void {
@@ -158,10 +157,7 @@ export class PostComponent {
           this.modalService.closeModal();
           this.postEvent.emit();
         }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
-          return EMPTY;
-        }),
+        handleHttpError(this.message),
         finalize(() => {
           this.isProcessing.set(false);
         }),

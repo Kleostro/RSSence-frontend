@@ -3,13 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
-  Input,
+  input,
   OnInit,
-  Output,
+  output,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -21,12 +20,12 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, tap } from 'rxjs';
 
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { hasKeyInProfileResponse, ProfileResponse } from '@/app/api/schemas/profiles-response';
 import { ProfilesService } from '@/app/api/services/profiles/profiles.service';
-import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/constants/profile-form';
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
+import { FORM_CONTROL_NAME, PROFILE_FORM_FIELD_CONFIG } from '@/app/constants/form/profile-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ProfileForm } from '@/app/interfaces/profile-form';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
@@ -34,6 +33,8 @@ import { FormFieldErrorComponent } from '@/app/shared/components/form-field-erro
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
+
+const DEBOUNCE_TIME = 300;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,28 +63,28 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
   private readonly message = inject(MessageService);
   private readonly profilesService = inject(ProfilesService);
   private readonly updatedProfile = signal<null | ProfileResponse>(null);
-
-  @Output() public backToProfilePageEvent = new EventEmitter<void>();
-  @ViewChild('birthdatePicker') private birthdatePicker!: DatePicker;
-  @Output() public formSubmitEvent = new EventEmitter<ProfileResponse>();
-  @Input() public profile: null | ProfileResponse = null;
-  @Output() public updateProfileForPreviewEvent = new EventEmitter<null | ProfileResponse>();
-
+  private birthdatePicker = viewChild.required<DatePicker>('birthdatePicker');
   public readonly maxAllowedDate = new Date();
   public readonly navigationService = inject(NavigationService);
   public readonly PROFILE_FORM_FIELD_CONFIG = PROFILE_FORM_FIELD_CONFIG;
-
   public avatarUrl = signal<null | string>(null);
+
+  public backToProfilePageEvent = output();
   public form!: FormGroup<ProfileForm>;
+  public formSubmitEvent = output<ProfileResponse>();
+
   public hasChanges = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
+  public profile = input<null | ProfileResponse>(null);
+  public updateProfileForPreviewEvent = output<null | ProfileResponse>();
 
   private createFormData(): FormData {
     const formData = new FormData();
 
     Object.entries(this.form.value).forEach(([key, value]) => {
       if (value && hasKeyInProfileResponse(key) && this.isValueChanged(key, value)) {
-        formData.append(key, value);
+        formData.append(key, value.trim());
+
         this.hasChanges.set(true);
       }
     });
@@ -104,27 +105,27 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
   private disableForm(): void {
     this.isProcessing.set(true);
     this.form.disable();
-    this.birthdatePicker.setDisabledState(true);
+    this.birthdatePicker().setDisabledState(true);
   }
 
   private enableForm(): void {
     this.isProcessing.set(false);
     this.form.enable();
-    this.birthdatePicker.setDisabledState(false);
+    this.birthdatePicker().setDisabledState(false);
   }
 
   private focusFirstInvalidField(): void {
     const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
     if (invalidControl) {
       const element = document.querySelector(`[formControlName="${invalidControl}"]`);
-      if (element instanceof HTMLInputElement) {
+      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
         element.focus();
       }
     }
   }
 
   private handleFormSubmit(formData: FormData): void {
-    const action$ = this.profile
+    const action$ = this.profile()
       ? this.profilesService.updateProfile(formData)
       : this.profilesService.createProfile(formData);
 
@@ -134,10 +135,9 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
         tap((newOrUpdatedProfile) => {
           this.formSubmitEvent.emit(newOrUpdatedProfile);
         }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
+        handleHttpError(this.message),
+        finalize(() => {
           this.enableForm();
-          return EMPTY;
         }),
       )
       .subscribe();
@@ -169,14 +169,14 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
           Validators.minLength(this.PROFILE_FORM_FIELD_CONFIG.username.min),
           Validators.maxLength(this.PROFILE_FORM_FIELD_CONFIG.username.max),
         ],
-        [usernameAvailability(this.profilesService, this.profile?.username ?? null)],
+        [usernameAvailability(this.profilesService, this.profile()?.username ?? null)],
       ],
     });
   }
 
   private isValueChanged(key: string, value: Date | string): boolean {
     if (hasKeyInProfileResponse(key)) {
-      const { profile } = this;
+      const profile = this.profile();
       if (!profile) {
         return true;
       }
@@ -185,75 +185,79 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
         return new Date(value).toISOString() !== new Date(String(profile[key])).toISOString();
       }
 
-      return profile[key] !== value;
+      return profile[key] !== value.trim();
     }
     return false;
   }
 
-  private updateProfileForPreview(): void {
+  private updateProfileForPreview(profile: null | ProfileResponse): void {
     const { bio, firstname, lastname, username } = this.form.getRawValue();
+
     this.updatedProfile.set({
-      avatarUrl: this.avatarUrl() ?? this.profile?.avatarUrl ?? null,
+      avatarUrl: this.avatarUrl() ?? profile?.avatarUrl ?? null,
       bio,
-      birthdate: this.birthdate() ?? this.profile?.birthdate ?? null,
-      createdAt: this.profile?.createdAt ?? '',
+      birthdate: this.birthdate() ?? profile?.birthdate ?? null,
+      createdAt: profile?.createdAt ?? '',
       firstname,
-      id: this.profile?.id ?? 0,
+      id: profile?.id ?? 0,
       lastname,
-      updatedAt: this.profile?.updatedAt ?? '',
-      userId: this.profile?.userId ?? 0,
+      updatedAt: profile?.updatedAt ?? '',
+      userId: profile?.userId ?? 0,
       username,
     });
+
     this.updateProfileForPreviewEvent.emit(this.updatedProfile());
   }
 
   public ngAfterViewInit(): void {
-    if (this.profile?.birthdate) {
-      this.birthdatePicker.writeValue(new Date(this.profile.birthdate));
+    const profile = this.profile();
+    if (profile?.birthdate) {
+      this.birthdatePicker().writeValue(new Date(profile.birthdate));
     }
   }
 
   public ngOnInit(): void {
-    this.initForm(this.profile);
+    const profile = this.profile();
+    this.initForm(profile);
 
-    if (this.profile) {
-      this.avatarUrl.set(this.profile.avatarUrl);
-      this.updatedProfile.set(this.profile);
+    if (profile) {
+      this.avatarUrl.set(profile.avatarUrl);
+      this.updatedProfile.set(profile);
     }
 
-    this.form.valueChanges.subscribe(() => {
-      this.updateProfileForPreview();
-    });
+    this.form.valueChanges
+      .pipe(debounceTime(DEBOUNCE_TIME), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.updateProfileForPreview(profile);
+      });
   }
 
   public onAvatarSelected(files: File[]): void {
     this.avatarFile.set(files[0]);
     this.hasChanges.set(true);
-
-    if (!files[0]) {
-      this.avatarUrl.set(null);
-      this.updateProfileForPreview();
-      return;
+    const profile = this.profile();
+    if (files[0]) {
+      this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
+      this.updateProfileForPreview(profile);
     }
-
-    this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
-    this.updateProfileForPreview();
   }
 
   public onBirthdateSelected(event: Date): void {
-    if (this.profile) {
+    const profile = this.profile();
+    if (profile) {
       const newDate = new Date(event).getTime();
-      const profileBirthdate = new Date(this.profile.birthdate ?? '').getTime();
+      const profileBirthdate = new Date(profile.birthdate ?? '').getTime();
       if (newDate !== profileBirthdate) {
         this.hasChanges.set(true);
       }
     }
     this.birthdate.set(new Date(event).toISOString());
-    this.updateProfileForPreview();
+    this.updateProfileForPreview(profile);
   }
 
   public submit(): void {
     this.form.markAllAsTouched();
+
     if (this.form.invalid) {
       this.focusFirstInvalidField();
       return;
@@ -262,8 +266,7 @@ export class ProfileFormComponent implements AfterViewInit, OnInit {
     this.disableForm();
 
     const formData = this.createFormData();
-
-    if (this.profile && !this.hasChanges()) {
+    if (this.profile() && !this.hasChanges()) {
       this.backToProfilePageEvent.emit();
       return;
     }

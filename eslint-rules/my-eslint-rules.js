@@ -17,7 +17,7 @@ export const myEslintRules = {
   '@typescript-eslint/explicit-module-boundary-types': 'error',
   '@typescript-eslint/method-signature-style': 'error',
   '@typescript-eslint/no-explicit-any': 'error',
-  '@typescript-eslint/no-floating-promises': 'off',
+  '@typescript-eslint/no-floating-promises': 'error',
   '@typescript-eslint/no-inferrable-types': 'error',
   '@typescript-eslint/no-unnecessary-type-parameters': 'off',
   '@typescript-eslint/no-unused-vars': [

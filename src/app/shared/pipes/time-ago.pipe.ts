@@ -40,6 +40,13 @@ export class TimeAgoPipe implements PipeTransform {
 
     const diffSeconds = Math.floor(diffMs / MS_PER_SECOND);
 
+    if (diffSeconds >= TIME_SECONDS.YEAR / 2) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${month}.${day}.${year}`;
+    }
+
     for (const unit of TIME_UNITS) {
       if (diffSeconds >= unit.seconds) {
         const interval = Math.floor(diffSeconds / unit.seconds);

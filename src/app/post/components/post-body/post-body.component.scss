@@ -1,9 +1,9 @@
 .post-content {
   overflow: hidden;
 
-  margin: 1rem 0;
+  margin-bottom: var(--offset-xs);
+  padding: var(--offset-xs);
 
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--p-text-color);
+  font: var(--font-text-s);
+  color: var(--text-color);
 }

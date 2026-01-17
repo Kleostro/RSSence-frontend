@@ -20,15 +20,32 @@
     </div>
 
     <div class="posts-wrapper">
-      <div class="posts-list-settings">
-        <app-posts-settings
-          [canCreatePost]="true"
-          [statusOptions]="this.postStatuses()"
-          [contributionStats]="this.contributionStats()"
-        />
-      </div>
+      <div class="posts-wrapper-top-outer">
+        <div class="posts-wrapper-top" appStickyState>
+          <button
+            pButton
+            pRipple
+            type="button"
+            class="post-form-button"
+            label="New post"
+            icon="pi pi-pencil"
+            severity="success"
+            text="true"
+            (click)="this.navigationService.navigateToCreationPost()"
+          ></button>
 
-      <div class="posts-list">
+          <button
+            pButton
+            pRipple
+            text="true"
+            label="Filters"
+            [icon]="this.postsSettingsRef().isOpen() ? 'pi pi-chevron-left' : 'pi pi-filter'"
+            [severity]="this.postsSettingsRef().isOpen() ? 'info' : 'primary'"
+            (click)="this.togglePostsSettings($event)"
+          ></button>
+        </div>
+      </div>
+      <div class="posts-wrapper-bottom">
         <app-posts-list
           [paginatedPostResponse]="this.paginatedPostResponse()"
           (pageChange)="this.handlePageChange($event)"
@@ -41,7 +58,24 @@
               (postFormEvent)="this.handlePostEvent()"
             /> </ng-template
         ></app-posts-list>
+        <app-posts-settings
+          #postsSettings
+          [statusOptions]="this.postStatuses()"
+          [contributionStats]="this.contributionStats()"
+        />
       </div>
     </div>
   }
 </div>
+
+<ng-template #deleteAuthorConfirm>
+  <app-confirm
+    infoMessage="Are you sure you want to delete author?"
+    warningMessage="The author will be permanently deleted!"
+    confirmButtonText="Delete"
+    confirmButtonSeverity="danger"
+    confirmButtonIcon="pi pi-eraser"
+    (confirmEvent)="this.deleteAuthor()"
+    [isProcessing]="this.isProcessing()"
+  />
+</ng-template>

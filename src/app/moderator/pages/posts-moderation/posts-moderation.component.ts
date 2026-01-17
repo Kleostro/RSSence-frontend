@@ -42,12 +42,6 @@ export class PostsModerationComponent implements OnInit {
       .subscribe();
   }
 
-  public handlePostEvent(): void {
-    this.loadPostsForModeration(this.navigationService.queryParams())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
-  }
-
   public ngOnInit(): void {
     this.navigationService.updateQueryParams({ status: [POST_STATUS.SUBMITTED] });
 

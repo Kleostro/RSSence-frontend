@@ -1,72 +1,109 @@
+:host {
+  display: contents;
+}
+
+.preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--offset-xs);
+
+  height: 100%;
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
+}
+
 .header {
-  margin-bottom: 2rem;
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }
 
 .header-top {
   display: flex;
-  gap: 2rem;
-  align-items: center;
-
-  padding: 1rem;
-  border-bottom: 0.1rem solid var(--p-surface-600);
-  border-radius: 2rem 2rem 0 0;
-
-  background-color: var(--p-surface-800);
+  gap: var(--offset-ms);
+  align-items: stretch;
 }
 
+
 .avatar-img {
-  overflow: hidden;
   width: 10rem;
   height: 10rem;
-  border-radius: 50%;
+
 
   ::ng-deep img {
-    object-fit: cover;
+    overflow: hidden;
+    border-radius: 50%;
   }
 }
 
 .author-name-wrapper {
   display: flex;
   flex-direction: column;
-  border-radius: 0.5rem;
+  gap: var(--offset-xs);
+  width: 100%;
 }
 
 .author-name {
-  padding: 0.3rem 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--offset-xxs);
 
-  font-size: 1.4rem;
-  line-height: 125%;
-  color: var(--p-text-color);
-  letter-spacing: 0.1rem;
+
+
+  font: var(--font-title);
+  color: var(--text-color);
+
+  &-text {
+    word-break: break-all;
+    word-wrap: break-word;
+  }
+
+}
+
+.author-username,
+.author-birthdate {
+  display: flex;
+  gap: var(--offset-xxs);
+  align-items: center;
+
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
 }
 
 .author-username {
-  padding: 0.3rem 0.6rem;
+  color: var(--text-color-darked);
+  word-wrap: break-word;
+}
 
-  font-size: 1rem;
-  font-weight: 100;
-  color: var(--p-surface-400);
-  letter-spacing: 0.05rem;
+.author-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--offset-xxs);
 }
 
 .bio {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border-bottom: 0.1rem solid var(--p-surface-600);
-  background-color: var(--p-surface-800);
+  display: flex;
+  flex-direction: column;
+
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }
 
 .title {
   margin-bottom: 0.5rem;
-
-  font-size: 1.4rem;
-  line-height: 125%;
-  color: var(--p-text-color);
-  letter-spacing: 0.05rem;
+  font: var(--font-title-s);
+  color: var(--text-color);
 }
 
 .text {
-  font-size: 1rem;
-  line-height: 125%;
-  color: var(--p-text-color);
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
+  word-wrap: break-word;
 }

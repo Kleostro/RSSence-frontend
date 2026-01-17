@@ -1,14 +1,22 @@
 .confirm {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--offset-xs);
 
   &-title {
-    font-size: 1.2rem;
+    font: var(--font-title-s);
+    color: var(--text-color);
   }
 
-  &-actions {
+  &-actions:not(:empty) {
     display: flex;
-    gap: 2rem;
+    gap: var(--offset-xs);
+    justify-content: flex-end;
+
+    padding: var(--offset-xxs);
+    border-radius: var(--border-radius-s);
+
+    background-color: var(--form-control-bg);
+    box-shadow: var(--shadow-s);
   }
 }

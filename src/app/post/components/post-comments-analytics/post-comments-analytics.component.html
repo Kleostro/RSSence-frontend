@@ -1,21 +1,45 @@
-<p-datepicker
-  [(ngModel)]="this.selectedDates"
-  [numberOfMonths]="2"
-  selectionMode="range"
-  [readonlyInput]="true"
-  [showIcon]="true"
-  [minDate]="this.minDate()"
-  [maxDate]="this.maxDate"
-  [disabled]="!this.isAnalyticLoaded()"
-  [fluid]="true"
-  variant="filled"
-  (onSelect)="this.onDateSelectHandler()"
-  class="datepicker"
-/>
+@let commentsInfoTooltipText =
+  `
+    Active comments:
+    The number of comments that have not been deleted.
+
+    Total comments:
+    The total number of comments, including deleted comments.
+    `;
+
+<div class="chart-top">
+  <h2 class="subtitle">
+    Comments
+    <span class="comments-info">
+      <span class="pi pi-info-circle comments-info-icon" autoHide="false" [pTooltip]="commentsInfoTooltipText"></span>
+    </span>
+  </h2>
+  <p-datepicker
+    [(ngModel)]="this.selectedDates"
+    [numberOfMonths]="2"
+    selectionMode="range"
+    [readonlyInput]="true"
+    [showIcon]="true"
+    [minDate]="this.minDate()"
+    [maxDate]="this.maxDate"
+    [disabled]="!this.isAnalyticLoaded()"
+    [fluid]="true"
+    variant="filled"
+    (onSelect)="this.onDateSelectHandler()"
+    class="datepicker"
+  />
+</div>
 
 @if (this.isAnalyticLoaded()) {
   @if (this.analyticDataByPost()?.length) {
-    <p-chart type="line" [responsive]="true" [data]="this.data()" [options]="this.options" class="chart" />
+    <p-chart
+      type="line"
+      height="30rem"
+      [responsive]="true"
+      [data]="this.data()"
+      [options]="this.options"
+      class="chart"
+    />
   } @else {
     <div class="not-found">
       <p class="not-found-text">
