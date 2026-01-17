@@ -1,7 +1,6 @@
 export const PART = {
   AUDIT: 'audit',
   CHILDREN: 'children',
-  CHILDREN_COUNT: 'children-count',
   HISTORY: 'history',
   ID: 'id',
   LOGIN: 'login',
@@ -13,6 +12,7 @@ export const PART = {
   REFRESH: 'refresh',
   REGISTER: 'register',
   REVERT: 'revert',
+  REVIEW: 'review',
   TREND: 'trend',
   VERSION_DIFF: 'version-diff',
   VERSIONS: 'versions',

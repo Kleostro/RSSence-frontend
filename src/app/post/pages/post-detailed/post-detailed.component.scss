@@ -1,24 +1,39 @@
 .back-button {
   width: max-content;
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
 }
 
 .post-comment-form {
-  margin-top: 1.5rem;
+  margin: var(--offset-ms) 0;
 }
 
 .profile-not-found {
   display: flex;
-  gap: 1rem;
+  gap: var(--offset-xxs);
   align-items: center;
-  margin: 1rem 0;
+  justify-content: center;
+
+  margin: var(--offset-ms) 0;
+  padding: var(--offset-s) var(--offset-xs);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
 
   &-message {
-    width: 80%;
+    font: var(--font-text-s);
+    color: var(--p-orange-600);
   }
-}
 
-.create-profile-button {
-  width: 20%;
-  margin-left: auto;
+  &-icon {
+    color: var(--p-orange-600);
+  }
+
+  &-button {
+    &-wrapper {
+      border-radius: var(--border-radius-s);
+      background-color: var(--bg-light);
+      box-shadow: var(--shadow-s);
+    }
+  }
 }

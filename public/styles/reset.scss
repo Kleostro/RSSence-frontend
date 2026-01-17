@@ -16,7 +16,8 @@ p {
 }
 
 pre {
-  margin: 0;
+  display: flex;
+  margin-block: 0;
   line-height: 1.5;
 }
 
@@ -27,4 +28,9 @@ button {
 a {
   user-select: none;
   text-decoration: none;
+}
+
+button:disabled {
+  pointer-events: none;
+
 }

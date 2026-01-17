@@ -1,6 +1,5 @@
 @let post = this.post();
-@let isShowPostUserActions =
-  this.isShowPostUserActions() && this.usersService.me()?.author?.id === this.getAuthor()?.id;
+@let isShowPostUserActions = this.isShowPostUserActions() && this.isPostAuthor();
 @let canSubmitPost = post?.status === 'DRAFT';
 @let canEditPost = post?.status !== 'REJECTED';
 @let canMoveToDetailsPage = post?.status === 'APPROVED' && !this.navigationService.isPostDetailedPage();
@@ -10,158 +9,149 @@
 
 @if (post) {
   <div class="post" [class.post-processing]="isProcessing()">
-    <div class="post-top">
-      <a
-        aria-disabled="true"
-        class="post-title"
-        [class.post-title-disabled]="!canMoveToDetailsPage"
-        (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
-        (keyup)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
-        (keydown)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
-        >{{ post.title }}</a
-      >
-
-      <div class="post-actions">
-        @if (canMoveToDetailsPage) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Read"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
-            class="post-read-button"
-            severity="success"
-            outlined="true"
-          ></button>
-        }
-        @if (canViewPostHistory) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Logs"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostHistory(post.id)"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
-            class="post-history-button"
-            severity="primary"
-            outlined="true"
-          ></button>
-        }
-        @if (canViewPostVersions) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Versions"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostVersions(post.id)"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-history'"
-            class="post-versions-button"
-            severity="info"
-            outlined="true"
-          ></button>
-        }
-
-        @if (canViewPostAnalytics) {
-          <button
-            pButton
-            pRipple
-            pTooltip="Analytics"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)="this.navigationService.navigateToPostAnalytics(post.id)"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-chart-bar'"
-            class="post-versions-button"
-            severity="info"
-            outlined="true"
-          ></button>
-        }
-
-        @if (isShowPostUserActions) {
-          @if (canSubmitPost) {
-            <button
-              pButton
-              pRipple
-              pTooltip="Submit"
-              tooltipPosition="bottom"
-              type="button"
-              [disabled]="isProcessing()"
-              (click)="this.submitPost()"
-              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
-              class="submit-post-button"
-              severity="success"
-              outlined="true"
-            ></button>
-          }
-          @if (canEditPost) {
-            <button
-              pButton
-              pRipple
-              pTooltip="Edit"
-              tooltipPosition="bottom"
-              type="button"
-              [disabled]="isProcessing()"
-              (click)="this.editPost()"
-              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
-              class="edit-post-button"
-              severity="primary"
-              outlined="true"
-            ></button>
-          }
-          <button
-            pButton
-            pRipple
-            pTooltip="Delete"
-            tooltipPosition="bottom"
-            type="button"
-            [disabled]="isProcessing()"
-            (click)=" this.modalService.openModal(this.deletePostConfirm(), `Deleting a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
-            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
-            class="delete-post-button"
-            severity="danger"
-            outlined="true"
-          ></button>
-        }
-      </div>
-    </div>
-
     <header class="post-header">
-      <div class="post-authors">
-        <app-post-avatar [author]="this.getAuthor()" />
-        @if (this.getCoauthors().length) {
-          <div class="post-coauthors-wrapper">
-            <app-coauthors-list [coauthors]="this.getCoauthors()" />
-          </div>
-        }
+      <div class="post-header-top">
+        <a
+          aria-disabled="true"
+          class="post-title"
+          [class.post-title-disabled]="!canMoveToDetailsPage"
+          (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+          (keyup)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+          (keydown)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+          >{{ post.title }}</a
+        >
 
-        <div class="post-times">
-          <span class="post-createdAt"> <span class="pi pi-clock"></span> {{ post.createdAt | timeAgo }} </span>
+        <div class="post-header-top-right">
+          @if (this.getCoauthors().length) {
+            <app-coauthors-list [coauthors]="this.getCoauthors()" />
+          }
+          <app-post-avatar [author]="this.getAuthor()" avatarSize="large" avatarPosition="right" />
         </div>
       </div>
-    </header>
+      <div class="post-header-bottom">
+        <div class="post-actions">
+          @if (canMoveToDetailsPage) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Read"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.navigationService.navigateToPostBySlug(post.slug ?? '')"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+              class="post-read-button"
+              severity="success"
+              text="true"
+            ></button>
+          }
+          @if (canViewPostHistory) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Logs"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.navigationService.navigateToPostHistory(post.id)"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-list'"
+              class="post-history-button"
+              severity="info"
+              text="true"
+            ></button>
+          }
+          @if (canViewPostVersions) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Versions"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.navigationService.navigateToPostVersions(post.id)"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-history'"
+              class="post-versions-button"
+              severity="info"
+              text="true"
+            ></button>
+          }
 
+          @if (canViewPostAnalytics) {
+            <button
+              pButton
+              pRipple
+              pTooltip="Analytics"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)="this.navigationService.navigateToPostAnalytics(post.id)"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-chart-bar'"
+              class="post-versions-button"
+              severity="info"
+              text="true"
+            ></button>
+          }
+
+          @if (isShowPostUserActions) {
+            @if (canSubmitPost) {
+              <button
+                pButton
+                pRipple
+                pTooltip="Submit"
+                tooltipPosition="bottom"
+                type="button"
+                [disabled]="isProcessing()"
+                (click)="this.submitPost()"
+                [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
+                class="submit-post-button"
+                severity="success"
+                text="true"
+              ></button>
+            }
+            @if (canEditPost) {
+              <button
+                pButton
+                pRipple
+                pTooltip="Edit"
+                tooltipPosition="bottom"
+                type="button"
+                [disabled]="isProcessing()"
+                (click)="this.navigationService.navigateToUpdatePost(post.id)"
+                [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
+                class="edit-post-button"
+                severity="primary"
+                text="true"
+              ></button>
+            }
+            <button
+              pButton
+              pRipple
+              pTooltip="Delete"
+              tooltipPosition="bottom"
+              type="button"
+              [disabled]="isProcessing()"
+              (click)=" this.modalService.openModal(this.deletePostConfirm(), `Deleting a post: ${post.title}`); this.modalService.contentWidth.set('50%')"
+              [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+              class="delete-post-button"
+              severity="danger"
+              text="true"
+            ></button>
+          }
+        </div>
+
+        <span class="post-createdAt"> <span class="pi pi-clock"></span> {{ post.createdAt | timeAgo }} </span>
+      </div>
+    </header>
     <body class="post-body" [class]="'post-body-' + post.status.toLowerCase()">
       @if (this.navigationService.isPostDetailedPage()) {
         <app-post-body [post]="post" />
       }
     </body>
-
     <footer class="post-footer">
       <app-post-footer [post]="post" />
     </footer>
   </div>
 }
-
-<ng-template #postForm>
-  <app-post-form [post]="post" (formSubmitEvent)="this.handlePostFormSubmit()" />
-</ng-template>
 
 <ng-template #deletePostConfirm>
   <app-confirm

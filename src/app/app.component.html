@@ -1,8 +1,21 @@
 @let isPageLoading = this.loaderService.isPageLoading();
 
-<app-header />
-<app-page-loader [hidden]="!isPageLoading" />
-<router-outlet [hidden]="isPageLoading" />
+<div class="app">
+  <app-sidebar />
+  <div class="app-content">
+    <div class="app-content-wrapper">
+      <app-header />
+
+      <div class="app-page-wrapper">
+        @if (!isPageLoading) {
+          <router-outlet class="app-router-outlet" />
+        } @else {
+          <app-page-loader />
+        }
+      </div>
+    </div>
+  </div>
+</div>
 
 <p-toast position="bottom-left" />
 <app-modal />

@@ -3,10 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl } from '@angular/forms';
 
 import { FIELD_ERROR_KEY } from '@/app/constants/field-error-key';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [MessageModule],
   selector: 'app-form-field-error',
   styleUrl: './form-field-error.component.scss',
   templateUrl: './form-field-error.component.html',
@@ -57,6 +58,11 @@ export class FormFieldErrorComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.control()
+      .events.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.errorMessage.set(this.getError());
+      });
     this.control()
       .statusChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {

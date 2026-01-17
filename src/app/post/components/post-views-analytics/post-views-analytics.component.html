@@ -1,21 +1,49 @@
-<p-datepicker
-  [(ngModel)]="this.selectedDates"
-  [numberOfMonths]="2"
-  selectionMode="range"
-  [readonlyInput]="true"
-  [showIcon]="true"
-  [minDate]="this.minDate()"
-  [maxDate]="this.maxDate"
-  [disabled]="!this.isAnalyticLoaded()"
-  [fluid]="true"
-  variant="filled"
-  (onSelect)="this.onDateSelectHandler()"
-  class="datepicker"
-/>
+@let viewsInfoTooltipText =
+  `
+    Unique Views:
+    The number of different people who have read this post.
+    If the same person reads it multiple times, it’s still counted as one.
+
+    Total Views:
+    Every single time this post was opened — regardless of who opened it.
+    Includes repeats by the same reader, authors, or co-authors.
+
+    The views of the author and co-authors are automatically excluded from the list to ensure the reliability of the indicators.
+    `;
+
+<div class="chart-top">
+  <h2 class="subtitle">
+    Views
+    <span class="views-info">
+      <span class="pi pi-info-circle views-info-icon" autoHide="false" [pTooltip]="viewsInfoTooltipText"></span>
+    </span>
+  </h2>
+  <p-datepicker
+    [(ngModel)]="this.selectedDates"
+    [numberOfMonths]="2"
+    selectionMode="range"
+    [readonlyInput]="true"
+    [showIcon]="true"
+    [minDate]="this.minDate()"
+    [maxDate]="this.maxDate"
+    [disabled]="!this.isAnalyticLoaded()"
+    [fluid]="true"
+    variant="filled"
+    (onSelect)="this.onDateSelectHandler()"
+    class="datepicker"
+  />
+</div>
 
 @if (this.isAnalyticLoaded()) {
   @if (this.analyticDataByPost()?.length) {
-    <p-chart type="line" [responsive]="true" [data]="this.data()" [options]="this.options" class="chart" />
+    <p-chart
+      type="line"
+      height="30rem"
+      [responsive]="true"
+      [data]="this.data()"
+      [options]="this.options"
+      class="chart"
+    />
   } @else {
     <div class="not-found">
       <p class="not-found-text">

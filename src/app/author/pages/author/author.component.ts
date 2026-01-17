@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { SpeedDialModule } from 'primeng/speeddial';
+import { TooltipModule } from 'primeng/tooltip';
 import { map, Observable, switchMap, tap } from 'rxjs';
 
 import { AuthorContributions } from '@/app/api/interfaces/author/author-contributions';
@@ -20,6 +21,7 @@ import { NavigationService } from '@/app/core/services/navigation/navigation.ser
 import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
+import { StickyStateDirective } from '@/app/shared/directives/sticky-state/sticky-state.directive';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +32,9 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
     SpeedDialModule,
     ButtonModule,
     RippleModule,
+    TooltipModule,
     PostsListComponent,
+    StickyStateDirective,
   ],
   selector: 'app-author',
   styleUrl: './author.component.scss',
@@ -45,6 +49,7 @@ export class AuthorComponent implements OnInit {
   public contributionStats = signal<AuthorContributions[]>([]);
   public currentUser = signal<null | UserResponse>(null);
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
+  public postsSettingsRef = viewChild.required<PostsSettingsComponent>('posts_settings');
 
   private loadAuthorContributionStats(username: string, query?: PaginationQueryDto): Observable<AuthorContributions[]> {
     return this.authorsService.getAuthorContributionStats(username, query).pipe(
@@ -125,5 +130,11 @@ export class AuthorComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  public togglePostsSettings(event: MouseEvent): void {
+    event.stopPropagation();
+    const ref = this.postsSettingsRef();
+    ref.isOpen.set(!ref.isOpen());
   }
 }

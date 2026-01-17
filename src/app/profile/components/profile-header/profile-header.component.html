@@ -1,7 +1,7 @@
 @let profile = this.profile();
 @let firstname = profile?.firstname?.length ? profile?.firstname : 'Jane';
 @let lastname = profile?.lastname?.length ? profile?.lastname : 'Doe';
-@let username = profile?.username ? '@' + profile?.username : 'jane_doe';
+@let username = profile?.username ? '@' + profile?.username : '@jane_doe';
 @let avatar = profile?.avatarUrl ?? 'img/svg/avatar-placeholder.svg';
 @let birthdate = profile?.birthdate?.length ? (profile?.birthdate | date: 'longDate') : '';
 
@@ -11,13 +11,19 @@
       <p-avatar class="avatar-img" [image]="avatar" />
     </div>
     <div class="profile-name-wrapper">
-      <strong class="profile-name"
-        ><span>{{ firstname }}</span>
-        <span>&nbsp;</span>
-        <span>{{ lastname }}</span></strong
-      >
-      <span class="profile-username">{{ username }}</span>
-      <span>{{ birthdate }}</span>
+      <div class="profile-name">
+        <span class="profile-name-text">{{ firstname }}</span> <span class="profile-name-text">{{ lastname }}</span>
+      </div>
+      <div class="profile-bottom">
+        <span class="profile-username">
+          <span><span class="pi pi-clone"></span></span>{{ username }}</span
+        >
+        @if (birthdate) {
+          <span class="profile-birthdate">
+            <span><span class="pi pi-gift"></span></span>{{ birthdate }}</span
+          >
+        }
+      </div>
     </div>
   </div>
 </header>

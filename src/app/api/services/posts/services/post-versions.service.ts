@@ -43,6 +43,11 @@ export class PostVersionsService {
     return this.http.get<PostVersionDiffResponse>(url, { params });
   }
 
+  public getVersionDiffForPostReview(postId: number): Observable<PostVersionDiffResponse> {
+    const url = buildApiUrl(ENDPOINTS.POSTS, postId.toString(), PART.VERSIONS, PART.REVIEW);
+    return this.http.get<PostVersionDiffResponse>(url);
+  }
+
   public getVersionsByPost(postId: number, query?: PostQuery): Observable<null | PaginatedPostVersionResponse> {
     const url = buildApiUrl(ENDPOINTS.POSTS, postId.toString(), PART.VERSIONS);
     return this.http.get<PaginatedPostVersionResponse>(url, { params: { ...query } }).pipe(

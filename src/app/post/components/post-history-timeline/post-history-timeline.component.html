@@ -7,31 +7,34 @@
   </ng-template>
   <ng-template #content let-history>
     <div class="history-item">
-      <div class="history-item-left">
-        <i class="history-item-action">Action</i>
-        <p-tag
-          class="action-type-tag"
-          [value]="history.actionType"
-          [severity]="this.isAuthorHistoryResponse(history) ? 'info' : 'success'"
-        />
+      <header class="history-item-header">
+        <div class="history-item-header-top">
+          <p-tag
+            class="action-type-tag"
+            [value]="history.actionType"
+            [severity]="this.isAuthorHistoryResponse(history) ? 'info' : 'success'"
+          />
+        </div>
         @if (this.isModerationHistoryResponse(history)) {
-          <i class="history-item-changes-in-status">Changes in status</i>
-          <div class="tags">
-            <p-tag
-              class="status-tag"
-              [value]="history.previousStatus ?? 'N/A'"
-              [severity]="this.getStatusSeverity(history.previousStatus)"
-            />
-            <span class="status-tag-separator">→</span>
-            <p-tag
-              class="status-tag"
-              [value]="history.newStatus"
-              [severity]="this.getStatusSeverity(history.newStatus)"
-            />
+          <div class="history-item-header-bottom">
+            <i class="history-item-changes-in-status">Changes in status</i>
+            <div class="tags">
+              <p-tag
+                class="status-tag"
+                [value]="history.previousStatus ?? 'N/A'"
+                [severity]="this.getStatusSeverity(history.previousStatus)"
+              />
+              <span class="status-tag-separator">→</span>
+              <p-tag
+                class="status-tag"
+                [value]="history.newStatus"
+                [severity]="this.getStatusSeverity(history.newStatus)"
+              />
+            </div>
           </div>
         }
-      </div>
-      <div class="history-item-center">
+      </header>
+      <body class="history-item-body">
         @if (this.isAuthorHistoryResponse(history) && history.description) {
           <div class="description-wrapper">
             <h3 class="description-title">Description</h3>
@@ -60,8 +63,8 @@
             </div>
           }
         }
-      </div>
-      <div class="history-item-right">
+      </body>
+      <footer class="history-item-footer">
         @if (this.isModerationHistoryResponse(history)) {
           @let moderatorProfile = history.moderator.user.profile;
           <i class="history-item-moderator">Moderator</i>
@@ -95,7 +98,7 @@
             <a [routerLink]="['/author', author?.username]" class="author-link">{{ author?.username }}</a>
           </div>
         }
-      </div>
+      </footer>
     </div>
   </ng-template>
 </p-timeline>

@@ -1,20 +1,32 @@
-<header class="header">
-  <div class="header-top">
-    <div class="avatar-wrapper">
-      <p-avatar class="avatar-img" [image]="author()?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
-    </div>
-    <div class="author-name-wrapper">
-      <strong class="author-name"
-        ><span>{{ author()?.firstname?.length ? author()?.firstname : 'Jane' }}</span>
-        <span>&nbsp;</span>
-        <span>{{ author()?.lastname?.length ? author()?.lastname : 'Doe' }}</span></strong
-      >
-      <span class="author-username">{{ author()?.username?.length ? '@' + author()?.username : 'jane_doe' }}</span>
-    </div>
-  </div>
-</header>
+@let author = this.author();
+@let firstname = author?.firstname?.length ? author?.firstname : 'Jane';
+@let lastname = author?.lastname?.length ? author?.lastname : 'Doe';
+@let username = author?.username ? '@' + author?.username : '@jane_doe';
+@let avatar = author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg';
 
-<div class="bio">
-  <h2 class="title">About me</h2>
-  <p class="text">{{ author()?.bio ?? '' }}</p>
+<div class="preview-wrapper">
+  <header class="header">
+    <div class="header-top">
+      <div class="avatar-wrapper">
+        <p-avatar class="avatar-img" [image]="avatar" />
+      </div>
+      <div class="author-name-wrapper">
+        <div class="author-name">
+          <span class="author-name-text">{{ firstname }}</span> <span class="author-name-text">{{ lastname }}</span>
+        </div>
+        <div class="author-bottom">
+          <span class="author-username">
+            <span><span class="pi pi-clone"></span></span>{{ username }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </header>
+
+  @if (this.author()?.bio; as bio) {
+    <div class="bio">
+      <h2 class="title">About me</h2>
+      <p class="text">{{ bio }}</p>
+    </div>
+  }
 </div>

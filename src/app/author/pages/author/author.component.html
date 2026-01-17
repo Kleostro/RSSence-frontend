@@ -11,17 +11,29 @@
   </div>
 
   <div class="posts-wrapper">
-    <div class="posts-list-settings">
-      <app-posts-settings [contributionStats]="this.contributionStats()" />
+    <div class="posts-wrapper-top-outer">
+      <div class="posts-wrapper-top" appStickyState>
+        <button
+          pButton
+          pRipple
+          text="true"
+          class="posts-filters-button"
+          [pTooltip]="this.postsSettingsRef().isOpen() ? 'Close filters' : 'Open filters'"
+          tooltipPosition="bottom"
+          [icon]="this.postsSettingsRef().isOpen() ? 'pi pi-chevron-left' : 'pi pi-filter'"
+          [severity]="this.postsSettingsRef().isOpen() ? 'info' : 'primary'"
+          (click)="this.togglePostsSettings($event)"
+        ></button>
+      </div>
     </div>
-
-    <div class="posts-list">
+    <div class="posts-wrapper-bottom">
       <app-posts-list
         [paginatedPostResponse]="this.paginatedPostResponse()"
         (pageChange)="this.handlePageChange($event)"
       >
         <ng-template let-post> <app-post [post]="post" /> </ng-template
       ></app-posts-list>
+      <app-posts-settings #posts_settings [contributionStats]="this.contributionStats()" />
     </div>
   </div>
 </div>

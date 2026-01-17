@@ -2,8 +2,8 @@
   position: relative;
 }
 
-.move-to-author-button {
+.button-box {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: var(--offset-ml);
+  right: var(--offset-ml);
 }

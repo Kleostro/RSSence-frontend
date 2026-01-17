@@ -1,12 +1,24 @@
 @let author = this.author();
 
 <div class="author-info">
-  <p-avatar
-    shape="circle"
-    class="post-avatar-img"
-    [image]="author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
-    size="normal"
-    [routerLink]="['/author', author?.username]"
-  />
-  <a [routerLink]="['/author', author?.username]" class="post-author-link">{{ author?.username }}</a>
+  @if (author) {
+    <p-avatar
+      [pTooltip]="author.username"
+      tooltipPosition="bottom"
+      shape="circle"
+      class="post-avatar-img"
+      [image]="author?.avatarUrl ?? 'img/svg/avatar-placeholder.svg'"
+      [size]="this.avatarSize()"
+      [routerLink]="['/author', author?.username]"
+    />
+  } @else {
+    <p-avatar
+      shape="circle"
+      pTooltip="Deleted author"
+      tooltipPosition="bottom"
+      class="post-avatar-img deleted"
+      image="img/svg/avatar-placeholder.svg"
+      [size]="this.avatarSize()"
+    />
+  }
 </div>

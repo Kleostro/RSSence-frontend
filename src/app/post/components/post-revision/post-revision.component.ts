@@ -2,14 +2,13 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, output, 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, finalize, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { PostsService } from '@/app/api/services/posts/posts.service';
-import { POST_REVISION_FORM_FIELD_CONFIG } from '@/app/constants/post-revision-form';
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
+import { POST_REVISION_FORM_FIELD_CONFIG } from '@/app/constants/form/post-revision-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
@@ -18,14 +17,7 @@ import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    ConfirmComponent,
-    ReactiveFormsModule,
-    InputTextModule,
-    FormFieldErrorComponent,
-    TextareaModule,
-    FloatLabelModule,
-  ],
+  imports: [ConfirmComponent, ReactiveFormsModule, InputTextModule, FormFieldErrorComponent, TextareaModule],
   selector: 'app-post-revision',
   styleUrl: './post-revision.component.scss',
   templateUrl: './post-revision.component.html',
@@ -65,10 +57,7 @@ export class PostRevisionComponent {
           }
           this.postRevisionEvent.emit();
         }),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
-          return EMPTY;
-        }),
+        handleHttpError(this.message),
         finalize(() => {
           this.isProcessing.set(false);
         }),

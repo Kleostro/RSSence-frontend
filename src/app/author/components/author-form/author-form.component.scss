@@ -1,19 +1,27 @@
-.author-name-controls,
-.author-credentials-controls {
+@use 'forms';
+
+.form {
+  @extend %form-base;
+}
+
+.name-controls-wrapper,
+.credentials-controls-wrapper {
   display: flex;
-  gap: 1rem;
+  gap: var(--offset-xs);
+}
+
+.name-controls-wrapper,
+.credentials-controls-wrapper,
+.bio-control-wrapper {
+  margin-bottom: var(--offset-xs);
 }
 
 .control {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
+  @extend %form-control-base;
 }
 
 .control-label {
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
+  @extend %form-label-base;
 
   &.file-over {
     .control-file-label {
@@ -24,41 +32,48 @@
 
 .control-label-text {
   display: flex;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
+  margin-bottom: var(--offset-xs);
+  font: var(--font-text-s);
+  color: var(--text-color);
 }
 
 ::ng-deep .p-inputtext {
-  width: 100%;
-  border: 0.1rem solid var(--p-surface-600);
-  color: var(--p-surface-300);
-  background: var(--p-surface-800);
+  @extend %form-input-base;
+}
+
+::ng-deep .p-datepicker {
+  @extend %form-input-base;
 }
 
 .control-textarea {
   resize: none;
-  height: 8rem;
+  height: 10rem;
 }
 
-.control-textarea-container {
+.bio-control-wrapper {
   position: relative;
+}
+
+.bio-box {
+  position: relative;
+  display: flex;
 }
 
 .counter {
   position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  font-size: 0.8rem;
+  right: calc(var(--offset-xxs) / 2);
+  bottom: calc(var(--offset-xxs) / 2);
+
+  padding: calc(var(--offset-xxs) / 2) var(--offset-xxs);
+  border-radius: var(--border-radius-xs);
+
+  font: var(--font-text-xxs);
+  color: var(--text-color-muted);
+
+  background-color: var(--form-control-bg);
+  box-shadow: var(--shadow-s);
 }
 
 .form-footer {
-  display: flex;
-  gap: 2rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.control-errors {
-  min-height: 1.5rem;
+  @extend %form-footer-base;
 }

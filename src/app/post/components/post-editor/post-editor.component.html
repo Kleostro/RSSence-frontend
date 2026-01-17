@@ -3,39 +3,41 @@
     <button
       pButton
       pRipple
-      outlined="true"
+      fluid="true"
+      text="true"
       type="button"
+      label="Write"
       severity="info"
       icon="pi pi-pencil"
+      [disabled]="!this.isPreviewMode()"
       (click)="this.isPreviewMode.set(false); togglePreview()"
-    >
-      Write
-    </button>
+    ></button>
     <button
       pButton
       pRipple
-      outlined="true"
+      [disabled]="this.isPreviewMode()"
+      label="Preview"
+      text="true"
+      fluid="true"
       type="button"
       severity="info"
       icon="pi pi-align-left"
       (click)="this.isPreviewMode.set(true); togglePreview()"
-    >
-      Preview
-    </button>
+    ></button>
   </div>
 
-  <div *ngIf="!isPreviewMode()" class="editor-container">
-    <textarea
-      #textarea
-      pInputText
-      fluid="true"
-      [id]="this.id()"
-      [(ngModel)]="this.value"
-      [value]="markdownContent()"
-      (input)="onInput($event)"
-      (paste)="onPaste($event)"
-    ></textarea>
-  </div>
+  <textarea
+    *ngIf="!isPreviewMode()"
+    class="p-inputtext control-textarea"
+    #textarea
+    pInputText
+    fluid="true"
+    [id]="this.id()"
+    [(ngModel)]="this.value"
+    [value]="markdownContent()"
+    (input)="onInput($event)"
+    (paste)="onPaste($event)"
+  ></textarea>
 
   <div
     *ngIf="isPreviewMode()"

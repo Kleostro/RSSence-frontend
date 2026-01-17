@@ -2,87 +2,191 @@
 @let contentControl = this.form.controls.content;
 
 <form class="form" [formGroup]="this.form">
-  <label for="title">Title</label>
-  <input class="title-input" pInputText fluid="true" id="title" formControlName="title" autocomplete="off" />
-  <div class="control-errors">
-    <app-form-field-error
-      [control]="titleControl"
-      field="title"
-      [fieldBoundaries]="POST_FORM_FIELD_CONFIG.title"
-      [errorMessages]="POST_FORM_FIELD_CONFIG.title.messages"
-    />
-  </div>
-
-  <label for="content">Content</label>
-  <app-post-editor #postEditor formControlName="content" id="content" />
-  <div class="control-errors">
-    <app-form-field-error
-      [control]="contentControl"
-      field="content"
-      [fieldBoundaries]="POST_FORM_FIELD_CONFIG.content"
-      [errorMessages]="POST_FORM_FIELD_CONFIG.content.messages"
-    />
-  </div>
-
-  <div class="multiple-select">
-    <ng-container formArrayName="coauthors">
-      <div class="coauthors">
-        <span>Add up to 5 coauthors</span>
-        <div class="coauthor-wrapper">
-          @for (coauthorFG of this.form.controls.coauthors.controls; track coauthorFG; let i = $index) {
-            <div [formGroup]="coauthorFG">
-              <div class="coauthor-fg-wrapper">
-                <div class="coauthor-control">
-                  <label [for]="'coauthor-' + i">Coauthor {{ i + 1 }}</label>
-                  <p-autocomplete
-                    formControlName="coauthor"
-                    fluid="true"
-                    [suggestions]="filteredAuthors()"
-                    (completeMethod)="filterAuthors($event)"
-                    [delay]="400"
-                    emptyMessage="The author was not found"
-                    field="username"
-                  >
-                    <ng-template let-coauthor #item>
-                      <div class="coauthor-item">
-                        <p-avatar [image]="coauthor.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
-                        <span>{{ coauthor.username }}</span>
-                      </div>
-                    </ng-template>
-                  </p-autocomplete>
-                </div>
-                <p-button
-                  class="remove-coauthor-btn"
-                  pRipple
-                  type="button"
-                  [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-                  severity="danger"
-                  outlined="true"
-                  (click)="this.form.controls.coauthors.removeAt(i)"
-                  [disabled]="this.isProcessing()"
+  <p-stepper [value]="1">
+    <p-step-list>
+      <p-step [value]="1"> Write a post </p-step>
+      <p-step [value]="2"> Add up to 5 coauthors (optional) </p-step>
+      <p-step [value]="3">Header II</p-step>
+    </p-step-list>
+    <p-step-panels>
+      <p-step-panel [value]="1">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="post-content-wrapper">
+            <div class="control">
+              <label class="control-label" for="title">Title <span style="color: red">*</span></label>
+              <input
+                class="control-input p-inputtext"
+                pInputText
+                fluid="true"
+                id="title"
+                formControlName="title"
+                autocomplete="off"
+              />
+              <div class="control-errors">
+                <app-form-field-error
+                  [control]="titleControl"
+                  field="title"
+                  [fieldBoundaries]="POST_FORM_FIELD_CONFIG.title"
+                  [errorMessages]="POST_FORM_FIELD_CONFIG.title.messages"
                 />
               </div>
             </div>
-          }
-        </div>
-        <div class="buttons-wrapper">
-          @if (this.form.controls.coauthors.controls.length < 5) {
-            <p-button
+
+            <div class="control">
+              <label class="control-label" for="content">Content <span style="color: red">*</span></label>
+              <div class="editor-box">
+                <app-post-editor #postEditor formControlName="content" id="content" />
+                <div class="counter" [hidden]="this.postEditor().isPreviewMode()">
+                  <span
+                    class="current"
+                    [style.color]="
+                      contentControl.value.length > this.POST_FORM_FIELD_CONFIG.content.max ? 'red' : 'inherit'
+                    "
+                    >{{ contentControl.value.length }}</span
+                  >&nbsp;/
+                  <span class="total">{{ this.POST_FORM_FIELD_CONFIG.content.max }}</span>
+                </div>
+              </div>
+              <div class="control-errors">
+                <app-form-field-error
+                  [control]="contentControl"
+                  field="content"
+                  [fieldBoundaries]="POST_FORM_FIELD_CONFIG.content"
+                  [errorMessages]="POST_FORM_FIELD_CONFIG.content.messages"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="stepper-action-wrapper">
+            <button
+              pButton
               pRipple
               type="button"
-              label="Add"
-              fluid="true"
-              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
-              severity="success"
-              outlined="true"
-              (click)="this.addCoauthor()"
+              class="next-btn"
+              iconPos="right"
+              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+              [disabled]="this.isProcessing() || !this.form.valid"
+              severity="primary"
+              text="true"
+              label="Next"
+              (click)="activateCallback(2)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <p-step-panel [value]="2">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="multiple-select">
+            <ng-container formArrayName="coauthors">
+              <div class="coauthors">
+                <div class="coauthor-wrapper">
+                  @for (coauthorFG of this.form.controls.coauthors.controls; track coauthorFG; let i = $index) {
+                    <div [formGroup]="coauthorFG" [@coauthorCollapse]>
+                      <div class="control coauthor-control">
+                        <div class="coauthor-control-top">
+                          <label class="control-label-s" [for]="'coauthor-' + i">Coauthor {{ i + 1 }}</label>
+                          <button
+                            class="remove-coauthor-btn"
+                            pButton
+                            pRipple
+                            type="button"
+                            [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                            severity="danger"
+                            text="true"
+                            (click)="this.form.controls.coauthors.removeAt(i)"
+                            [disabled]="this.isProcessing()"
+                          ></button>
+                        </div>
+                        <p-autocomplete
+                          formControlName="coauthor"
+                          fluid="true"
+                          [suggestions]="filteredAuthors()"
+                          (completeMethod)="filterAuthors($event)"
+                          [delay]="400"
+                          emptyMessage="The author was not found"
+                          field="username"
+                        >
+                          <ng-template let-coauthor #item>
+                            <div class="coauthor-item">
+                              <p-avatar [image]="coauthor.avatarUrl ?? 'img/svg/avatar-placeholder.svg'" />
+                              <span>{{ coauthor.username }}</span>
+                            </div>
+                          </ng-template>
+                        </p-autocomplete>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                @if (this.form.controls.coauthors.controls.length < 5) {
+                  <button
+                    pButton
+                    pRipple
+                    class="add-coauthor-btn"
+                    type="button"
+                    label="Add"
+                    fluid="true"
+                    [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-plus'"
+                    severity="success"
+                    text="true"
+                    (click)="this.addCoauthor()"
+                    [disabled]="this.isProcessing()"
+                  ></button>
+                }
+              </div>
+            </ng-container>
+          </div>
+          <div class="stepper-action-wrapper">
+            <button
+              pButton
+              pRipple
+              type="button"
+              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
               [disabled]="this.isProcessing()"
-            />
-          }
-        </div>
-      </div>
-    </ng-container>
-  </div>
+              severity="secondary"
+              class="back-btn"
+              text="true"
+              label="Back"
+              (click)="activateCallback(1)"
+            ></button>
+            <button
+              pButton
+              pRipple
+              type="button"
+              class="next-btn"
+              iconPos="right"
+              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+              [disabled]="this.isProcessing()"
+              severity="primary"
+              text="true"
+              label="Next"
+              (click)="activateCallback(3)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="stepper-action-wrapper">
+            <button
+              pButton
+              pRipple
+              type="button"
+              [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-left'"
+              [disabled]="this.isProcessing()"
+              severity="secondary"
+              class="back-btn"
+              text="true"
+              label="Back"
+              (click)="activateCallback(2)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
 
   <div class="form-footer">
     <button
@@ -95,7 +199,7 @@
       [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
       [disabled]="form.invalid || this.isProcessing()"
       severity="success"
-      outlined="true"
+      text="true"
     ></button>
     <button
       pButton
@@ -107,7 +211,7 @@
       [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-pencil'"
       [disabled]="form.invalid || this.isProcessing()"
       severity="info"
-      outlined="true"
+      text="true"
     ></button>
   </div>
 </form>

@@ -8,21 +8,27 @@
     <p-speeddial
       [model]="navigationItems"
       direction="left"
-      [buttonProps]="{ severity: 'primary', outlined: true }"
+      rotateAnimation="false"
+      showIcon="pi pi-bars"
+      hideIcon="pi pi-times"
+      [buttonProps]="{ severity: 'primary', text: true }"
       [tooltipOptions]="{ tooltipPosition: 'bottom' }"
-      [style]="{ position: 'absolute', right: '1rem', top: '1rem' }"
+      [style]="{ position: 'absolute', right: '3rem', top: '3rem' }"
     />
   } @else if (currentProfile) {
-    <p-button
-      pRipple
-      type="button"
-      class="move-to-author-button"
-      (click)="navigateToAuthor.emit(authorUsername)"
-      label="Author"
-      icon="pi pi-user"
-      severity="info"
-      outlined="true"
-    />
+    <div class="button-box">
+      <button
+        pButton
+        pRipple
+        type="button"
+        class="move-to-author-button"
+        (click)="navigateToAuthor.emit(authorUsername)"
+        label="Author"
+        icon="pi pi-user"
+        severity="info"
+        text="true"
+      ></button>
+    </div>
   }
   <app-profile-preview [profile]="currentProfile" />
 </div>

@@ -4,7 +4,6 @@ import { catchError, EMPTY, Observable, of, switchMap, tap } from 'rxjs';
 
 import { AuthResponse } from '@/app/api/schemas/auth-response';
 import { LogoutResponse } from '@/app/api/schemas/logout-response';
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { UserResponse } from '@/app/api/schemas/users-response';
 import { LoginService } from '@/app/api/services/login/login.service';
 import { LogoutService } from '@/app/api/services/logout/logout.service';
@@ -31,11 +30,6 @@ export class AuthService {
 
   public isUserLoggedIn = signal(false);
 
-  private handleAuthError(error: OverriddenHttpErrorResponse): Observable<never> {
-    this.message.error(error.error.message);
-    return EMPTY;
-  }
-
   private handleAuthSuccess({ accessToken, refreshToken }: AuthResponse): void {
     this.tokenService.setToken(accessToken, refreshToken);
     this.isUserLoggedIn.set(true);
@@ -55,10 +49,14 @@ export class AuthService {
     return this.loginService.login(email, password).pipe(
       tap((data) => {
         this.handleAuthSuccess(data);
-        this.navigationService.navigateToHome();
       }),
-      switchMap(() => this.usersService.getMe()),
-      catchError(this.handleAuthError.bind(this)),
+      switchMap(() =>
+        this.usersService.getMe().pipe(
+          tap(() => {
+            this.navigationService.navigateToHome();
+          }),
+        ),
+      ),
     );
   }
 
@@ -100,7 +98,6 @@ export class AuthService {
         this.message.success(MESSAGE.REGISTRATION_SUCCESS);
       }),
       switchMap(() => this.login({ email, password })),
-      catchError((error: OverriddenHttpErrorResponse) => this.handleAuthError(error)),
     );
   }
 }

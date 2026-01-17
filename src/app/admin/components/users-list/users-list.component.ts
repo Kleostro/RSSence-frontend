@@ -15,7 +15,6 @@ import {
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { Message } from 'primeng/message';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
 import { Skeleton } from 'primeng/skeleton';
@@ -25,11 +24,22 @@ import { TagModule } from 'primeng/tag';
 import { PaginatedUserResponse, UserResponse } from '@/app/api/schemas/users-response';
 import { RolesService } from '@/app/api/services/roles/roles.service';
 import { UsersService } from '@/app/api/services/users/users.service';
+import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
 import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Paginator, TableModule, Skeleton, ButtonModule, RippleModule, RouterLink, TagModule, Message, DatePipe],
+  imports: [
+    Paginator,
+    TableModule,
+    Skeleton,
+    ButtonModule,
+    RippleModule,
+    RouterLink,
+    TagModule,
+    DatePipe,
+    ConfirmComponent,
+  ],
   selector: 'app-users-list',
   styleUrl: './users-list.component.scss',
   templateUrl: './users-list.component.html',

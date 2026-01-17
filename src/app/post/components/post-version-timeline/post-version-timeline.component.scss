@@ -1,6 +1,7 @@
 .version-timeline {
   ::ng-deep.p-timeline-event-opposite {
     flex: none;
+    width: 8rem;
   }
 }
 
@@ -8,15 +9,16 @@
   cursor: pointer;
 
   display: flex;
-  gap: 1rem;
+  gap: var(--offset-xs);
   align-items: center;
 
-  margin: 1rem 0;
-  padding: 1rem 2rem;
-  border-radius: 1rem;
+  margin: var(--offset-xs) 0;
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
 
-  background-color: var(--p-surface-800);
-  outline: 0.15rem solid var(--p-surface-800);
+  background-color: var(--bg);
+  outline: 0.15rem solid transparent;
+  box-shadow: var(--shadow-s);
 
   transition:
     outline 0.2s,
@@ -36,15 +38,14 @@
   }
 
   &:hover:not(.version-item-select) {
-    outline: 0.15rem solid var(--p-surface-500);
+    outline: 0.15rem solid var(--p-content-border-color);
   }
 }
 
 .version-number {
   margin-right: auto;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--p-text-color);
+  font: var(--font-title-s);
+  color: var(--text-color);
 }
 
 .version-info {
@@ -53,11 +54,13 @@
 
 .version-status {
   display: flex;
-  gap: 1rem;
+  gap: var(--offset-xs);
   align-items: center;
 
-  padding: 0.5rem 1rem;
+  padding: 0.5rem var(--offset-xs);
   border-radius: 0.5rem;
+
+  font: var(--font-text-xs);
 
   &.current {
     border: 0.1rem solid var(--p-primary-color);
@@ -65,11 +68,14 @@
   }
 
   &.archived {
-    border: 0.1rem dotted var(--p-text-muted-color);
-    color: var(--p-text-muted-color);
+    border: 0.1rem dotted var(--text-color-muted);
+    color: var(--text-color-muted);
   }
 }
 
-.checkbox-input {
-  cursor: pointer;
+
+
+.version-actions {
+  display: flex;
+  gap: var(--offset-xxs);
 }

@@ -8,9 +8,9 @@
     type="button"
     (click)="this.navigationService.goBack()"
     label="Back"
-    icon="pi pi-arrow-left"
+    icon="pi pi-chevron-left"
     severity="info"
-    outlined="true"
+    text="true"
   ></button>
 
   <h1 class="title">{{ pageTitle }}</h1>
@@ -29,9 +29,8 @@
         [disabled]="this.isProcessing() || !this.selectedVersions().length"
         [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
         label="Reset"
-        [fluid]="true"
         severity="info"
-        outlined="true"
+        text="true"
       ></button>
       <button
         pButton
@@ -40,15 +39,15 @@
         (click)="this.compareVersions()"
         [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right-arrow-left'"
         label="Compare"
-        severity="success"
+        severity="primary"
         class="compare-button"
         type="button"
-        [fluid]="true"
-        outlined="true"
+        text="true"
       ></button>
     </div>
 
     <p-paginator
+      class="versions-list-paginator"
       (onPageChange)="onPageChange($event)"
       [first]="first"
       [rows]="limit"
@@ -57,6 +56,7 @@
     />
 
     <app-post-version-timeline
+      [currentPost]="this.currentPost()"
       [versions]="versions"
       [isProcessing]="this.isProcessing()"
       [selectedVersions]="this.selectedVersions()"
@@ -66,6 +66,7 @@
     />
 
     <p-paginator
+      class="versions-list-paginator"
       (onPageChange)="onPageChange($event)"
       [first]="first"
       [rows]="limit"

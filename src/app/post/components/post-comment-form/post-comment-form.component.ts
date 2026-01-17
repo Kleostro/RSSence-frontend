@@ -6,7 +6,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
 
-import { POST_COMMENT_FORM_FIELD_CONFIG } from '@/app/constants/post-comment-form';
+import { POST_COMMENT_FORM_FIELD_CONFIG } from '@/app/constants/form/post-comment-form';
 import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
 
 @Component({

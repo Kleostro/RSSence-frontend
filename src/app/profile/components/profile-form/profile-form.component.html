@@ -4,38 +4,62 @@
 @let bioControl = form.controls.bio;
 
 @if (form) {
-  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="profile-name-controls">
+  <form class="form" [formGroup]="form" (ngSubmit)="this.submit()">
+    <div class="name-controls-wrapper">
       <div class="control">
         <label for="firstname" class="control-label">Firstname <span style="color: red">*</span></label>
-        <input id="firstname" type="text" pInputText formControlName="firstname" class="control-input p-inputtext" />
+        <input
+          spellcheck="false"
+          autocomplete="off"
+          id="firstname"
+          type="text"
+          pInputText
+          formControlName="firstname"
+          class="control-input p-inputtext"
+        />
         <div class="control-errors">
           <app-form-field-error
             [control]="firstnameControl"
             field="firstname"
-            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.firstname"
-            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.firstname.messages"
+            [fieldBoundaries]="this.PROFILE_FORM_FIELD_CONFIG.firstname"
+            [errorMessages]="this.PROFILE_FORM_FIELD_CONFIG.firstname.messages"
           />
         </div>
       </div>
       <div class="control">
         <label for="lastname" class="control-label">Lastname <span style="color: red">*</span></label>
-        <input id="lastname" type="text" pInputText formControlName="lastname" class="control-input p-inputtext" />
+        <input
+          spellcheck="false"
+          autocomplete="off"
+          id="lastname"
+          type="text"
+          pInputText
+          formControlName="lastname"
+          class="control-input p-inputtext"
+        />
         <div class="control-errors">
           <app-form-field-error
             [control]="lastnameControl"
             field="lastname"
-            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.lastname"
-            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.lastname.messages"
+            [fieldBoundaries]="this.PROFILE_FORM_FIELD_CONFIG.lastname"
+            [errorMessages]="this.PROFILE_FORM_FIELD_CONFIG.lastname.messages"
           />
         </div>
       </div>
     </div>
-    <div class="profile-credentials-controls">
+    <div class="credentials-controls-wrapper">
       <div class="control">
         <label for="username" class="control-label">Username <span style="color: red">*</span></label>
         <p-icon-field>
-          <input id="username" type="text" pInputText formControlName="username" class="control-input p-inputtext" />
+          <input
+            spellcheck="false"
+            autocomplete="off"
+            id="username"
+            type="text"
+            pInputText
+            formControlName="username"
+            class="control-input p-inputtext"
+          />
           <p-inputicon
             [styleClass]="usernameControl.dirty && usernameControl.pending ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
           />
@@ -44,8 +68,8 @@
           <app-form-field-error
             [control]="usernameControl"
             field="username"
-            [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.username"
-            [errorMessages]="PROFILE_FORM_FIELD_CONFIG.username.messages"
+            [fieldBoundaries]="this.PROFILE_FORM_FIELD_CONFIG.username"
+            [errorMessages]="this.PROFILE_FORM_FIELD_CONFIG.username.messages"
           />
 
           @if (usernameControl.dirty && usernameControl.pending) {
@@ -56,67 +80,75 @@
         </div>
       </div>
       <div class="control">
-        <label class="control-label" for="birthday">Birthdate</label>
+        <label class="control-label" for="birthdate">Birthdate</label>
         <p-icon-field>
           <p-datepicker
-            id="birthday"
-            (onSelect)="onBirthdateSelected($event)"
+            inputId="birthdate"
+            readonlyInput="true"
+            (onSelect)="this.onBirthdateSelected($event)"
             #birthdatePicker
-            [maxDate]="maxAllowedDate"
+            [maxDate]="this.maxAllowedDate"
           />
           <p-inputicon styleClass="pi pi-calendar" />
         </p-icon-field>
       </div>
     </div>
-    <div class="control control-textarea-container">
-      <label class="control-label" for="bio">About me</label>
-      <textarea
-        id="bio"
-        rows="5"
-        pInputTextarea
-        variant="filled"
-        formControlName="bio"
-        class="control-input p-inputtext control-textarea"
-      ></textarea>
-      <div class="counter">
-        <span
-          class="current"
-          [style.color]="bioControl.value.length > PROFILE_FORM_FIELD_CONFIG.bio.max ? 'red' : 'inherit'"
-          >{{ bioControl.value.length }}</span
-        >&nbsp;/
-        <span class="total">{{ PROFILE_FORM_FIELD_CONFIG.bio.max }}</span>
+    <div class="bio-control-wrapper">
+      <div class="control">
+        <label class="control-label" for="bio">About me</label>
+        <div class="bio-box">
+          <textarea
+            id="bio"
+            rows="5"
+            pInputTextarea
+            variant="filled"
+            formControlName="bio"
+            class="control-input p-inputtext control-textarea"
+          ></textarea>
+          <div class="counter">
+            <span
+              class="current"
+              [style.color]="bioControl.value.length > this.PROFILE_FORM_FIELD_CONFIG.bio.max ? 'red' : 'inherit'"
+              >{{ bioControl.value.length }}</span
+            >&nbsp;/
+            <span class="total">{{ this.PROFILE_FORM_FIELD_CONFIG.bio.max }}</span>
+          </div>
+        </div>
+        <div class="control-errors">
+          <app-form-field-error
+            [control]="bioControl"
+            field="bio"
+            [fieldBoundaries]="this.PROFILE_FORM_FIELD_CONFIG.bio"
+            [errorMessages]="this.PROFILE_FORM_FIELD_CONFIG.bio.messages"
+          />
+        </div>
       </div>
-      <div class="control-errors">
-        <app-form-field-error
-          [control]="bioControl"
-          field="bio"
-          [fieldBoundaries]="PROFILE_FORM_FIELD_CONFIG.bio"
-          [errorMessages]="PROFILE_FORM_FIELD_CONFIG.bio.messages"
+    </div>
+    <div class="file-control-wrapper">
+      <div class="control">
+        <app-file-uploader
+          inputId="avatar"
+          label="Avatar"
+          [fileUrl]="this.avatarUrl()"
+          [isProcessing]="this.isProcessing()"
+          (fileSelectedEvent)="this.onAvatarSelected($event)"
         />
       </div>
     </div>
-    <div class="control">
-      <app-file-uploader
-        inputId="avatar"
-        label="Avatar"
-        [fileUrl]="this.avatarUrl()"
-        [isProcessing]="isProcessing()"
-        (fileSelectedEvent)="onAvatarSelected($event)"
-      />
-    </div>
 
     <div class="form-footer">
-      <p-button
+      <button
+        pButton
         pRipple
         type="button"
         fluid="true"
-        [label]="this.profile ? 'Back' : 'Home'"
-        [icon]="this.profile ? 'pi pi-arrow-left' : 'pi pi-home'"
-        [disabled]="isProcessing()"
+        [label]="this.profile() ? 'Back' : 'Author'"
+        [icon]="this.profile() ? 'pi pi-arrow-left' : 'pi pi-pencil'"
+        [disabled]="this.isProcessing()"
         severity="info"
-        outlined="true"
-        (click)="this.profile ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToHome()"
-      />
+        text="true"
+        (click)="this.profile() ? this.backToProfilePageEvent.emit() : this.navigationService.navigateToAuthor()"
+      ></button>
 
       <button
         pButton
@@ -124,10 +156,10 @@
         type="submit"
         fluid="true"
         label="Save"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-        [disabled]="isProcessing()"
+        [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+        [disabled]="this.isProcessing()"
         severity="success"
-        outlined="true"
+        text="true"
       ></button>
     </div>
   </form>

@@ -1,122 +1,124 @@
-@let firstnameControl = form.controls.firstname;
-@let lastnameControl = form.controls.lastname;
-@let usernameControl = form.controls.username;
-@let bioControl = form.controls.bio;
+@let firstnameControl = this.form.controls.firstname;
+@let lastnameControl = this.form.controls.lastname;
+@let usernameControl = this.form.controls.username;
+@let bioControl = this.form.controls.bio;
 
-@if (form) {
-  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="author-name-controls">
-      <div class="control">
-        <label for="firstname" class="control-label">Firstname <span style="color: red">*</span></label>
-        <input id="firstname" type="text" pInputText formControlName="firstname" class="control-input p-inputtext" />
-        <div class="control-errors">
-          <app-form-field-error
-            [control]="firstnameControl"
-            field="firstname"
-            [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.firstname"
-            [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.firstname.messages"
-          />
-        </div>
-      </div>
-      <div class="control">
-        <label for="lastname" class="control-label">Lastname <span style="color: red">*</span></label>
-        <input id="lastname" type="text" pInputText formControlName="lastname" class="control-input p-inputtext" />
-        <div class="control-errors">
-          <app-form-field-error
-            [control]="lastnameControl"
-            field="lastname"
-            [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.lastname"
-            [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.lastname.messages"
-          />
-        </div>
+<form class="form" [formGroup]="this.form" (ngSubmit)="this.submit()">
+  <div class="name-controls-wrapper">
+    <div class="control">
+      <label for="firstname" class="control-label">Firstname <span style="color: red">*</span></label>
+      <input id="firstname" type="text" pInputText formControlName="firstname" class="control-input p-inputtext" />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="firstnameControl"
+          field="firstname"
+          [fieldBoundaries]="this.AUTHOR_FORM_FIELD_CONFIG.firstname"
+          [errorMessages]="this.AUTHOR_FORM_FIELD_CONFIG.firstname.messages"
+        />
       </div>
     </div>
-    <div class="author-credentials-controls">
-      <div class="control">
-        <label for="username" class="control-label">Username <span style="color: red">*</span></label>
-        <p-icon-field>
-          <input id="username" type="text" pInputText formControlName="username" class="control-input p-inputtext" />
-          <p-inputicon
-            [styleClass]="usernameControl.dirty && usernameControl.pending ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
-          />
-        </p-icon-field>
-        <div class="control-errors">
-          <app-form-field-error
-            [control]="usernameControl"
-            field="username"
-            [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.username"
-            [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.username.messages"
-          />
-
-          @if (usernameControl.dirty && usernameControl.pending) {
-            <small style="color: gray">Checking username availability...</small>
-          } @else if (!usernameControl.errors && !usernameControl.pending) {
-            <small style="color: green">Username is available!</small>
-          }
-        </div>
+    <div class="control">
+      <label for="lastname" class="control-label">Lastname <span style="color: red">*</span></label>
+      <input id="lastname" type="text" pInputText formControlName="lastname" class="control-input p-inputtext" />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="lastnameControl"
+          field="lastname"
+          [fieldBoundaries]="this.AUTHOR_FORM_FIELD_CONFIG.lastname"
+          [errorMessages]="this.AUTHOR_FORM_FIELD_CONFIG.lastname.messages"
+        />
       </div>
     </div>
-    <div class="control control-textarea-container">
+  </div>
+  <div class="credentials-controls-wrapper">
+    <div class="control">
+      <label for="username" class="control-label">Username <span style="color: red">*</span></label>
+      <p-icon-field>
+        <input id="username" type="text" pInputText formControlName="username" class="control-input p-inputtext" />
+        <p-inputicon
+          [styleClass]="usernameControl.dirty && usernameControl.pending ? 'pi pi-spin pi-spinner' : 'pi pi-user'"
+        />
+      </p-icon-field>
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="usernameControl"
+          field="username"
+          [fieldBoundaries]="this.AUTHOR_FORM_FIELD_CONFIG.username"
+          [errorMessages]="this.AUTHOR_FORM_FIELD_CONFIG.username.messages"
+        />
+
+        @if (usernameControl.dirty && usernameControl.pending) {
+          <small style="color: gray">Checking username availability...</small>
+        } @else if (!usernameControl.errors && !usernameControl.pending) {
+          <small style="color: green">Username is available!</small>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="bio-control-wrapper">
+    <div class="control">
       <label class="control-label" for="bio">About me</label>
-      <textarea
-        id="bio"
-        rows="5"
-        pInputTextarea
-        variant="filled"
-        formControlName="bio"
-        class="control-input p-inputtext control-textarea"
-      ></textarea>
-      <div class="counter">
-        <span
-          class="current"
-          [style.color]="bioControl.value.length > AUTHOR_FORM_FIELD_CONFIG.bio.max ? 'red' : 'inherit'"
-          >{{ form.controls.bio.value.length }}</span
-        >&nbsp;/
-        <span class="total">{{ AUTHOR_FORM_FIELD_CONFIG.bio.max }}</span>
+      <div class="bio-box">
+        <textarea
+          id="bio"
+          rows="5"
+          pInputTextarea
+          variant="filled"
+          formControlName="bio"
+          class="control-input p-inputtext control-textarea"
+        ></textarea>
+        <div class="counter">
+          <span
+            class="current"
+            [style.color]="bioControl.value.length > this.AUTHOR_FORM_FIELD_CONFIG.bio.max ? 'red' : 'inherit'"
+            >{{ this.form.controls.bio.value.length }}</span
+          >&nbsp;/
+          <span class="total">{{ this.AUTHOR_FORM_FIELD_CONFIG.bio.max }}</span>
+        </div>
       </div>
       <div class="control-errors">
         <app-form-field-error
           [control]="bioControl"
           field="bio"
-          [fieldBoundaries]="AUTHOR_FORM_FIELD_CONFIG.bio"
-          [errorMessages]="AUTHOR_FORM_FIELD_CONFIG.bio.messages"
+          [fieldBoundaries]="this.AUTHOR_FORM_FIELD_CONFIG.bio"
+          [errorMessages]="this.AUTHOR_FORM_FIELD_CONFIG.bio.messages"
         />
       </div>
     </div>
-    <div class="control">
-      <app-file-uploader
-        inputId="avatar"
-        label="Avatar"
-        [fileUrl]="this.avatarUrl()"
-        [isProcessing]="isProcessing()"
-        (fileSelectedEvent)="onAvatarSelected($event)"
-      />
-    </div>
+  </div>
+  <div class="control">
+    <app-file-uploader
+      inputId="avatar"
+      label="Avatar"
+      [fileUrl]="this.avatarUrl()"
+      [isProcessing]="this.isProcessing()"
+      (fileSelectedEvent)="this.onAvatarSelected($event)"
+    />
+  </div>
 
-    <div class="form-footer">
-      <button
-        pButton
-        pRipple
-        type="button"
-        fluid="true"
-        [label]="this.author ? 'Back' : 'Profile'"
-        [icon]="this.author ? 'pi pi-arrow-left' : 'pi pi-user'"
-        [disabled]="isProcessing()"
-        severity="info"
-        outlined="true"
-        (click)="this.author ? this.backToAuthorPageEvent.emit() : this.navigationService.navigateToProfile()"
-      ></button>
-      <button
-        pButton
-        pRipple
-        type="submit"
-        fluid="true"
-        [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-        [disabled]="isProcessing()"
-        severity="success"
-        outlined="true"
-        label="Save"
-      ></button>
-    </div>
-  </form>
-}
+  <div class="form-footer">
+    <button
+      pButton
+      pRipple
+      type="button"
+      fluid="true"
+      [label]="this.author() ? 'Back' : 'Profile'"
+      [icon]="this.author() ? 'pi pi-arrow-left' : 'pi pi-user'"
+      [disabled]="this.isProcessing()"
+      severity="info"
+      text="true"
+      (click)="this.author() ? this.backToAuthorPageEvent.emit() : this.navigationService.navigateToProfile()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      type="submit"
+      fluid="true"
+      [icon]="this.isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+      [disabled]="this.isProcessing()"
+      severity="success"
+      text="true"
+      label="Save"
+    ></button>
+  </div>
+</form>

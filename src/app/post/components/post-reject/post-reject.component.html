@@ -10,46 +10,48 @@
   (confirmEvent)="this.rejectPost()"
   [isProcessing]="this.isProcessing()"
 >
-  <form class="rejectForm" [formGroup]="this.rejectForm">
-    <p-floatlabel>
+  <form class="form" [formGroup]="this.rejectForm">
+    <div class="control">
+      <label class="control-label" for="comment">Comment <span style="color: red">*</span></label>
       <textarea
         pTextarea
-        class="form-textarea"
+        class="control-input p-inputtext control-textarea"
         rows="10"
         id="comment"
         name="comment"
         formControlName="comment"
       ></textarea>
-      <label for="comment">Comment <span style="color: red">*</span></label>
-    </p-floatlabel>
 
-    <div class="control-errors">
-      <app-form-field-error
-        [control]="commentControl"
-        field="comment"
-        [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.comment"
-        [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.comment.messages"
-      />
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="commentControl"
+          field="comment"
+          [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.comment"
+          [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.comment.messages"
+        />
+      </div>
     </div>
 
-    <label for="reasons">Reason <span style="color: red">*</span></label>
-    <p-listbox
-      id="reasons"
-      name="reasons"
-      formControlName="reasons"
-      [options]="this.reasons"
-      [multiple]="true"
-      [checkbox]="true"
-      optionLabel="label"
-    />
-
-    <div class="control-errors">
-      <app-form-field-error
-        [control]="reasonsControl"
-        field="reasons"
-        [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.reasons"
-        [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.reasons.messages"
+    <div class="control">
+      <label class="control-label" for="reasons">Reason <span style="color: red">*</span></label>
+      <p-listbox
+        id="reasons"
+        name="reasons"
+        formControlName="reasons"
+        [options]="this.reasons"
+        [multiple]="true"
+        [checkbox]="true"
+        optionLabel="label"
       />
+
+      <div class="control-errors">
+        <app-form-field-error
+          [control]="reasonsControl"
+          field="reasons"
+          [fieldBoundaries]="POST_REJECT_FORM_FIELD_CONFIG.reasons"
+          [errorMessages]="POST_REJECT_FORM_FIELD_CONFIG.reasons.messages"
+        />
+      </div>
     </div>
   </form>
 </app-confirm>

@@ -6,21 +6,47 @@
   width: 100% !important;
 }
 
+.chart-top {
+  display: flex;
+  gap: var(--offset-xs);
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
 .datepicker {
   width: 16rem;
   margin-left: auto;
 }
 
+
+.comments-info {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--p-blue-400);
+}
+
+.subtitle {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  font: var(--font-text-s);
+  color: var(--text-color);
+}
+
 .skeleton-wrapper {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: var(--offset-xs);
 }
 
 .not-found {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: var(--offset-xs);
 
   &-text {
     font-size: 1.2rem;

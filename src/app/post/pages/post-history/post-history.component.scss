@@ -1,9 +1,15 @@
 .back-button {
   width: max-content;
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
 }
 
 .history-wrapper {
   align-self: flex-start;
+
   width: 100%;
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
 }

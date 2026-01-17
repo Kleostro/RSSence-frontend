@@ -9,6 +9,7 @@ import {
   PaginatedProfileResponseSchema,
   ProfileResponse,
 } from '@/app/api/schemas/profiles-response';
+import { UsersService } from '@/app/api/services/users/users.service';
 import { MESSAGE } from '@/app/shared/services/constants/message';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { ENVIRONMENT } from '@/environment/environment';
@@ -19,6 +20,7 @@ import { ENVIRONMENT } from '@/environment/environment';
 export class ProfilesService {
   private readonly http = inject(HttpClient);
   private readonly message = inject(MessageService);
+  private readonly usersService = inject(UsersService);
 
   public checkUsernameAvailability(username: string): Observable<boolean> {
     return this.http.post<boolean>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}/${ENDPOINTS.USERNAME_CHECK}`, {
@@ -28,7 +30,8 @@ export class ProfilesService {
 
   public createProfile(profile: FormData): Observable<ProfileResponse> {
     return this.http.post<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile).pipe(
-      tap(() => {
+      tap((createdProfile: ProfileResponse) => {
+        this.usersService.me.update((me) => me && { ...me, profile: createdProfile });
         this.message.success(MESSAGE.CREATE_PROFILE_SUCCESS);
       }),
     );
@@ -57,7 +60,8 @@ export class ProfilesService {
 
   public updateProfile(profile: FormData): Observable<ProfileResponse> {
     return this.http.patch<ProfileResponse>(`${ENVIRONMENT.API_URL}${ENDPOINTS.PROFILES}`, profile).pipe(
-      tap(() => {
+      tap((updatedProfile: ProfileResponse) => {
+        this.usersService.me.update((me) => me && { ...me, profile: updatedProfile });
         this.message.success(MESSAGE.UPDATE_PROFILE_SUCCESS);
       }),
     );

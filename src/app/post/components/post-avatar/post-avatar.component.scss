@@ -1,7 +1,8 @@
 :host {
   display: flex;
   flex-direction: column;
-  margin-right: auto;
+
+
 }
 
 .post-avatar-img {
@@ -9,21 +10,25 @@
   transition: filter 0.3s;
 
   &:hover {
-    filter: brightness(1.5);
+    filter: brightness(1.2);
+  }
+
+  &.deleted {
+    cursor: auto;
+    opacity: 0.7;
+
+    &:hover {
+      filter: none;
+    }
   }
 }
 
-.post-author-link {
-  cursor: pointer;
-  transition: color 0.3s;
 
-  &:hover {
-    color: var(--p-primary-color);
-  }
-}
 
 .author-info {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+
+
 }

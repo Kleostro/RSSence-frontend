@@ -1,3 +1,3 @@
 @if (this.errorMessage()) {
-  <small style="color: red">{{ this.errorMessage() }}</small>
+  <p-message class="error-message" severity="error" [text]="this.errorMessage() ?? ''" />
 }

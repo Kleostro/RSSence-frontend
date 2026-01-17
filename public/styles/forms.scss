@@ -1,0 +1,77 @@
+:root {
+  --form-bg: var(--bg-dark);
+  --form-control-bg: var(--bg);
+  --form-input-bg: var(--bg-light);
+}
+
+%form-base {
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+  background-color: var(--form-bg);
+  box-shadow: var(--shadow-s);
+}
+
+%form-control-base {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--form-control-bg);
+  outline: 0.1rem solid transparent;
+  box-shadow: var(--shadow-s);
+
+  transition: outline 0.3s;
+
+
+
+
+  &:has(.control-input.ng-invalid.ng-touched),
+  &:has(.control-input.ng-invalid.ng-dirty) {
+    @extend %form-control-error;
+  }
+
+  &:has(.control-input.ng-valid.ng-dirty) {
+    @extend %form-control-success;
+  }
+}
+
+%form-control-error {
+  outline: 0.1rem solid var(--p-red-500);
+}
+
+%form-control-success {
+  outline: 0.1rem solid var(--p-green-500);
+}
+
+%form-label-base {
+  margin-bottom: var(--offset-xxs);
+  font: var(--font-text-xs);
+  color: var(--text-color);
+}
+
+
+%form-input-base {
+  width: 100%;
+  border-radius: var(--border-radius-s);
+
+  font: var(--font-text-xs);
+  color: var(--text-color);
+
+  background-color: var(--form-input-bg);
+}
+
+%form-footer-base {
+  display: flex;
+  gap: var(--offset-xs);
+  justify-content: flex-end;
+
+  margin-top: var(--offset-xs);
+  padding: var(--offset-xxs);
+  border-radius: var(--border-radius-s);
+
+  background-color: var(--form-control-bg);
+  box-shadow: var(--shadow-s);
+}

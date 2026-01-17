@@ -1,3 +1,5 @@
+@use 'forms';
+
 .post-editor {
   display: flex;
   flex-direction: column;
@@ -7,31 +9,34 @@
 
 .editor-toolbar {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: var(--offset-xs);
+
+
+  margin-bottom: var(--offset-xs);
+  padding: var(--offset-xxs) var(--offset-xs);
+  border-radius: var(--border-radius-s);
+
+  background-color: var(--bg-light);
+  box-shadow: var(--shadow-s);
 }
 
-.editor-container {
-  position: relative;
+::ng-deep .p-inputtext {
+  @extend %form-input-base;
+}
 
-  textarea {
-    resize: none;
-
-    height: calc(100dvh - 36rem);
-    padding: 1rem;
-    border: 0.1rem solid var(--p-surface-600);
-
-    color: var(--p-surface-300);
-
-    background: var(--p-surface-800);
-  }
+.control-textarea {
+  resize: none;
+  height: 25rem;
 }
 
 .preview-container {
   overflow-y: auto;
 
-  height: calc(100dvh - 36rem);
-  padding: 1rem;
-  border: 0.1rem solid var(--p-surface-600);
-  border-radius: var(--p-inputtext-border-radius);
+  height: 25rem;
+  padding: 0 var(--offset-xs);
+  border-radius: var(--border-radius-s);
+
+  color: var(--text-color);
+
+  background-color: var(--bg);
 }

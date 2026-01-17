@@ -1,20 +1,37 @@
 .back-button {
   width: max-content;
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
 }
 
 .title {
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
   text-align: center;
 }
 
 .actions-wrapper {
   display: flex;
-  gap: 1rem;
+  gap: var(--offset-xs);
 }
 
 .versions-wrapper {
   position: relative;
+
   display: grid;
-  gap: 1rem;
+  gap: var(--offset-xs);
+
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
+}
+
+.versions-list-paginator {
+  ::ng-deep.p-paginator-page.p-paginator-page-selected {
+    pointer-events: none;
+  }
+
+  ::ng-deep.p-paginator {
+    background: var(--bg);
+  }
 }

@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
+import { TooltipModule } from 'primeng/tooltip';
 import { finalize, switchMap, tap } from 'rxjs';
 
 import { PostResponse } from '@/app/api/schemas/post/posts-response';
@@ -25,6 +26,7 @@ import { CommentService } from '@/app/post/services/comment.service';
     PostCommentFormComponent,
     PostCommentsListComponent,
     MessageModule,
+    TooltipModule,
   ],
   selector: 'app-post-detailed',
   styleUrl: './post-detailed.component.scss',

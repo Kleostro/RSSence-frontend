@@ -1,20 +1,20 @@
 import { Location } from '@angular/common';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 
-import { filter } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 
-import { APP_PATH, APP_ROUTE } from '@/app/core/services/navigation/routes';
+import { APP_PATH, APP_ROUTE, MODERATOR_PATH } from '@/app/core/services/navigation/routes';
 
 @Injectable({
   providedIn: 'root',
 })
-export class NavigationService {
+export class NavigationService implements OnDestroy {
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly destroy$ = new Subject<void>();
   private readonly location = inject(Location);
   private readonly router = inject(Router);
-
   public isLoginPage = signal<boolean>(false);
   public isPostDetailedModerationPage = signal<boolean>(false);
   public isPostDetailedPage = signal<boolean>(false);
@@ -23,18 +23,23 @@ export class NavigationService {
   public queryParams$ = toObservable(this.queryParams);
 
   constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      const { url } = this.router;
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        const { url } = this.router;
 
-      this.isPostDetailedPage.set(url.startsWith(APP_ROUTE.POSTS + '/'));
-      this.isLoginPage.set(url.startsWith(APP_ROUTE.LOGIN));
-      this.isPostModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION));
-      this.isPostDetailedModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION + '/'));
+        this.isPostDetailedPage.set(url.startsWith(APP_ROUTE.POSTS + '/'));
+        this.isLoginPage.set(url.startsWith(APP_ROUTE.LOGIN));
+        this.isPostModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION));
+        this.isPostDetailedModerationPage.set(url.startsWith(APP_ROUTE.POST_MODERATION + '/'));
 
-      this.activatedRoute.queryParams.subscribe((params) => {
-        this.queryParams.set(params);
+        this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+          this.queryParams.set(params);
+        });
       });
-    });
   }
 
   public goBack(): void {
@@ -42,71 +47,93 @@ export class NavigationService {
   }
 
   public navigateToAuthor(): void {
-    this.router.navigate([APP_ROUTE.AUTHOR]);
+    void this.router.navigate([APP_ROUTE.AUTHOR]);
   }
 
   public navigateToAuthorByUsername(username: null | string): void {
-    this.router.navigate([APP_ROUTE.AUTHOR, username]);
+    void this.router.navigate([APP_ROUTE.AUTHOR, username]);
+  }
+
+  public navigateToCreationPost(): void {
+    void this.router.navigate([APP_ROUTE.POSTS, APP_PATH.PROCESS.toLowerCase(), APP_PATH.CREATION.toLowerCase()]);
   }
 
   public navigateToForbidden(): void {
-    this.router.navigate([APP_ROUTE.FORBIDDEN]);
+    void this.router.navigate([APP_ROUTE.FORBIDDEN]);
   }
 
   public navigateToHome(): void {
-    this.router.navigate([APP_ROUTE.HOME]);
+    void this.router.navigate([APP_ROUTE.HOME]);
   }
 
   public navigateToLogin(): void {
-    this.router.navigate([APP_ROUTE.LOGIN]);
+    void this.router.navigate([APP_ROUTE.LOGIN]);
   }
 
   public navigateToNotFound(): void {
-    this.router.navigate([APP_ROUTE.NOT_FOUND]);
+    void this.router.navigate([APP_ROUTE.NOT_FOUND]);
   }
 
   public navigateToPostAnalytics(postId: null | number): void {
-    this.router.navigate([APP_ROUTE.POSTS, postId, APP_PATH.ANALYTICS.toLowerCase()]);
+    void this.router.navigate([APP_ROUTE.POSTS, postId, APP_PATH.ANALYTICS.toLowerCase()]);
   }
 
   public navigateToPostBySlug(slug?: string): void {
-    this.router.navigate([APP_ROUTE.POSTS, slug]);
+    void this.router.navigate([APP_ROUTE.POSTS, slug]);
   }
 
   public navigateToPostHistory(postId: null | number): void {
     const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.HISTORY}`;
 
-    this.router.navigate([url]);
+    void this.router.navigate([url]);
   }
 
   public navigateToPostModeration(): void {
-    this.router.navigate([APP_ROUTE.POST_MODERATION]);
+    void this.router.navigate([APP_ROUTE.POST_MODERATION]);
   }
 
-  public navigateToPostModerationBySlug(slug?: string): void {
-    this.router.navigate([APP_ROUTE.POST_MODERATION, slug]);
+  public navigateToPostModerationById(id?: number): void {
+    void this.router.navigate([APP_ROUTE.POST_MODERATION, id]);
+  }
+
+  public navigateToPostReview(postId: number): void {
+    const url = `/${APP_PATH.MODERATOR.toLowerCase()}/${MODERATOR_PATH.POSTS.toLowerCase()}/${postId}/${MODERATOR_PATH.REVIEW.toLowerCase()}`;
+    void this.router.navigate([url]);
   }
 
   public navigateToPostVersionDiff(postId: number, from: number, to: number): void {
     const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.VERSION_DIFF}`;
-    this.router.navigate([url], { queryParams: { from, to } });
+    void this.router.navigate([url], { queryParams: { from, to } });
   }
 
   public navigateToPostVersions(postId: null | number): void {
     const url = `${APP_ROUTE.POSTS}/${postId}/${APP_ROUTE.VERSIONS}`;
-    this.router.navigate([url]);
+    void this.router.navigate([url]);
   }
 
   public navigateToProfile(): void {
-    this.router.navigate([APP_ROUTE.PROFILE]);
+    void this.router.navigate([APP_ROUTE.PROFILE]);
   }
 
   public navigateToProfileByUsername(username: null | string): void {
-    this.router.navigate([APP_ROUTE.PROFILE, username]);
+    void this.router.navigate([APP_ROUTE.PROFILE, username]);
+  }
+
+  public navigateToRegister(): void {
+    void this.router.navigate([APP_ROUTE.REGISTER]);
+  }
+
+  public navigateToUpdatePost(postId: null | number): void {
+    void this.router.navigate([APP_ROUTE.POSTS, APP_PATH.PROCESS.toLowerCase(), APP_PATH.UPDATE.toLowerCase(), postId]);
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public updateQueryParams(params: Params): void {
-    this.router.navigate([], {
+    void this.router.navigate([], {
       queryParams: params,
       queryParamsHandling: 'merge',
       relativeTo: this.activatedRoute,

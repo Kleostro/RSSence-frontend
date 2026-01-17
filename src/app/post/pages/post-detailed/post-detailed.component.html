@@ -9,9 +9,9 @@
     type="button"
     (click)="this.navigationService.goBack()"
     label="Back"
-    icon="pi pi-arrow-left"
+    icon="pi pi-chevron-left"
     severity="info"
-    outlined="true"
+    text="true"
   ></button>
 
   @if (post !== undefined) {
@@ -27,24 +27,27 @@
       </div>
     } @else {
       <div class="profile-not-found">
-        <p-message severity="warn" class="profile-not-found-message" icon="pi pi-exclamation-circle"
-          >You need to create a profile to write a comment.</p-message
-        >
-        <button
-          pButton
-          pRipple
-          type="button"
-          (click)="this.navigationService.navigateToProfile()"
-          label="Create profile"
-          class="create-profile-button"
-          icon="pi pi-arrow-right"
-          severity="info"
-          outlined="true"
-        ></button>
+        <span class="pi pi-exclamation-circle profile-not-found-icon"></span>
+        <span class="profile-not-found-message"> You need to create a profile to write a comment.</span>
+
+        <div class="profile-not-found-button-wrapper">
+          <button
+            pButton
+            pRipple
+            pTooltip="Create profile"
+            tooltipPosition="bottom"
+            type="button"
+            (click)="this.navigationService.navigateToProfile()"
+            class="profile-not-found-button"
+            icon="pi pi-chevron-right"
+            severity="info"
+            text="true"
+          ></button>
+        </div>
       </div>
     }
 
-    <div class="post-comment-list">
+    <div class="post-comments-list">
       <app-post-comments-list (pageChange)="this.handlePageChange($event)" />
     </div>
   }

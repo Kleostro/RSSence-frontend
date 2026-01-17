@@ -1,13 +1,12 @@
 .post-stats {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(min-content, 1fr));
+  gap: var(--offset-xs);
 
   width: 100%;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border: 0.1rem solid var(--p-surface-500);
-  border-radius: 0.5rem;
+  padding: var(--offset-xs);
+  border-radius: 0 0 var(--border-radius-m) var(--border-radius-m);
 
-  background-color: var(--p-surface-700);
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }

@@ -1,45 +1,98 @@
 .back-button {
   width: max-content;
-  margin-bottom: 1rem;
+  margin-bottom: var(--offset-ms);
+}
+
+.version-diff-wrapper {
+  padding: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
 }
 
 .diff-container {
-  border: 0.2rem solid var(--p-surface-600);
-  border-radius: 0.2rem;
-  background-color: var(--p-surface-900);
+  display: flex;
+  flex-direction: column;
+  gap: var(--offset-ms);
+
+  padding-bottom: var(--offset-ms);
+  border-radius: var(--border-radius-m);
+
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
 }
 
 .diff-header {
   display: flex;
+
+  padding: var(--offset-xs);
+  border-radius: var(--border-radius-m) var(--border-radius-m) 0 0;
+
+  background-color: var(--bg);
+  box-shadow: var(--shadow-s);
+}
+
+.diff-box {
+  display: flex;
+  flex-direction: column;
+  margin: 0 var(--offset-xs);
+  background-color: var(--bg);
+
+}
+
+.diff-box-header {
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--offset-xxs);
+  border-radius: var(--border-radius-m) var(--border-radius-m) 0 0;
+
+  background-color: var(--bg-light);
+  outline: none;
+  box-shadow: var(--shadow-s);
+
+  transition: background-color 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background-color: color-mix(in srgb, var(--bg-light) 20%, transparent);
+  }
 }
 
 .title-label {
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--p-text-color);
+  flex: 1;
+  font: var(--font-title-s);
+  color: var(--text-color-darked);
   text-align: center;
+}
 
-  background-color: var(--p-surface-800);
+.title-icon {
+  color: var(--text-color-muted);
+  transition: rotate 0.3s ease-in-out;
 }
 
 .version-label {
   flex: 1;
-
-  padding: 0.5rem;
-
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--p-text-color);
+  font: var(--font-title-s);
+  color: var(--text-color);
   text-align: center;
 }
 
 .diff-view {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-bottom: 1rem;
+
+  padding: var(--offset-xs);
+  border-radius: 0 0 var(--border-radius-m) var(--border-radius-m);
+
+
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-s);
+
 }
 
 .diff-left {
@@ -53,24 +106,20 @@
 .diff-line {
   display: flex;
   align-items: flex-start;
-
-  padding: 0.25rem 0.5rem;
-
-  color: var(--p-text-color);
-  word-wrap: break-word;
-  white-space: pre-wrap;
+  padding: calc(var(--offset-xxs) / 2);
+  border-radius: var(--border-radius-s);
 
   &.add {
-    background-color: color-mix(in srgb, var(--p-green-900) 40%, var(--p-surface-800) 60%);
+    background-color: color-mix(in srgb, var(--p-green-900) 40%, var(--bg-light) 60%);
 
     .line-index,
     .line-marker {
-      color: var(--p-green-500);
+      color: var(--p-green-600);
     }
   }
 
   &.remove {
-    background-color: color-mix(in srgb, var(--p-red-800) 30%, var(--p-surface-800) 70%);
+    background-color: color-mix(in srgb, var(--p-red-800) 30%, var(--bg-light) 70%);
 
     .line-index,
     .line-marker {
@@ -81,37 +130,35 @@
 
 .line-index {
   margin-right: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--p-text-muted-color);
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
 }
 
 .line-marker {
   margin-right: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--p-text-muted-color);
+  font: var(--font-text-xs);
+  color: var(--text-color-muted);
 }
 
 .line-content {
   flex: 1;
+  font: var(--font-text-s);
+  color: var(--text-color);
 
-  font-family: monospace;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  word-break: break-all;
-  white-space: break-spaces;
 
   .common {
-    color: var(--p-text-color);
+    color: var(--text-color);
   }
 
   .add {
+    color: var(--p-green-100);
     text-decoration: none;
-    background-color: color-mix(in srgb, var(--p-green-700) 60%, var(--p-surface-800) 40%);
+    background-color: color-mix(in srgb, var(--p-green-700) 60%, var(--bg-light) 40%);
   }
 
   .remove {
     color: var(--p-red-100);
     text-decoration: line-through;
-    background-color: color-mix(in srgb, var(--p-red-700) 60%, var(--p-surface-800) 40%);
+    background-color: color-mix(in srgb, var(--p-red-700) 60%, var(--bg-light) 40%);
   }
 }

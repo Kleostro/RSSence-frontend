@@ -1,37 +1,40 @@
+@use 'forms';
+
 :host {
   display: contents;
 }
 
+
 .form {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
+  @extend %form-base;
 
   &.disabled {
     pointer-events: none;
     opacity: 0.7;
   }
+
+  &-submit-button {
+    font: var(--font-text-xs);
+  }
+}
+
+.form-footer {
+  @extend %form-footer-base;
+}
+
+.control {
+  @extend %form-control-base;
 }
 
 .control-label {
-  display: flex;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
+  @extend %form-label-base;
 }
 
 ::ng-deep .p-inputtext {
-  width: 100%;
-  border: 0.1rem solid var(--p-surface-600);
-  color: var(--p-surface-300);
-  background: var(--p-surface-800);
+  @extend %form-input-base;
 }
 
 .control-textarea {
   resize: none;
-  height: 8rem;
-}
-
-.control-errors {
-  min-height: 1.5rem;
+  height: 10rem;
 }

@@ -1,14 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  EventEmitter,
-  inject,
-  Input,
-  OnInit,
-  Output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -18,13 +8,13 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { TextareaModule } from 'primeng/textarea';
-import { catchError, EMPTY, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, switchMap, tap } from 'rxjs';
 
 import { AuthorResponse, hasKeyInAuthorResponse } from '@/app/api/schemas/authors-response';
-import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
 import { AuthorsService } from '@/app/api/services/authors/authors.service';
 import { UsersService } from '@/app/api/services/users/users.service';
-import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/constants/author-form';
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
+import { AUTHOR_FORM_FIELD_CONFIG, FORM_CONTROL_NAME } from '@/app/constants/form/author-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { AuthorForm } from '@/app/interfaces/author-form';
 import { FileUploaderComponent } from '@/app/shared/components/file-uploader/file-uploader.component';
@@ -32,6 +22,8 @@ import { FormFieldErrorComponent } from '@/app/shared/components/form-field-erro
 import { FileHandlingService } from '@/app/shared/services/file-handling/file-handling.service';
 import { MessageService } from '@/app/shared/services/message/message.service';
 import { usernameAvailability } from '@/app/shared/validators/username-availability';
+
+const DEBOUNCE_TIME = 300;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,19 +52,19 @@ export class AuthorFormComponent implements OnInit {
   private readonly updatedAuthor = signal<AuthorResponse | null>(null);
   private readonly usersService = inject(UsersService);
 
-  @Input() public author: AuthorResponse | null = null;
-  @Output() public backToAuthorPageEvent = new EventEmitter<void>();
-  @Output() public formSubmitEvent = new EventEmitter<AuthorResponse>();
-  @Output() public updateAuthorForPreviewEvent = new EventEmitter<AuthorResponse | null>();
-
   public readonly AUTHOR_FORM_FIELD_CONFIG = AUTHOR_FORM_FIELD_CONFIG;
   public readonly navigationService = inject(NavigationService);
-
+  public author = input<AuthorResponse | null>(null);
   public avatarUrl = signal<null | string>(null);
+
+  public backToAuthorPageEvent = output();
   public form!: FormGroup<AuthorForm>;
+
+  public formSubmitEvent = output<AuthorResponse>();
   public hasChanges = signal<boolean>(false);
   public isProcessing = signal<boolean>(false);
   public isUsernameAvailable = signal<boolean | null>(null);
+  public updateAuthorForPreviewEvent = output<AuthorResponse | null>();
 
   private createFormData(): FormData {
     const formData = new FormData();
@@ -106,14 +98,14 @@ export class AuthorFormComponent implements OnInit {
     const invalidControl = Object.keys(this.form.controls).find((controlName) => this.form.get(controlName)?.invalid);
     if (invalidControl) {
       const element = document.querySelector(`[formControlName="${invalidControl}"]`);
-      if (element instanceof HTMLInputElement) {
+      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
         element.focus();
       }
     }
   }
 
   private handleFormSubmit(formData: FormData): void {
-    const action$ = this.author
+    const action$ = this.author()
       ? this.authorsService.updateAuthor(formData)
       : this.authorsService.createAuthor(formData);
 
@@ -124,10 +116,9 @@ export class AuthorFormComponent implements OnInit {
           this.formSubmitEvent.emit(newOrUpdatedAuthor);
         }),
         switchMap(() => this.usersService.getMe()),
-        catchError((error: OverriddenHttpErrorResponse) => {
-          this.message.error(error.error.message);
+        handleHttpError(this.message),
+        finalize(() => {
           this.enableForm();
-          return EMPTY;
         }),
       )
       .subscribe();
@@ -159,64 +150,66 @@ export class AuthorFormComponent implements OnInit {
           Validators.minLength(this.AUTHOR_FORM_FIELD_CONFIG.username.min),
           Validators.maxLength(this.AUTHOR_FORM_FIELD_CONFIG.username.max),
         ],
-        [usernameAvailability(this.authorsService, this.author?.username ?? null)],
+        [usernameAvailability(this.authorsService, this.author()?.username ?? null)],
       ],
     });
   }
 
   private isValueChanged(key: string, value: string): boolean {
     if (hasKeyInAuthorResponse(key)) {
-      const { author } = this;
+      const author = this.author();
       if (!author) {
         return true;
       }
 
-      return author[key] !== value;
+      return author[key] !== value.trim();
     }
     return false;
   }
 
-  private updateAuthorForPreview(): void {
+  private updateAuthorForPreview(author: AuthorResponse | null): void {
     const { bio, firstname, lastname, username } = this.form.getRawValue();
+
     this.updatedAuthor.set({
-      avatarUrl: this.avatarUrl() ?? this.author?.avatarUrl ?? null,
+      avatarUrl: this.avatarUrl() ?? author?.avatarUrl ?? null,
       bio,
-      createdAt: this.author?.createdAt ?? '',
+      createdAt: author?.createdAt ?? '',
       firstname,
-      id: this.author?.id ?? 0,
+      id: author?.id ?? 0,
       lastname,
-      updatedAt: this.author?.updatedAt ?? '',
-      userId: this.author?.userId ?? 0,
+      updatedAt: author?.updatedAt ?? '',
+      userId: author?.userId ?? 0,
       username,
     });
+
     this.updateAuthorForPreviewEvent.emit(this.updatedAuthor());
   }
 
   public ngOnInit(): void {
-    this.initForm(this.author);
+    const author = this.author();
+    this.initForm(author);
 
-    if (this.author) {
-      this.avatarUrl.set(this.author.avatarUrl);
-      this.updatedAuthor.set(this.author);
+    if (author) {
+      this.avatarUrl.set(author.avatarUrl);
+      this.updatedAuthor.set(author);
     }
 
-    this.form.valueChanges.subscribe(() => {
-      this.updateAuthorForPreview();
-    });
+    this.form.valueChanges
+      .pipe(debounceTime(DEBOUNCE_TIME), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.updateAuthorForPreview(author);
+      });
   }
 
   public onAvatarSelected(files: File[]): void {
     this.avatarFile.set(files[0]);
     this.hasChanges.set(true);
 
-    if (!files[0]) {
-      this.avatarUrl.set(null);
-      this.updateAuthorForPreview();
-      return;
+    const author = this.author();
+    if (files[0]) {
+      this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
+      this.updateAuthorForPreview(author);
     }
-
-    this.avatarUrl.set(this.fileHandlingService.createObjectURL(files[0]));
-    this.updateAuthorForPreview();
   }
 
   public submit(): void {
@@ -228,7 +221,7 @@ export class AuthorFormComponent implements OnInit {
 
     this.disableForm();
     const formData = this.createFormData();
-    if (this.author && !this.hasChanges()) {
+    if (this.author() && !this.hasChanges()) {
       this.backToAuthorPageEvent.emit();
       return;
     }

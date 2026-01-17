@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+  TemplateRef,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { PaginatorState } from 'primeng/paginator';
 import { RippleModule } from 'primeng/ripple';
-import { forkJoin, map, Observable, switchMap, tap } from 'rxjs';
+import { finalize, forkJoin, map, Observable, switchMap, tap } from 'rxjs';
 
 import { AuthorContributions } from '@/app/api/interfaces/author/author-contributions';
 import { PaginationQueryDto } from '@/app/api/interfaces/pagination-query';
@@ -18,13 +27,16 @@ import { PostsService } from '@/app/api/services/posts/posts.service';
 import { UsersService } from '@/app/api/services/users/users.service';
 import { AuthorFormWrapperComponent } from '@/app/author/components/author-form-wrapper/author-form-wrapper.component';
 import { AuthorInfoComponent } from '@/app/author/components/author-info/author-info.component';
-import { FORM_STATE } from '@/app/constants/author-form';
+import { FORM_STATE } from '@/app/constants/form/author-form';
+import { FormState } from '@/app/constants/form/profile-form';
 import { getNavigationAuthorPage } from '@/app/constants/navigation-author-page';
-import { FormState } from '@/app/constants/profile-form';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { PostComponent } from '@/app/post/components/post/post.component';
 import { PostsListComponent } from '@/app/post/components/posts-list/posts-list.component';
 import { PostsSettingsComponent } from '@/app/post/components/posts-settings/posts-settings.component';
+import { ConfirmComponent } from '@/app/shared/components/confirm/confirm.component';
+import { StickyStateDirective } from '@/app/shared/directives/sticky-state/sticky-state.directive';
+import { ModalService } from '@/app/shared/services/modal/modal.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,7 +47,9 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
     ButtonModule,
     PostComponent,
     RippleModule,
+    StickyStateDirective,
     PostsListComponent,
+    ConfirmComponent,
   ],
   selector: 'app-me-author',
   styleUrl: './me-author.component.scss',
@@ -44,6 +58,7 @@ import { PostsSettingsComponent } from '@/app/post/components/posts-settings/pos
 export class MeAuthorComponent implements OnInit {
   private readonly authorsService = inject(AuthorsService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly modalService = inject(ModalService);
   private readonly postsService = inject(PostsService);
   private readonly route = inject(ActivatedRoute);
   private readonly usersService = inject(UsersService);
@@ -52,6 +67,8 @@ export class MeAuthorComponent implements OnInit {
   public authorFormState = signal<FormState>(FORM_STATE.CREATE);
   public contributionStats = signal<AuthorContributions[]>([]);
   public currentAuthor = signal<AuthorResponse | null>(null);
+  public deleteAuthorConfirm = viewChild.required<TemplateRef<HTMLDivElement>>('deleteAuthorConfirm');
+  public isProcessing = signal<boolean>(false);
   public navigationItems = getNavigationAuthorPage(
     () => {
       this.navigationService.navigateToProfile();
@@ -60,13 +77,15 @@ export class MeAuthorComponent implements OnInit {
       this.authorFormState.set(FORM_STATE.UPDATE);
     },
     () => {
-      this.deleteAuthor();
+      this.modalService.openModal(this.deleteAuthorConfirm(), 'Deleting an author');
+      this.modalService.contentWidth.set('50%');
     },
   );
-
   public paginatedPostResponse = signal<null | PaginatedPostResponse>(null);
   public paginatedPostResponseOnTab = signal<null | PaginatedPostResponse>(null);
+  public postsSettingsRef = viewChild.required<PostsSettingsComponent>('postsSettings');
   public postStatuses = signal<PostStatuses[]>([]);
+
   public previewAuthor = signal<AuthorResponse | null>(null);
 
   private loadAuthorContributionStats(username: string, query?: PaginationQueryDto): Observable<AuthorContributions[]> {
@@ -126,17 +145,23 @@ export class MeAuthorComponent implements OnInit {
       return;
     }
 
+    this.isProcessing.set(true);
     this.authorsService
       .deleteAuthor(username)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         switchMap(() => this.usersService.getMe()),
+        finalize(() => {
+          this.isProcessing.set(false);
+        }),
+        map(() => {
+          this.currentAuthor.set(null);
+          this.previewAuthor.set(null);
+          this.paginatedPostResponse.set(null);
+          this.modalService.closeModal();
+        }),
       )
-      .subscribe(() => {
-        this.currentAuthor.set(null);
-        this.previewAuthor.set(null);
-        this.paginatedPostResponse.set(null);
-      });
+      .subscribe();
   }
 
   public handleAuthorFormSubmit(newOrUpdatedAuthor: AuthorResponse): void {
@@ -197,5 +222,11 @@ export class MeAuthorComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  public togglePostsSettings(event: MouseEvent): void {
+    event.stopPropagation();
+    const ref = this.postsSettingsRef();
+    ref.isOpen.set(!ref.isOpen());
   }
 }

@@ -1,67 +1,103 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DividerModule } from 'primeng/divider';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { RippleModule } from 'primeng/ripple';
 import { finalize } from 'rxjs';
 
+import { handleHttpError } from '@/app/api/utils/handle-http-error';
 import { AuthService } from '@/app/auth/services/auth/auth.service';
+import { LOGIN_FORM_FIELD_CONFIG } from '@/app/constants/form/login-form';
+import { NavigationService } from '@/app/core/services/navigation/navigation.service';
 import { APP_ROUTE } from '@/app/core/services/navigation/routes';
+import { LoginForm } from '@/app/interfaces/login-form';
+import { FormFieldErrorComponent } from '@/app/shared/components/form-field-error/form-field-error.component';
+import { MessageService } from '@/app/shared/services/message/message.service';
 import { trimData } from '@/app/utils/trim-data';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    ReactiveFormsModule,
-    FloatLabelModule,
-    InputTextModule,
-    ButtonModule,
-    PasswordModule,
-    RouterLink,
-    IconField,
-    InputIcon,
-    DividerModule,
-  ],
+  imports: [ReactiveFormsModule, InputTextModule, ButtonModule, RippleModule, PasswordModule, FormFieldErrorComponent],
   selector: 'app-login-form',
   styleUrl: './login-form.component.scss',
   templateUrl: './login-form.component.html',
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly message = inject(MessageService);
 
+  public readonly navigationService = inject(NavigationService);
   public APP_ROUTE = APP_ROUTE;
-  public isLoginInProgress = signal(false);
+  public form!: FormGroup<LoginForm>;
+  public isProcessing = signal(false);
 
+  public LOGIN_FORM_FIELD_CONFIG = LOGIN_FORM_FIELD_CONFIG;
   public loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.email, Validators.required]],
     password: ['', [Validators.required]],
   });
 
-  public onSubmit(): void {
-    this.loginForm.markAllAsTouched();
+  private createFormData(): { email: string; password: string } {
+    const { email, password } = trimData(this.form.getRawValue());
 
-    if (!this.loginForm.valid) {
-      return;
-    }
+    return { email, password };
+  }
 
-    this.isLoginInProgress.set(true);
+  private disableForm(): void {
+    this.isProcessing.set(true);
+    this.form.disable();
+  }
 
-    const { email, password } = trimData(this.loginForm.getRawValue());
+  private enableForm(): void {
+    this.isProcessing.set(false);
+    this.form.enable();
+  }
 
+  private handleFormSubmit(formData: { email: string; password: string }): void {
     this.authService
-      .login({ email, password })
+      .login(formData)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        handleHttpError(this.message),
         finalize(() => {
-          this.isLoginInProgress.set(false);
+          this.enableForm();
         }),
       )
       .subscribe();
+  }
+
+  private initForm(): void {
+    this.form = this.fb.nonNullable.group({
+      email: ['', [Validators.required.bind(this), Validators.email.bind(this)]],
+      password: [
+        '',
+        [
+          Validators.required.bind(this),
+          Validators.minLength(this.LOGIN_FORM_FIELD_CONFIG.password.min),
+          Validators.maxLength(this.LOGIN_FORM_FIELD_CONFIG.password.max),
+        ],
+      ],
+    });
+  }
+
+  public ngOnInit(): void {
+    this.initForm();
+  }
+
+  public onSubmit(): void {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      return;
+    }
+
+    this.disableForm();
+    const formData = this.createFormData();
+    this.handleFormSubmit(formData);
   }
 }

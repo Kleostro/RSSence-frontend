@@ -1,0 +1,25 @@
+.app {
+  display: flex;
+  height: 100vh;
+  transition: all 0.2s ease;
+}
+
+.app-content {
+  overflow: auto;
+  flex: 1;
+  height: 100%;
+
+  &-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0 auto;
+  }
+}
+
+
+.app-page-wrapper {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 2rem;
+}

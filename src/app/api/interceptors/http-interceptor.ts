@@ -5,6 +5,7 @@ import { WA_LOCAL_STORAGE } from '@ng-web-apis/common';
 import { catchError, finalize, throwError } from 'rxjs';
 
 import { OverriddenHttpErrorResponse } from '@/app/api/schemas/overriden-http-error-response';
+import { addAuthHeader } from '@/app/api/utils/add-auth-header';
 import { STORE_KEYS } from '@/app/constants/store-keys';
 import { LoaderService } from '@/app/core/services/loader/loader.service';
 import { NavigationService } from '@/app/core/services/navigation/navigation.service';
@@ -19,6 +20,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const accessToken = ls.getItem(STORE_KEYS.ACCESS_TOKEN);
 
   loaderService.turnOn();
+
   if (!req.url.startsWith(ENVIRONMENT.API_URL)) {
     return next(req).pipe(
       finalize(() => {
@@ -28,17 +30,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
     );
   }
 
-  let modifiedReq = req.clone({
-    withCredentials: true,
-  });
-
-  if (accessToken) {
-    modifiedReq = modifiedReq.clone({
-      setHeaders: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-  }
+  const modifiedReq = addAuthHeader(req, accessToken);
 
   return next(modifiedReq).pipe(
     finalize(() => {
@@ -47,10 +39,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: OverriddenHttpErrorResponse) => {
       if (error.error.statusCode === FORBIDDEN_STATUS_CODE) {
         navigationService.navigateToForbidden();
-
-        return throwError(() => error);
       }
-
       return throwError(() => error);
     }),
   );

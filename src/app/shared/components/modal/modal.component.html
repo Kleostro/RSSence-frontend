@@ -1,8 +1,8 @@
 <div
   class="modal"
   [class]="this.modalService.isModalShow() ? 'show' : ''"
-  (click)="outsideClick($event)"
-  (keydown)="onKeydown($event)"
+  (click)="this.outsideClick($event)"
+  (keydown)="this.onKeydown($event)"
   tabindex="0"
 >
   <div
@@ -21,7 +21,7 @@
           [outlined]="true"
           [text]="true"
           severity="danger"
-          (click)="modalService.closeModal()"
+          (click)="this.modalService.closeModal()"
         />
       </div>
       <div class="modal-body">

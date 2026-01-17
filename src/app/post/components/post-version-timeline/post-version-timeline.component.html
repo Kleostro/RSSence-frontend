@@ -36,39 +36,40 @@
     >
       <span class="version-number">Version {{ version.version }}</span>
 
+      @if (!version.isCurrent && this.currentPost()?.status === 'APPROVED') {
+        <div class="version-actions">
+          <button
+            pButton
+            pRipple
+            class="version-revert-button"
+            type="button"
+            (click)="this.revertVersion.emit(version)"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
+            [disabled]="isProcessing()"
+            pTooltip="Revert"
+            tooltipPosition="bottom"
+            severity="success"
+            text="true"
+          ></button>
+
+          <button
+            pButton
+            pRipple
+            class="version-delete-button"
+            type="button"
+            (click)="this.deleteVersion.emit(version)"
+            [disabled]="isProcessing()"
+            [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
+            pTooltip="Delete"
+            tooltipPosition="bottom"
+            severity="danger"
+            text="true"
+          ></button>
+        </div>
+      }
       <div class="version-status" [class]="version.isCurrent ? 'current' : 'archived'">
         {{ version.isCurrent ? 'Current' : 'Archived' }}
       </div>
-
-      @if (!version.isCurrent) {
-        <button
-          pButton
-          pRipple
-          class="version-revert-button"
-          type="button"
-          (click)="this.revertVersion.emit(version)"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
-          [disabled]="isProcessing()"
-          pTooltip="Revert"
-          tooltipPosition="bottom"
-          severity="success"
-          outlined="true"
-        ></button>
-
-        <button
-          pButton
-          pRipple
-          class="version-delete-button"
-          type="button"
-          (click)="this.deleteVersion.emit(version)"
-          [disabled]="isProcessing()"
-          [icon]="isProcessing() ? 'pi pi-spin pi-spinner' : 'pi pi-eraser'"
-          pTooltip="Delete"
-          tooltipPosition="bottom"
-          severity="danger"
-          outlined="true"
-        ></button>
-      }
     </div>
   </ng-template>
 </p-timeline>

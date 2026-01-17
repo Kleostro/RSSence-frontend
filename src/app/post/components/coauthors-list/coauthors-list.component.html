@@ -1,9 +1,9 @@
 @let coauthors = this.coauthors();
 
-<span class="coauthors-label">coauthors:</span>
 <p-avatar-group class="coauthors-avatar-group">
   @for (coauthor of coauthors; track $index) {
     <p-avatar
+      [@coauthorCollapse]
       class="coauthors-avatar"
       *ngIf="!this.isShortCoauthors() || $index < 3"
       [pTooltip]="coauthor.username"
@@ -21,9 +21,9 @@
     [label]="this.isShortCoauthors() ? '+' + (coauthors.length - 3) : ''"
     [icon]="this.isShortCoauthors() ? 'pi pi-users' : 'pi pi-ellipsis-h'"
     [style]="{
-      'background-color': 'var(--p-primary-color)',
-      color: 'var(--p-surface-800)',
-      'font-size': '0.9rem',
+      'background-color': 'var(--p-primary-400)',
+      color: 'var(--p-primary-contrast-color)',
+      'font-size': '0.8rem',
     }"
     shape="circle"
     size="normal"
